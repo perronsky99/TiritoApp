@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
 import { ChatService } from '../../core/services/chat.service';
-import { User } from '../../core/models';
+import { User } from '../../core/models/user.model';
 
 /**
  * Layout principal de la aplicación
