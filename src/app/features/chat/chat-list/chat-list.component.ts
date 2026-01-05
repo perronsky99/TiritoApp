@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChatService } from '../../../core/services/chat.service';
-import { Chat } from '../../../core/models';
+import { ChatService, IChat } from '../../../core/services/chat.service';
 
 /**
  * Lista de chats del usuario
@@ -13,7 +12,7 @@ import { Chat } from '../../../core/models';
   styleUrls: ['./chat-list.component.scss']
 })
 export class ChatListComponent implements OnInit {
-  chats: Chat[] = [];
+  chats: IChat[] = [];
   loading = true;
   error: string | null = null;
 
@@ -30,9 +29,9 @@ export class ChatListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.chatService.getChats().subscribe({
-      next: (chats) => {
-        this.chats = chats;
+    this.chatService.getMyChats().subscribe({
+      next: (response) => {
+        this.chats = response.chats;
         this.loading = false;
       },
       error: () => {
@@ -42,13 +41,14 @@ export class ChatListComponent implements OnInit {
     });
   }
 
-  openChat(chat: Chat): void {
-    this.router.navigate(['/chat', chat.id]);
+  openChat(chat: IChat): void {
+    // Navegar usando el tiritoId ya que así funciona el backend v1.0
+    this.router.navigate(['/chat', chat.tiritoId]);
   }
 
-  getOtherParticipant(chat: Chat): string {
-    // Simplemente devolvemos el primer participante que no somos nosotros
-    // Esto se maneja mejor con el currentUser, pero por ahora simplificamos
-    return chat.participants[0]?.userName || 'Usuario';
+  getOtherParticipant(chat: IChat): string {
+    // participants viene populado con { _id, name, email }
+    const participant = chat.participants[0];
+    return participant?.name || 'Usuario';
   }
 }

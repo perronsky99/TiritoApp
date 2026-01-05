@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { TiritosService } from '../../../core/services/tiritos.service';
-import { ChatService } from '../../../core/services/chat.service';
+import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
 import { Tirito } from '../../../core/models';
@@ -75,6 +75,7 @@ export class TiritoDetailComponent implements OnInit {
 
   /**
    * Inicia contacto con el creador del tirito
+   * Backend v1.0: Enviar mensaje crea el chat automáticamente
    */
   contact(): void {
     if (!this.authService.isLoggedIn) {
@@ -86,29 +87,21 @@ export class TiritoDetailComponent implements OnInit {
 
     if (!this.tirito) return;
 
-    // Verificar si ya existe un chat
-    this.chatService.findChatByTirito(this.tirito.id).subscribe({
-      next: (existingChat) => {
-        if (existingChat) {
-          this.router.navigate(['/chat', existingChat.id]);
-        } else {
-          // Crear nuevo chat
-          this.chatService.createChat({
-            tiritoId: this.tirito!.id,
-            message: `Hola! Me interesa tu tirito "${this.tirito!.title}"`
-          }).subscribe({
-            next: (chat) => {
-              this.analyticsService.trackChatStarted(chat.id, this.tirito!.id);
-              this.analyticsService.trackContactInitiated(this.tirito!.id);
-              this.router.navigate(['/chat', chat.id]);
-            },
-            error: () => {
-              this.snackBar.open('No pudimos iniciar el chat', 'Cerrar', {
-                duration: 3000
-              });
-            }
-          });
-        }
+    // Enviar primer mensaje - el backend crea el chat automáticamente
+    const initialMessage = `Hola! Me interesa tu tirito "${this.tirito.title}"`;
+    
+    this.chatService.sendMessage(this.tirito.id, initialMessage).subscribe({
+      next: (response) => {
+        // Backend devuelve { message: string, data: IMessage } donde data.chatId tiene el ID del chat
+        this.analyticsService.trackChatStarted(response.data.chatId, this.tirito!.id);
+        this.analyticsService.trackContactInitiated(this.tirito!.id);
+        // Navegar al chat usando el tiritoId
+        this.router.navigate(['/chat', this.tirito!.id]);
+      },
+      error: () => {
+        this.snackBar.open('No pudimos iniciar el chat', 'Cerrar', {
+          duration: 3000
+        });
       }
     });
   }

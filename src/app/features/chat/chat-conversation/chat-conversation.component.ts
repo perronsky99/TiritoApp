@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ChatService } from '../../../core/services/chat.service';
+import { ChatService, IChat, IMessage } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Chat, ChatMessage } from '../../../core/models';
 
 /**
  * Conversación de chat
- * Ruta: /chat/:id
+ * Ruta: /chat/:id (donde :id es el tiritoId)
  * Requiere login
+ * 
+ * Backend v1.0: Los mensajes vienen incluidos al obtener el chat
  */
 @Component({
   selector: 'app-chat-conversation',
@@ -17,20 +18,15 @@ import { Chat, ChatMessage } from '../../../core/models';
 export class ChatConversationComponent implements OnInit, AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
   
-  chat: Chat | null = null;
-  messages: ChatMessage[] = [];
+  chat: IChat | null = null;
+  messages: IMessage[] = [];
   loading = true;
   error: string | null = null;
+  tiritoId: string = '';
   
   // Nuevo mensaje
   newMessage = '';
   sending = false;
-  selectedImage: File | null = null;
-  
-  // Paginación
-  loadingMore = false;
-  hasMore = false;
-  page = 1;
   
   // Auto scroll
   private shouldScroll = true;
@@ -43,9 +39,11 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadChat(id);
+    // El parámetro :id ahora representa el tiritoId
+    const tiritoId = this.route.snapshot.paramMap.get('id');
+    if (tiritoId) {
+      this.tiritoId = tiritoId;
+      this.loadChat(tiritoId);
     }
   }
 
@@ -55,16 +53,17 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  loadChat(id: string): void {
+  loadChat(tiritoId: string): void {
     this.loading = true;
     this.error = null;
 
-    this.chatService.getChatById(id).subscribe({
-      next: (chat) => {
-        this.chat = chat;
-        this.loadMessages();
-        // Marcar como leído
-        this.chatService.markAsRead(id).subscribe();
+    this.chatService.getChat(tiritoId).subscribe({
+      next: (response) => {
+        this.chat = response.chat;
+        // Backend v1.0: mensajes vienen en respuesta separada
+        this.messages = response.messages || [];
+        this.loading = false;
+        this.shouldScroll = true;
       },
       error: (err) => {
         if (err.status === 404) {
@@ -77,53 +76,17 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  loadMessages(loadMore = false): void {
-    if (!this.chat) return;
-
-    if (loadMore) {
-      this.loadingMore = true;
-      this.page++;
-      this.shouldScroll = false;
-    }
-
-    this.chatService.getMessages(this.chat.id, this.page).subscribe({
-      next: (response) => {
-        if (loadMore) {
-          this.messages = [...response.messages.reverse(), ...this.messages];
-        } else {
-          this.messages = response.messages.reverse();
-        }
-        this.hasMore = response.hasMore;
-        this.loading = false;
-        this.loadingMore = false;
-        
-        if (!loadMore) {
-          this.shouldScroll = true;
-        }
-      },
-      error: () => {
-        this.error = 'No pudimos cargar los mensajes';
-        this.loading = false;
-        this.loadingMore = false;
-      }
-    });
-  }
-
   sendMessage(): void {
-    if (!this.chat || (!this.newMessage.trim() && !this.selectedImage)) return;
+    if (!this.tiritoId || !this.newMessage.trim()) return;
 
     this.sending = true;
     this.shouldScroll = true;
 
-    this.chatService.sendMessage({
-      chatId: this.chat.id,
-      content: this.newMessage.trim(),
-      image: this.selectedImage || undefined
-    }).subscribe({
-      next: (message) => {
-        this.messages.push(message);
+    this.chatService.sendMessage(this.tiritoId, this.newMessage.trim()).subscribe({
+      next: (response) => {
+        // Backend devuelve { message: string, data: IMessage }
+        this.messages.push(response.data);
         this.newMessage = '';
-        this.selectedImage = null;
         this.sending = false;
       },
       error: () => {
@@ -132,31 +95,22 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  onImageSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.selectedImage = input.files[0];
-    }
-  }
-
-  removeSelectedImage(): void {
-    this.selectedImage = null;
-  }
-
-  isOwnMessage(message: ChatMessage): boolean {
-    return message.senderId === this.authService.currentUser?.id;
+  isOwnMessage(message: IMessage): boolean {
+    // El sender viene populado con { _id, name, email }
+    const senderId = typeof message.sender === 'object' ? message.sender._id : message.sender;
+    return senderId === this.authService.currentUser?.id;
   }
 
   getOtherParticipantName(): string {
     if (!this.chat) return '';
     const currentUserId = this.authService.currentUser?.id;
-    const other = this.chat.participants.find(p => p.userId !== currentUserId);
+    const other = this.chat.participants.find(p => p.odI !== currentUserId);
     return other?.userName || 'Usuario';
   }
 
   goToTirito(): void {
-    if (this.chat) {
-      this.router.navigate(['/tiritos', this.chat.tiritoId]);
+    if (this.tiritoId) {
+      this.router.navigate(['/tiritos', this.tiritoId]);
     }
   }
 
