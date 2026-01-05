@@ -1,0 +1,113 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>¿Necesitás una mano?</h1>
+      <p class="subtitle">
+        Publicá lo que necesitás y conectá con alguien que puede ayudarte. 
+        Sin vueltas, sin CVs, sin procesos.
+      </p>
+      <div class="hero-actions">
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="goToCreateTirito()">
+          <mat-icon>add</mat-icon>
+          Publicar un tirito
+        </button>
+        <button 
+          mat-stroked-button
+          (click)="goToTiritos()">
+          Ver tiritos disponibles
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how-it-works">
+    <h2>¿Cómo funciona?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">
+          <mat-icon>edit</mat-icon>
+        </div>
+        <h3>1. Publicá</h3>
+        <p>Contá qué necesitás resolver. Puede ser cualquier cosa puntual.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <mat-icon>chat</mat-icon>
+        </div>
+        <h3>2. Conectá</h3>
+        <p>Alguien interesado te contacta y coordinan por chat.</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <h3>3. Listo</h3>
+        <p>Se resuelve el tirito y cerrás la publicación.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Tiritos -->
+  <section class="recent-tiritos">
+    <div class="section-header">
+      <h2>Tiritos recientes</h2>
+      <button mat-button color="primary" (click)="goToTiritos()">
+        Ver todos
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+
+    <app-loading-spinner 
+      *ngIf="loading"
+      [message]="'Cargando tiritos...'">
+    </app-loading-spinner>
+
+    <app-error-state 
+      *ngIf="error && !loading"
+      [message]="error"
+      (retry)="loadRecentTiritos()">
+    </app-error-state>
+
+    <div class="tiritos-grid" *ngIf="!loading && !error">
+      <mat-card 
+        *ngFor="let tirito of recentTiritos"
+        class="tirito-card"
+        (click)="goToTirito(tirito)">
+        <mat-card-header>
+          <div mat-card-avatar class="tirito-avatar">
+            {{ tirito.creatorName.charAt(0).toUpperCase() }}
+          </div>
+          <mat-card-title>{{ tirito.title | truncate:40 }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ tirito.description | truncate:100 }}</p>
+          <div class="tirito-meta">
+            <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+            <span class="location" *ngIf="tirito.location">
+              <mat-icon>location_on</mat-icon>
+              {{ tirito.location }}
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <app-empty-state 
+      *ngIf="!loading && !error && recentTiritos.length === 0"
+      icon="inbox"
+      title="No hay tiritos todavía"
+      message="¡Sé el primero en publicar uno!">
+      <button mat-raised-button color="primary" (click)="goToCreateTirito()">
+        Publicar tirito
+      </button>
+    </app-empty-state>
+  </section>
+</div>

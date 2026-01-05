@@ -1,0 +1,83 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+// Sidenav
+mat-sidenav {
+  width: 280px;
+}
+
+.sidenav-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+  }
+}
+
+// Toolbar
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.menu-btn {
+  display: none;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-right: 2rem;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+
+  a {
+    color: white;
+  }
+
+  button mat-icon {
+    margin-right: 4px;
+  }
+}
+
+.user-btn,
+.login-btn {
+  color: white;
+}
+
+// Main content
+.main-content {
+  min-height: calc(100vh - 64px);
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .menu-btn {
+    display: block;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .logo {
+    margin-right: 0;
+  }
+}

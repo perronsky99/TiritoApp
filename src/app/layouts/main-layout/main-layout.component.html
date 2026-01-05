@@ -1,0 +1,127 @@
+<mat-sidenav-container class="sidenav-container">
+  <!-- Sidenav (Mobile) -->
+  <mat-sidenav 
+    #sidenav
+    mode="over"
+    [opened]="isSidenavOpen"
+    (closed)="closeSidenav()">
+    
+    <div class="sidenav-header">
+      <span class="logo" (click)="goToHome()">Tirito</span>
+    </div>
+
+    <mat-nav-list>
+      <a mat-list-item (click)="goToHome()">
+        <mat-icon matListItemIcon>home</mat-icon>
+        <span matListItemTitle>Inicio</span>
+      </a>
+      
+      <a mat-list-item (click)="goToTiritos()">
+        <mat-icon matListItemIcon>list</mat-icon>
+        <span matListItemTitle>Ver tiritos</span>
+      </a>
+      
+      <a mat-list-item (click)="goToCreateTirito()">
+        <mat-icon matListItemIcon>add_circle</mat-icon>
+        <span matListItemTitle>Publicar tirito</span>
+      </a>
+
+      <ng-container *ngIf="authService.isLoggedIn">
+        <mat-divider></mat-divider>
+        
+        <a mat-list-item (click)="goToChat()">
+          <mat-icon matListItemIcon [matBadge]="(unreadCount$ | async) || null" matBadgeColor="accent">
+            chat
+          </mat-icon>
+          <span matListItemTitle>Mis chats</span>
+        </a>
+        
+        <a mat-list-item (click)="goToProfile()">
+          <mat-icon matListItemIcon>person</mat-icon>
+          <span matListItemTitle>Mi perfil</span>
+        </a>
+        
+        <mat-divider></mat-divider>
+        
+        <a mat-list-item (click)="logout()">
+          <mat-icon matListItemIcon>logout</mat-icon>
+          <span matListItemTitle>Cerrar sesión</span>
+        </a>
+      </ng-container>
+
+      <ng-container *ngIf="!authService.isLoggedIn">
+        <mat-divider></mat-divider>
+        
+        <a mat-list-item (click)="goToLogin()">
+          <mat-icon matListItemIcon>login</mat-icon>
+          <span matListItemTitle>Iniciar sesión</span>
+        </a>
+      </ng-container>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <!-- Main Content -->
+  <mat-sidenav-content>
+    <!-- Toolbar -->
+    <mat-toolbar color="primary" class="toolbar">
+      <button mat-icon-button (click)="toggleSidenav()" class="menu-btn">
+        <mat-icon>menu</mat-icon>
+      </button>
+      
+      <span class="logo" (click)="goToHome()">Tirito</span>
+
+      <span class="spacer"></span>
+
+      <!-- Desktop nav -->
+      <nav class="desktop-nav">
+        <a mat-button (click)="goToTiritos()">Tiritos</a>
+        <button 
+          mat-raised-button 
+          color="accent"
+          (click)="goToCreateTirito()">
+          <mat-icon>add</mat-icon>
+          Publicar
+        </button>
+      </nav>
+
+      <!-- User menu -->
+      <ng-container *ngIf="authService.isLoggedIn; else loginBtn">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-btn">
+          <mat-icon [matBadge]="(unreadCount$ | async) || null" matBadgeColor="warn">
+            account_circle
+          </mat-icon>
+        </button>
+        
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="goToChat()">
+            <mat-icon>chat</mat-icon>
+            <span>Mis chats</span>
+          </button>
+          <button mat-menu-item (click)="goToProfile()">
+            <mat-icon>person</mat-icon>
+            <span>Mi perfil</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar sesión</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+      
+      <ng-template #loginBtn>
+        <button 
+          mat-button 
+          (click)="goToLogin()"
+          class="login-btn">
+          Ingresar
+        </button>
+      </ng-template>
+    </mat-toolbar>
+
+    <!-- Page content -->
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

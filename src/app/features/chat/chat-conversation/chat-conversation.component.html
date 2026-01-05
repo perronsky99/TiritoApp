@@ -1,0 +1,101 @@
+<div class="chat-conversation-container">
+  <!-- Header -->
+  <div class="chat-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    
+    <div class="header-info" *ngIf="chat">
+      <span class="participant-name">{{ getOtherParticipantName() }}</span>
+      <span class="tirito-link" (click)="goToTirito()">
+        {{ chat.tiritoTitle | truncate:30 }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <app-loading-spinner 
+    *ngIf="loading"
+    [message]="'Cargando conversación...'">
+  </app-loading-spinner>
+
+  <!-- Error -->
+  <app-error-state 
+    *ngIf="error && !loading"
+    [message]="error"
+    [showRetry]="false">
+  </app-error-state>
+
+  <!-- Messages -->
+  <div 
+    class="messages-container" 
+    #messagesContainer
+    *ngIf="!loading && !error && chat">
+    
+    <!-- Load more -->
+    <div class="load-more" *ngIf="hasMore">
+      <button 
+        mat-button 
+        (click)="loadMessages(true)"
+        [disabled]="loadingMore">
+        {{ loadingMore ? 'Cargando...' : 'Ver mensajes anteriores' }}
+      </button>
+    </div>
+
+    <!-- Messages list -->
+    <div 
+      class="message"
+      *ngFor="let message of messages"
+      [class.own]="isOwnMessage(message)">
+      
+      <div class="message-bubble">
+        <img 
+          *ngIf="message.imageUrl" 
+          [src]="message.imageUrl" 
+          alt="Imagen"
+          class="message-image">
+        <p *ngIf="message.content">{{ message.content }}</p>
+        <span class="message-time">{{ message.createdAt | relativeTime }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input" *ngIf="!loading && !error && chat">
+    <!-- Selected image preview -->
+    <div class="image-preview" *ngIf="selectedImage">
+      <img [src]="selectedImage | async" alt="Preview">
+      <button mat-icon-button (click)="removeSelectedImage()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="input-row">
+      <input 
+        type="file" 
+        #imageInput
+        accept="image/*"
+        hidden
+        (change)="onImageSelected($event)">
+      
+      <button mat-icon-button (click)="imageInput.click()">
+        <mat-icon>image</mat-icon>
+      </button>
+
+      <input 
+        type="text"
+        [(ngModel)]="newMessage"
+        (keypress)="onKeyPress($event)"
+        placeholder="Escribí un mensaje..."
+        [disabled]="sending">
+
+      <button 
+        mat-icon-button 
+        color="primary"
+        (click)="sendMessage()"
+        [disabled]="sending || (!newMessage.trim() && !selectedImage)">
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

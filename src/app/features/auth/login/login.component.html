@@ -1,0 +1,158 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1 class="logo">Tirito</h1>
+      <p class="tagline">Trabajos puntuales, sin vueltas</p>
+    </div>
+
+    <!-- Login Form -->
+    <form 
+      *ngIf="isLoginMode" 
+      [formGroup]="loginForm" 
+      (ngSubmit)="onLogin()"
+      class="auth-form">
+      
+      <h2>Iniciar sesión</h2>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input 
+          matInput 
+          type="email" 
+          formControlName="email"
+          placeholder="tu@email.com">
+        <mat-error *ngIf="loginEmail?.hasError('required')">
+          El email es requerido
+        </mat-error>
+        <mat-error *ngIf="loginEmail?.hasError('email')">
+          Ingresá un email válido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input 
+          matInput 
+          [type]="hidePassword ? 'password' : 'text'" 
+          formControlName="password">
+        <button 
+          mat-icon-button 
+          matSuffix 
+          type="button"
+          (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="loginPassword?.hasError('required')">
+          La contraseña es requerida
+        </mat-error>
+        <mat-error *ngIf="loginPassword?.hasError('minlength')">
+          Mínimo 6 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <button 
+        mat-raised-button 
+        color="primary"
+        type="submit"
+        [disabled]="loading"
+        class="submit-btn">
+        <mat-icon *ngIf="loading">
+          <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>
+        {{ loading ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+
+      <p class="toggle-mode">
+        ¿No tenés cuenta? 
+        <a (click)="toggleMode()">Registrate</a>
+      </p>
+    </form>
+
+    <!-- Register Form -->
+    <form 
+      *ngIf="!isLoginMode" 
+      [formGroup]="registerForm" 
+      (ngSubmit)="onRegister()"
+      class="auth-form">
+      
+      <h2>Crear cuenta</h2>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input 
+          matInput 
+          type="text" 
+          formControlName="name"
+          placeholder="Tu nombre">
+        <mat-error *ngIf="registerName?.hasError('required')">
+          El nombre es requerido
+        </mat-error>
+        <mat-error *ngIf="registerName?.hasError('minlength')">
+          Mínimo 2 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input 
+          matInput 
+          type="email" 
+          formControlName="email"
+          placeholder="tu@email.com">
+        <mat-error *ngIf="registerEmail?.hasError('required')">
+          El email es requerido
+        </mat-error>
+        <mat-error *ngIf="registerEmail?.hasError('email')">
+          Ingresá un email válido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input 
+          matInput 
+          [type]="hidePassword ? 'password' : 'text'" 
+          formControlName="password">
+        <button 
+          mat-icon-button 
+          matSuffix 
+          type="button"
+          (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="registerPassword?.hasError('required')">
+          La contraseña es requerida
+        </mat-error>
+        <mat-error *ngIf="registerPassword?.hasError('minlength')">
+          Mínimo 6 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>¿Qué querés hacer?</mat-label>
+        <mat-select formControlName="role">
+          <mat-option value="user">Busco ayuda para algo</mat-option>
+          <mat-option value="worker">Ofrezco mis servicios</mat-option>
+          <mat-option value="business">Soy negocio / empresa</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button 
+        mat-raised-button 
+        color="primary"
+        type="submit"
+        [disabled]="loading"
+        class="submit-btn">
+        <mat-icon *ngIf="loading">
+          <mat-spinner diameter="20"></mat-spinner>
+        </mat-icon>
+        {{ loading ? 'Creando cuenta...' : 'Crear cuenta' }}
+      </button>
+
+      <p class="toggle-mode">
+        ¿Ya tenés cuenta? 
+        <a (click)="toggleMode()">Iniciá sesión</a>
+      </p>
+    </form>
+  </div>
+</div>

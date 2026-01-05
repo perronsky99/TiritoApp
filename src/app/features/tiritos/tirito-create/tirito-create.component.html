@@ -1,0 +1,95 @@
+<div class="create-container">
+  <div class="create-card">
+    <h1>Publicar un tirito</h1>
+    <p class="subtitle">Contá qué necesitás y alguien te va a contactar</p>
+
+    <!-- Checking limit -->
+    <app-loading-spinner 
+      *ngIf="checkingLimit"
+      [message]="'Verificando...'">
+    </app-loading-spinner>
+
+    <!-- Can't create message -->
+    <div class="limit-reached" *ngIf="!checkingLimit && !canCreate">
+      <mat-icon>info</mat-icon>
+      <p>{{ cantCreateMessage }}</p>
+      <button mat-stroked-button routerLink="/tiritos">
+        Ver mis tiritos
+      </button>
+    </div>
+
+    <!-- Form -->
+    <form 
+      *ngIf="!checkingLimit && canCreate"
+      [formGroup]="form" 
+      (ngSubmit)="onSubmit()">
+
+      <mat-form-field appearance="outline">
+        <mat-label>¿Qué necesitás?</mat-label>
+        <input 
+          matInput 
+          formControlName="title"
+          placeholder="Ej: Arreglo de canilla que gotea"
+          maxlength="100">
+        <mat-hint align="end">{{ title?.value?.length || 0 }}/100</mat-hint>
+        <mat-error *ngIf="title?.hasError('required')">
+          El título es requerido
+        </mat-error>
+        <mat-error *ngIf="title?.hasError('minlength')">
+          Mínimo 5 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contá más detalles</mat-label>
+        <textarea 
+          matInput 
+          formControlName="description"
+          placeholder="Describí lo que necesitás, cuándo lo necesitás, y cualquier detalle relevante..."
+          rows="5"
+          maxlength="1000">
+        </textarea>
+        <mat-hint align="end">{{ description?.value?.length || 0 }}/1000</mat-hint>
+        <mat-error *ngIf="description?.hasError('required')">
+          La descripción es requerida
+        </mat-error>
+        <mat-error *ngIf="description?.hasError('minlength')">
+          Mínimo 20 caracteres
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Ubicación (opcional)</mat-label>
+        <input 
+          matInput 
+          formControlName="location"
+          placeholder="Ej: Palermo, CABA">
+        <mat-icon matPrefix>location_on</mat-icon>
+      </mat-form-field>
+
+      <div class="images-field">
+        <label>Imágenes (opcional)</label>
+        <app-image-upload
+          [images]="images"
+          (imagesChange)="onImagesChange($event)">
+        </app-image-upload>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          mat-button 
+          type="button"
+          (click)="cancel()">
+          Cancelar
+        </button>
+        <button 
+          mat-raised-button 
+          color="primary"
+          type="submit"
+          [disabled]="loading || form.invalid">
+          {{ loading ? 'Publicando...' : 'Publicar tirito' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

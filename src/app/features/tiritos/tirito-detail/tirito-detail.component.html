@@ -1,0 +1,113 @@
+<div class="tirito-detail-container">
+  <!-- Back button -->
+  <button mat-button class="back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Volver a tiritos
+  </button>
+
+  <!-- Loading -->
+  <app-loading-spinner 
+    *ngIf="loading"
+    [message]="'Cargando tirito...'">
+  </app-loading-spinner>
+
+  <!-- Error -->
+  <app-error-state 
+    *ngIf="error && !loading"
+    [title]="'Tirito no encontrado'"
+    [message]="error"
+    [showRetry]="false">
+  </app-error-state>
+
+  <!-- Detail -->
+  <div class="tirito-content" *ngIf="tirito && !loading && !error">
+    <!-- Images Gallery -->
+    <div class="images-section" *ngIf="tirito.images.length > 0">
+      <div class="main-image">
+        <img 
+          [src]="tirito.images[selectedImageIndex].url" 
+          [alt]="tirito.title">
+      </div>
+      <div class="thumbnails" *ngIf="tirito.images.length > 1">
+        <button 
+          *ngFor="let image of tirito.images; let i = index"
+          class="thumbnail"
+          [class.active]="i === selectedImageIndex"
+          (click)="selectImage(i)">
+          <img [src]="image.thumbnailUrl || image.url" alt="Thumbnail">
+        </button>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+      <div class="header">
+        <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+        <span class="date">{{ tirito.createdAt | relativeTime }}</span>
+      </div>
+
+      <h1>{{ tirito.title }}</h1>
+
+      <div class="creator" (click)="goToProfile()">
+        <div class="avatar">
+          {{ tirito.creatorName.charAt(0).toUpperCase() }}
+        </div>
+        <div class="creator-info">
+          <span class="name">{{ tirito.creatorName }}</span>
+          <span class="label">Publicado por</span>
+        </div>
+      </div>
+
+      <div class="description">
+        <p>{{ tirito.description }}</p>
+      </div>
+
+      <div class="location" *ngIf="tirito.location">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ tirito.location }}</span>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <!-- Si NO es el owner y está abierto -->
+        <ng-container *ngIf="!isOwner && tirito.status === 'open'">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="contact()">
+            <mat-icon>chat</mat-icon>
+            Contactar
+          </button>
+        </ng-container>
+
+        <!-- Si es el owner -->
+        <ng-container *ngIf="isOwner">
+          <button 
+            mat-raised-button 
+            color="accent"
+            *ngIf="tirito.status === 'open'"
+            [disabled]="actionLoading"
+            (click)="markInProgress()">
+            <mat-icon>play_arrow</mat-icon>
+            Marcar en progreso
+          </button>
+
+          <button 
+            mat-raised-button 
+            *ngIf="tirito.status !== 'closed'"
+            [disabled]="actionLoading"
+            (click)="closeTirito()">
+            <mat-icon>check</mat-icon>
+            Cerrar tirito
+          </button>
+        </ng-container>
+
+        <!-- Tirito cerrado -->
+        <div class="closed-message" *ngIf="tirito.status === 'closed'">
+          <mat-icon>check_circle</mat-icon>
+          Este tirito ya fue resuelto
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

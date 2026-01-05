@@ -1,0 +1,57 @@
+<div class="chat-list-container">
+  <h1>Mis conversaciones</h1>
+
+  <!-- Loading -->
+  <app-loading-spinner 
+    *ngIf="loading"
+    [message]="'Cargando chats...'">
+  </app-loading-spinner>
+
+  <!-- Error -->
+  <app-error-state 
+    *ngIf="error && !loading"
+    [message]="error"
+    (retry)="loadChats()">
+  </app-error-state>
+
+  <!-- List -->
+  <div class="chats-list" *ngIf="!loading && !error">
+    <div 
+      class="chat-item"
+      *ngFor="let chat of chats"
+      (click)="openChat(chat)"
+      [class.unread]="chat.unreadCount > 0">
+      
+      <div class="avatar">
+        {{ getOtherParticipant(chat).charAt(0).toUpperCase() }}
+      </div>
+      
+      <div class="chat-info">
+        <div class="chat-header">
+          <span class="name">{{ getOtherParticipant(chat) }}</span>
+          <span class="time" *ngIf="chat.lastMessage">
+            {{ chat.lastMessage.createdAt | relativeTime }}
+          </span>
+        </div>
+        <div class="chat-preview">
+          <span class="tirito-ref">{{ chat.tiritoTitle | truncate:25 }}</span>
+          <span class="last-message" *ngIf="chat.lastMessage">
+            {{ chat.lastMessage.content | truncate:40 }}
+          </span>
+        </div>
+      </div>
+
+      <div class="unread-badge" *ngIf="chat.unreadCount > 0">
+        {{ chat.unreadCount }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <app-empty-state 
+    *ngIf="!loading && !error && chats.length === 0"
+    icon="chat_bubble_outline"
+    title="Sin conversaciones"
+    message="Cuando contactes a alguien por un tirito, aparecerá aquí">
+  </app-empty-state>
+</div>

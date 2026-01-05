@@ -1,0 +1,70 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+
+/**
+ * Rutas oficiales de Tirito App v1.0
+ * 
+ * Públicas:
+ * - /
+ * - /tiritos
+ * - /tiritos/:id
+ * 
+ * Requieren login:
+ * - /tiritos/nuevo
+ * - /chat/:id
+ * - /perfil/:id
+ * 
+ * Auth:
+ * - /login
+ * 
+ * Reservadas (NO IMPLEMENTADAS):
+ * - /perfil/editar
+ * - /tiritos/:id/editar
+ * - /pagos
+ * - /pagos/planes
+ * - /pagos/historial
+ */
+const routes: Routes = [
+  // Auth routes (sin layout)
+  {
+    path: 'login',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
+  
+  // Main routes (con layout)
+  {
+    path: '',
+    component: MainLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./features/home/home.module').then(m => m.HomeModule)
+      },
+      {
+        path: 'tiritos',
+        loadChildren: () => import('./features/tiritos/tiritos.module').then(m => m.TiritosModule)
+      },
+      {
+        path: 'chat',
+        loadChildren: () => import('./features/chat/chat.module').then(m => m.ChatModule)
+      },
+      {
+        path: 'perfil',
+        loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule)
+      }
+    ]
+  },
+  
+  // Wildcard - redirect to home
+  {
+    path: '**',
+    redirectTo: ''
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

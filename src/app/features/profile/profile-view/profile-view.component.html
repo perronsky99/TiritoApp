@@ -1,0 +1,89 @@
+<div class="profile-container">
+  <!-- Back button -->
+  <button mat-button class="back-btn" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Volver
+  </button>
+
+  <!-- Loading -->
+  <app-loading-spinner 
+    *ngIf="loading"
+    [message]="'Cargando perfil...'">
+  </app-loading-spinner>
+
+  <!-- Error -->
+  <app-error-state 
+    *ngIf="error && !loading"
+    [title]="'Perfil no encontrado'"
+    [message]="error"
+    [showRetry]="false">
+  </app-error-state>
+
+  <!-- Profile -->
+  <div class="profile-content" *ngIf="user && !loading && !error">
+    <!-- Header -->
+    <div class="profile-header">
+      <div class="avatar">
+        <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.name">
+        <span *ngIf="!user.avatar">{{ user.name.charAt(0).toUpperCase() }}</span>
+      </div>
+      
+      <div class="user-info">
+        <h1>
+          {{ user.name }}
+          <app-verification-badge 
+            *ngIf="user.verificationStatus !== 'unverified'"
+            [status]="user.verificationStatus">
+          </app-verification-badge>
+        </h1>
+        <span class="role-badge">{{ getRoleLabel(user.role) }}</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <span class="value">{{ tiritos.length }}</span>
+        <span class="label">Tiritos</span>
+      </div>
+      <div class="stat">
+        <span class="value">
+          {{ user.verificationStatus === 'verified' ? 'Sí' : 'No' }}
+        </span>
+        <span class="label">Verificado</span>
+      </div>
+    </div>
+
+    <!-- User's Tiritos -->
+    <div class="user-tiritos">
+      <h2>Tiritos publicados</h2>
+
+      <app-loading-spinner 
+        *ngIf="loadingTiritos"
+        [size]="30">
+      </app-loading-spinner>
+
+      <div class="tiritos-list" *ngIf="!loadingTiritos && tiritos.length > 0">
+        <mat-card 
+          *ngFor="let tirito of tiritos"
+          class="tirito-card"
+          (click)="goToTirito(tirito)">
+          <mat-card-header>
+            <mat-card-title>{{ tirito.title | truncate:40 }}</mat-card-title>
+            <mat-card-subtitle>{{ tirito.createdAt | relativeTime }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <app-empty-state 
+        *ngIf="!loadingTiritos && tiritos.length === 0"
+        icon="work_outline"
+        title="Sin tiritos"
+        message="Este usuario no tiene tiritos publicados">
+      </app-empty-state>
+    </div>
+  </div>
+</div>

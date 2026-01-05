@@ -1,0 +1,169 @@
+/**
+ * Tirito App - Global Styles
+ * Mobile-first approach
+ */
+
+// Angular Material Theme
+@use '@angular/material' as mat;
+
+// Include core styles
+@include mat.core();
+
+// Define custom theme colors
+$tirito-primary: mat.define-palette(mat.$purple-palette, 700);
+$tirito-accent: mat.define-palette(mat.$pink-palette, A200);
+$tirito-warn: mat.define-palette(mat.$red-palette);
+
+// Create theme
+$tirito-theme: mat.define-light-theme((
+  color: (
+    primary: $tirito-primary,
+    accent: $tirito-accent,
+    warn: $tirito-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Apply theme
+@include mat.all-component-themes($tirito-theme);
+
+// ============================================
+// GLOBAL STYLES
+// ============================================
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: #fafafa;
+  color: #333;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================
+// TYPOGRAPHY
+// ============================================
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+a {
+  color: #7b1fa2;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// ============================================
+// BUTTONS
+// ============================================
+
+button {
+  font-family: inherit;
+}
+
+.mat-mdc-raised-button,
+.mat-mdc-stroked-button,
+.mat-mdc-flat-button {
+  border-radius: 24px !important;
+  padding: 0 24px !important;
+}
+
+// ============================================
+// CARDS
+// ============================================
+
+.mat-mdc-card {
+  border-radius: 12px !important;
+}
+
+// ============================================
+// FORMS
+// ============================================
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+// ============================================
+// UTILITIES
+// ============================================
+
+.text-center {
+  text-align: center;
+}
+
+.text-muted {
+  color: #666;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+// ============================================
+// SCROLLBAR
+// ============================================
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+
+  &:hover {
+    background: #999;
+  }
+}
+
+// ============================================
+// SNACKBAR
+// ============================================
+
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #4caf50;
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #f44336;
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+
+@media (max-width: 600px) {
+  html {
+    font-size: 14px;
+  }
+}

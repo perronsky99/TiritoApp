@@ -1,0 +1,120 @@
+<div class="tiritos-list-container">
+  <!-- Header -->
+  <div class="list-header">
+    <h1>Tiritos disponibles</h1>
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="goToCreate()">
+      <mat-icon>add</mat-icon>
+      Publicar tirito
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar</mat-label>
+      <input 
+        matInput 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="¿Qué estás buscando?">
+      <button mat-icon-button matSuffix (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <div class="status-chips">
+      <mat-chip-list>
+        <mat-chip 
+          [selected]="currentStatus === 'all'"
+          (click)="onFilterChange('all')">
+          Todos
+        </mat-chip>
+        <mat-chip 
+          [selected]="currentStatus === 'open'"
+          (click)="onFilterChange('open')">
+          Abiertos
+        </mat-chip>
+        <mat-chip 
+          [selected]="currentStatus === 'in_progress'"
+          (click)="onFilterChange('in_progress')">
+          En progreso
+        </mat-chip>
+      </mat-chip-list>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <app-loading-spinner 
+    *ngIf="loading"
+    [message]="'Cargando tiritos...'">
+  </app-loading-spinner>
+
+  <!-- Error -->
+  <app-error-state 
+    *ngIf="error && !loading"
+    [message]="error"
+    (retry)="loadTiritos()">
+  </app-error-state>
+
+  <!-- List -->
+  <div class="tiritos-grid" *ngIf="!loading && !error">
+    <mat-card 
+      *ngFor="let tirito of tiritos"
+      class="tirito-card"
+      (click)="goToTirito(tirito)">
+      
+      <!-- Images preview -->
+      <div class="tirito-images" *ngIf="tirito.images.length > 0">
+        <img [src]="tirito.images[0].thumbnailUrl || tirito.images[0].url" [alt]="tirito.title">
+        <span class="image-count" *ngIf="tirito.images.length > 1">
+          +{{ tirito.images.length - 1 }}
+        </span>
+      </div>
+
+      <mat-card-header>
+        <div mat-card-avatar class="tirito-avatar">
+          {{ tirito.creatorName.charAt(0).toUpperCase() }}
+        </div>
+        <mat-card-title>{{ tirito.title | truncate:50 }}</mat-card-title>
+        <mat-card-subtitle>
+          {{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ tirito.description | truncate:120 }}</p>
+        <div class="tirito-footer">
+          <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+          <span class="location" *ngIf="tirito.location">
+            <mat-icon>location_on</mat-icon>
+            {{ tirito.location }}
+          </span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty State -->
+  <app-empty-state 
+    *ngIf="!loading && !error && tiritos.length === 0"
+    icon="search_off"
+    title="No encontramos tiritos"
+    [message]="searchQuery ? 'Probá con otra búsqueda' : 'Todavía no hay tiritos publicados'">
+    <button mat-raised-button color="primary" (click)="goToCreate()">
+      Publicar el primero
+    </button>
+  </app-empty-state>
+
+  <!-- Load More -->
+  <div class="load-more" *ngIf="hasMore && !loading">
+    <button 
+      mat-stroked-button 
+      (click)="loadMore()"
+      [disabled]="loadingMore">
+      {{ loadingMore ? 'Cargando...' : 'Ver más tiritos' }}
+    </button>
+  </div>
+</div>
