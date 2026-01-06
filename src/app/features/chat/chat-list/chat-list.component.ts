@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChatService, IChat } from '../../../core/services/chat.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 /**
  * Lista de chats del usuario
@@ -18,7 +19,8 @@ export class ChatListComponent implements OnInit {
 
   constructor(
     private chatService: ChatService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -48,7 +50,8 @@ export class ChatListComponent implements OnInit {
 
   getOtherParticipant(chat: IChat): string {
     // participants viene populado con { _id, name, email }
-    const participant = chat.participants[0];
-    return participant?.name || 'Usuario';
+    const currentUserId = this.authService.currentUser?.id;
+    const other = chat.participants.find(p => p._id !== currentUserId);
+    return other?.name || 'Usuario';
   }
 }
