@@ -104,8 +104,9 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
   getOtherParticipantName(): string {
     if (!this.chat) return '';
     const currentUserId = this.authService.currentUser?.id;
-    const other = this.chat.participants.find(p => p.odI !== currentUserId);
-    return other?.userName || 'Usuario';
+    // El backend retorna participants: [{_id, name, email}]
+    const other = this.chat.participants.find(p => p._id !== currentUserId);
+    return other?.name || 'Usuario';
   }
 
   goToTirito(): void {

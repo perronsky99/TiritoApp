@@ -44,8 +44,13 @@ export class ChatListComponent implements OnInit {
   }
 
   openChat(chat: IChat): void {
-    // Navegar usando el tiritoId ya que así funciona el backend v1.0
-    this.router.navigate(['/chat', chat.tiritoId]);
+    // tiritoId puede venir como objeto populado {_id, title, status} o como string
+    const tiritoId = typeof chat.tiritoId === 'object' ? chat.tiritoId._id : chat.tiritoId;
+    if (tiritoId) {
+      this.router.navigate(['/chat', tiritoId]);
+    } else {
+      alert('No se encontró el tiritoId para esta conversación');
+    }
   }
 
   getOtherParticipant(chat: IChat): string {
@@ -53,5 +58,13 @@ export class ChatListComponent implements OnInit {
     const currentUserId = this.authService.currentUser?.id;
     const other = chat.participants.find(p => p._id !== currentUserId);
     return other?.name || 'Usuario';
+  }
+
+  getTiritoTitle(chat: IChat): string {
+    // tiritoId puede venir como objeto populado {_id, title, status} o como string
+    if (typeof chat.tiritoId === 'object') {
+      return chat.tiritoId.title || '';
+    }
+    return '';
   }
 }

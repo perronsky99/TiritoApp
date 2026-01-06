@@ -3,11 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+export interface ITirito {
+  _id: string;
+  title: string;
+  status: string;
+}
+
 export interface IChat {
   _id: string;
-  tiritoId: string;
+  tiritoId: string | ITirito; // Puede venir como string o como objeto populado
   participants: any[];
   createdAt: string;
+  lastMessage?: any;
+  unreadCount?: number;
 }
 
 export interface IMessage {

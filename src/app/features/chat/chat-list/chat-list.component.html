@@ -34,7 +34,7 @@
           </span>
         </div>
         <div class="chat-preview">
-          <span class="tirito-ref">{{ chat.tiritoTitle | truncate:25 }}</span>
+          <span class="tirito-ref">{{ getTiritoTitle(chat) | truncate:25 }}</span>
           <span class="last-message" *ngIf="chat.lastMessage">
             {{ chat.lastMessage.content | truncate:40 }}
           </span>
