@@ -1,0 +1,35 @@
+<div class="notifications-page">
+  <header class="page-header">
+    <h1>Notificaciones</h1>
+    <div class="actions">
+      <button mat-button color="primary" (click)="markAll()">Marcar todas como leídas</button>
+    </div>
+  </header>
+
+  <section *ngIf="loading" class="loading">
+    <mat-spinner diameter="36"></mat-spinner>
+  </section>
+
+  <mat-list *ngIf="!loading && notifications.length > 0" class="notifications-list">
+    <mat-divider></mat-divider>
+    <mat-list-item *ngFor="let n of notifications" (click)="open(n)" [class.unread]="!n.read">
+      <mat-icon matListIcon>{{ n.type === 'tirito_interest' ? 'favorite' : (n.type === 'chat_new' ? 'chat_bubble' : 'message') }}</mat-icon>
+      <div matLine class="title">{{ n.title }}</div>
+      <div matLine class="message">{{ n.message }}</div>
+      <div class="meta">{{ n.createdAt | relativeTime }}</div>
+      <button mat-icon-button matSuffix (click)="delete($event, n)" aria-label="Eliminar">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+  </mat-list>
+
+  <div *ngIf="!loading && notifications.length === 0" class="empty">
+    <mat-icon>notifications_none</mat-icon>
+    <p>No hay notificaciones</p>
+  </div>
+
+  <div class="load-more" *ngIf="notifications.length < total && !loading">
+    <button mat-button (click)="loadMore()">Cargar más</button>
+  </div>
+</div>

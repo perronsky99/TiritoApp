@@ -1,0 +1,30 @@
+.notifications-page {
+  padding: 24px;
+
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .notifications-list {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  mat-list-item {
+    cursor: pointer;
+    &.unread {
+      background: rgba(98,0,238,0.04);
+    }
+    .title { font-weight: 600; }
+    .message { color: rgba(0,0,0,0.7); }
+    .meta { font-size: 12px; color: rgba(0,0,0,0.45); }
+  }
+
+  .empty { text-align: center; color: rgba(0,0,0,0.54); padding: 36px 0; }
+
+  .load-more { text-align: center; margin-top: 12px; }
+}
