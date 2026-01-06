@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
 /**
@@ -51,7 +52,8 @@ const routes: Routes = [
       },
       {
         path: 'notificaciones',
-        loadChildren: () => import('./features/notifications/notifications.module').then(m => m.NotificationsModule)
+        loadChildren: () => import('./features/notifications/notifications.module').then(m => m.NotificationsModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'perfil',

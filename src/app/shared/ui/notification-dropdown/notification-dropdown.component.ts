@@ -25,6 +25,7 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private router: Router
   ) {}
+  
 
   ngOnInit(): void {
     // Suscribirse al contador de no leídas

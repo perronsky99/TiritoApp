@@ -14,6 +14,13 @@
     overflow: hidden;
   }
 
+  .group-label {
+    margin: 16px 0 8px;
+    font-size: 14px;
+    color: rgba(0,0,0,0.6);
+    font-weight: 600;
+  }
+
   mat-list-item {
     cursor: pointer;
     &.unread {

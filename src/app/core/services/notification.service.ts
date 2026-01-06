@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, interval, of, Subscription } from 'rxjs';
 import { tap, switchMap, startWith, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
+import { io, Socket } from 'socket.io-client';
 
 /**
  * Tipos de notificación
@@ -63,6 +64,7 @@ export class NotificationService {
   // Polling interval (30 segundos)
   private readonly POLL_INTERVAL = 30000;
   private pollingSubscription: Subscription | null = null;
+  private socket: Socket | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -84,6 +86,9 @@ export class NotificationService {
         ))
       )
       .subscribe();
+
+    // Also connect socket for real-time updates
+    this.connectSocket();
   }
 
   /**
@@ -94,6 +99,45 @@ export class NotificationService {
     if (this.pollingSubscription) {
       this.pollingSubscription.unsubscribe();
       this.pollingSubscription = null;
+    }
+
+    this.disconnectSocket();
+  }
+
+  private connectSocket(): void {
+    try {
+      if (this.socket) return;
+      const base = environment.apiUrl.replace(/\/api\/?$/, '');
+      // connect with autoConnect false to control when to register
+      const token = localStorage.getItem('tirito_jwt_token');
+      this.socket = io(base, { autoConnect: true, auth: { token } });
+
+      this.socket.on('connect', () => {
+        // register with current user id if available
+        const stored = localStorage.getItem('tirito_user');
+          const token = localStorage.getItem('tirito_jwt_token');
+          if (stored) {
+            const user = JSON.parse(stored);
+            this.socket?.emit('register', user.id || user._id);
+          }
+      });
+
+      this.socket.on('notification', (payload: any) => {
+        // Push into subjects
+        const current = this.notificationsSubject.value || [];
+        this.notificationsSubject.next([payload, ...current]);
+        const unread = this.unreadCountSubject.value + (payload.read ? 0 : 1);
+        this.unreadCountSubject.next(unread);
+      });
+    } catch (err) {
+      console.warn('Socket connect error', err);
+    }
+  }
+
+  private disconnectSocket(): void {
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
     }
   }
 
