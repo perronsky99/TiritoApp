@@ -51,11 +51,15 @@ export class ProfileViewComponent implements OnInit {
       },
       error: (err) => {
         if (err.status === 404) {
+          // Perfil no encontrado: intentar mostrar al menos los tiritos del creatorId
           this.error = 'Este usuario no existe';
+          this.loading = false;
+          // Intentar cargar tiritos publicados por este id para mostrar información parcial
+          this.loadUserTiritosByCreator(userId);
         } else {
           this.error = 'No pudimos cargar el perfil';
+          this.loading = false;
         }
-        this.loading = false;
       }
     });
   }
@@ -71,6 +75,34 @@ export class ProfileViewComponent implements OnInit {
       next: (response) => {
         // Filtrar solo los del usuario actual (temporal)
         this.tiritos = response.data.filter(t => t.creatorId === this.user?.id);
+        this.loadingTiritos = false;
+      },
+      error: () => {
+        this.loadingTiritos = false;
+      }
+    });
+  }
+
+  // Intentar cargar tiritos usando un creatorId cuando el perfil no existe
+  loadUserTiritosByCreator(creatorId: string): void {
+    this.loadingTiritos = true;
+    this.tiritosService.getTiritos({ limit: 12 }).subscribe({
+      next: (response) => {
+        const matches = response.data.filter(t => t.creatorId === creatorId);
+        this.tiritos = matches;
+        // Si encontramos al menos un tirito, usar el creatorName del primero como nombre del perfil
+        if (matches.length > 0) {
+          this.user = {
+            id: creatorId,
+            name: matches[0].creatorName || 'Usuario',
+            email: '',
+            role: 'user',
+            verificationStatus: 'unverified',
+            createdAt: matches[0].createdAt,
+            updatedAt: matches[0].createdAt
+          } as any;
+          this.error = null; // mostrar contenido parcial
+        }
         this.loadingTiritos = false;
       },
       error: () => {

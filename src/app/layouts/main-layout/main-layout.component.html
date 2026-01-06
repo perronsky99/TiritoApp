@@ -89,12 +89,14 @@
         <!-- Notification Dropdown -->
         <app-notification-dropdown></app-notification-dropdown>
 
-        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-btn">
-          <mat-icon>
-            account_circle
-          </mat-icon>
-        </button>
-        
+        <ng-container *ngIf="(currentUser$ | async) as user">
+          <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
+            <img *ngIf="user?.avatar" [src]="user.avatar" class="user-avatar" alt="avatar"/>
+            <mat-icon *ngIf="!user?.avatar">account_circle</mat-icon>
+            <span class="user-name">{{ user?.name || 'Usuario' }}</span>
+          </button>
+        </ng-container>
+
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item (click)="goToChat()">
             <mat-icon>chat</mat-icon>
