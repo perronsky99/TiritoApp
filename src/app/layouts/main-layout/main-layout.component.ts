@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
 import { ChatService } from '../../core/services/chat.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { User } from '../../core/models/user.model';
 
 /**
@@ -15,19 +16,29 @@ import { User } from '../../core/models/user.model';
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.scss']
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit {
   isSidenavOpen = false;
   
   currentUser$: Observable<User | null>;
   unreadCount$: Observable<number>;
+  notificationCount$: Observable<number>;
 
   constructor(
     public authService: AuthService,
     private chatService: ChatService,
+    private notificationService: NotificationService,
     private router: Router
   ) {
     this.currentUser$ = this.authService.currentUser$;
     this.unreadCount$ = this.chatService.unreadCount$;
+    this.notificationCount$ = this.notificationService.unreadCount$;
+  }
+
+  ngOnInit(): void {
+    // Iniciar polling de notificaciones si el usuario está autenticado
+    if (this.authService.isLoggedIn) {
+      this.notificationService.startPolling();
+    }
   }
 
   toggleSidenav(): void {
@@ -77,6 +88,7 @@ export class MainLayoutComponent {
   }
 
   logout(): void {
+    this.notificationService.reset();
     this.authService.logout();
     this.closeSidenav();
   }

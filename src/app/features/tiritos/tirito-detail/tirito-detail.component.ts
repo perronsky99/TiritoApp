@@ -6,6 +6,7 @@ import { TiritosService } from '../../../core/services/tiritos.service';
 import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { Tirito } from '../../../core/models';
 
 /**
@@ -36,6 +37,7 @@ export class TiritoDetailComponent implements OnInit {
     private chatService: ChatService,
     public authService: AuthService,
     private analyticsService: AnalyticsService,
+    private notificationService: NotificationService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -92,15 +94,28 @@ export class TiritoDetailComponent implements OnInit {
     
     this.chatService.sendMessage(this.tirito.id, initialMessage).subscribe({
       next: (response) => {
-        // Backend devuelve { message: string, data: IMessage } donde data.chatId tiene el ID del chat
+        // Backend devuelve { message: string, data: IMessage, isNewChat: boolean }
         this.analyticsService.trackChatStarted(response.data.chatId, this.tirito!.id);
         this.analyticsService.trackContactInitiated(this.tirito!.id);
+        
+        // Mostrar toast de confirmación
+        this.snackBar.open('¡Mensaje enviado! El dueño del tirito recibirá una notificación.', 'Ver chat', {
+          duration: 5000,
+          panelClass: ['success-snackbar']
+        }).onAction().subscribe(() => {
+          this.router.navigate(['/chat', this.tirito!.id]);
+        });
+
+        // Refrescar contador de notificaciones (por si el usuario también tiene notificaciones)
+        this.notificationService.refreshUnreadCount();
+        
         // Navegar al chat usando el tiritoId
         this.router.navigate(['/chat', this.tirito!.id]);
       },
       error: () => {
         this.snackBar.open('No pudimos iniciar el chat', 'Cerrar', {
-          duration: 3000
+          duration: 3000,
+          panelClass: ['error-snackbar']
         });
       }
     });
@@ -166,7 +181,7 @@ export class TiritoDetailComponent implements OnInit {
   }
 
   goToProfile(): void {
-    if (this.tirito) {
+    if (this.tirito?.creatorId) {
       this.router.navigate(['/perfil', this.tirito.creatorId]);
     }
   }

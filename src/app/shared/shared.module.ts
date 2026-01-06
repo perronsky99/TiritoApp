@@ -26,6 +26,7 @@ import { EmptyStateComponent } from './ui/empty-state/empty-state.component';
 import { VerificationBadgeComponent } from './ui/verification-badge/verification-badge.component';
 import { TiritoStatusBadgeComponent } from './ui/tirito-status-badge/tirito-status-badge.component';
 import { ImageUploadComponent } from './ui/image-upload/image-upload.component';
+import { NotificationDropdownComponent } from './ui/notification-dropdown/notification-dropdown.component';
 
 // Pipes
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
@@ -56,13 +57,16 @@ const UI_COMPONENTS = [
   EmptyStateComponent,
   VerificationBadgeComponent,
   TiritoStatusBadgeComponent,
-  ImageUploadComponent
+  ImageUploadComponent,
+  NotificationDropdownComponent
 ];
 
 const PIPES = [
   RelativeTimePipe,
   TruncatePipe
 ];
+
+import { RouterModule } from '@angular/router';
 
 /**
  * Shared Module - Se importa en cada feature module
@@ -75,10 +79,12 @@ const PIPES = [
   ],
   imports: [
     CommonModule,
+    RouterModule,
     ...MATERIAL_MODULES
   ],
   exports: [
     CommonModule,
+    RouterModule,
     ...MATERIAL_MODULES,
     ...UI_COMPONENTS,
     ...PIPES

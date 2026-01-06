@@ -1,0 +1,86 @@
+<div class="notification-dropdown">
+  <!-- Trigger Button -->
+  <button 
+    mat-icon-button 
+    (click)="toggleDropdown()"
+    [matBadge]="unreadCount > 0 ? unreadCount : null"
+    [matBadgeHidden]="unreadCount === 0"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+    class="notification-trigger"
+    aria-label="Notificaciones">
+    <mat-icon>notifications</mat-icon>
+  </button>
+
+  <!-- Dropdown Panel -->
+  <div 
+    class="notification-panel" 
+    *ngIf="isOpen"
+    (clickOutside)="closeDropdown()">
+    
+    <!-- Header -->
+    <div class="panel-header">
+      <span class="title">Notificaciones</span>
+      <button 
+        mat-button 
+        color="primary" 
+        *ngIf="unreadCount > 0"
+        (click)="markAllAsRead()">
+        Marcar todas como leídas
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="loading">
+      <mat-spinner diameter="24"></mat-spinner>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="notifications-list" *ngIf="!loading">
+      <div 
+        class="notification-item"
+        *ngFor="let notification of notifications"
+        [class.unread]="!notification.read"
+        (click)="onNotificationClick(notification)">
+        
+        <div class="notification-icon" [ngClass]="getNotificationColor(notification.type)">
+          <mat-icon>{{ getNotificationIcon(notification.type) }}</mat-icon>
+        </div>
+
+        <div class="notification-content">
+          <div class="notification-title">{{ notification.title }}</div>
+          <div class="notification-message">{{ notification.message }}</div>
+          <div class="notification-time">{{ notification.createdAt | relativeTime }}</div>
+        </div>
+
+        <button 
+          mat-icon-button 
+          class="delete-btn"
+          (click)="deleteNotification($event, notification)"
+          matTooltip="Eliminar">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="notifications.length === 0">
+        <mat-icon>notifications_none</mat-icon>
+        <span>No tienes notificaciones</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="panel-footer" *ngIf="notifications.length > 0">
+      <a mat-button color="primary" routerLink="/notificaciones" (click)="closeDropdown()">
+        Ver todas
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay for closing dropdown -->
+<div 
+  class="dropdown-overlay" 
+  *ngIf="isOpen" 
+  (click)="closeDropdown()">
+</div>

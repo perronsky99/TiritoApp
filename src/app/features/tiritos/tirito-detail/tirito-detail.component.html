@@ -22,10 +22,10 @@
   <!-- Detail -->
   <div class="tirito-content" *ngIf="tirito && !loading && !error">
     <!-- Images Gallery -->
-    <div class="images-section" *ngIf="tirito.images.length > 0">
+    <div class="images-section" *ngIf="tirito.images && tirito.images.length > 0">
       <div class="main-image">
         <img 
-          [src]="tirito.images[selectedImageIndex].url" 
+          [src]="tirito.images[selectedImageIndex]?.url" 
           [alt]="tirito.title">
       </div>
       <div class="thumbnails" *ngIf="tirito.images.length > 1">
@@ -50,10 +50,10 @@
 
       <div class="creator" (click)="goToProfile()">
         <div class="avatar">
-          {{ tirito.creatorName.charAt(0).toUpperCase() }}
+          {{ tirito.creatorName ? tirito.creatorName.charAt(0).toUpperCase() : 'U' }}
         </div>
         <div class="creator-info">
-          <span class="name">{{ tirito.creatorName }}</span>
+          <span class="name">{{ tirito.creatorName || 'Usuario' }}</span>
           <span class="label">Publicado por</span>
         </div>
       </div>

@@ -86,8 +86,11 @@
 
       <!-- User menu -->
       <ng-container *ngIf="authService.isLoggedIn; else loginBtn">
+        <!-- Notification Dropdown -->
+        <app-notification-dropdown></app-notification-dropdown>
+
         <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-btn">
-          <mat-icon [matBadge]="(unreadCount$ | async) || null" matBadgeColor="warn">
+          <mat-icon>
             account_circle
           </mat-icon>
         </button>
