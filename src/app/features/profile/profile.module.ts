@@ -4,6 +4,7 @@ import { SharedModule } from '../../shared/shared.module';
 
 import { AuthGuard } from '../../core/guards/auth.guard';
 import { ProfileViewComponent } from './profile-view/profile-view.component';
+import { RatingDialogComponent } from './rating-dialog/rating-dialog.component';
 
 const routes: Routes = [
   { path: ':id', component: ProfileViewComponent, canActivate: [AuthGuard] }
@@ -11,7 +12,8 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    ProfileViewComponent
+    ProfileViewComponent,
+    RatingDialogComponent
   ],
   imports: [
     SharedModule,

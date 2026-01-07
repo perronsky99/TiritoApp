@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService } from '../../../core/services/profile.service';
 import { TiritosService } from '../../../core/services/tiritos.service';
+import { RatingService } from '../../../core/services/rating.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { RatingDialogComponent } from '../rating-dialog/rating-dialog.component';
 import { AuthService } from '../../../core/auth/auth.service';
 import { User, Tirito } from '../../../core/models';
 
@@ -23,13 +27,22 @@ export class ProfileViewComponent implements OnInit {
   
   // Para tiritos del usuario
   loadingTiritos = false;
+  // Ratings
+  ratings: any[] = [];
+  ratingSummary: { avgScore?: number; count?: number } = {};
+  showRatingForm: { [tiritoId: string]: boolean } = {};
+  ratingDrafts: { [tiritoId: string]: { score: number; comment: string; submitting?: boolean } } = {};
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private profileService: ProfileService,
     private tiritosService: TiritosService,
-    public authService: AuthService
+    public authService: AuthService,
+    private ratingService: RatingService,
+    private snackBar: MatSnackBar
+    ,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +61,7 @@ export class ProfileViewComponent implements OnInit {
         this.user = user;
         this.loading = false;
         this.loadUserTiritos();
+        this.loadRatings(user.id);
       },
       error: (err) => {
         if (err.status === 404) {
@@ -76,10 +90,91 @@ export class ProfileViewComponent implements OnInit {
         // Filtrar solo los del usuario actual (temporal)
         this.tiritos = response.data.filter(t => t.creatorId === this.user?.id);
         this.loadingTiritos = false;
+        // preparar borradores de valoración
+        this.tiritos.forEach(t => {
+          this.ratingDrafts[t.id] = { score: 5, comment: '' };
+        });
       },
       error: () => {
         this.loadingTiritos = false;
       }
+    });
+  }
+
+  // Cargar resumen y reseñas del usuario
+  loadRatings(userId: string): void {
+    this.ratingService.getSummary(userId).subscribe({
+      next: (res: any) => this.ratingSummary = res,
+      error: () => this.ratingSummary = {}
+    });
+
+    this.ratingService.getRatingsForUser(userId).subscribe({
+      next: (res: any) => this.ratings = res.data || [],
+      error: () => this.ratings = []
+    });
+  }
+
+  canRateTirito(tirito: Tirito): boolean {
+    const me = this.authService.currentUser;
+    if (!me || !this.user) return false;
+    if (tirito.status !== 'closed') return false;
+    // Only participants can rate the other party
+    const participated = me.id === tirito.creatorId || me.id === tirito.assignedTo;
+    // Can't rate self
+    if (me.id === this.user.id) return false;
+    return participated;
+  }
+
+  toggleRatingForm(tirito: Tirito): void {
+    this.showRatingForm[tirito.id] = !this.showRatingForm[tirito.id];
+  }
+
+  submitRating(tirito: Tirito): void {
+    const draft = this.ratingDrafts[tirito.id];
+    if (!draft || !this.user) return;
+    draft.submitting = true;
+
+    this.ratingService.createRating({
+      tiritoId: tirito.id,
+      targetId: this.user.id,
+      score: draft.score,
+      comment: draft.comment
+    }).subscribe({
+      next: () => {
+        draft.submitting = false;
+        this.showRatingForm[tirito.id] = false;
+        this.snackBar.open('Valoración enviada', undefined, { duration: 3000 });
+        // refresh summary and list
+        if (this.user) this.loadRatings(this.user.id);
+      },
+      error: (err) => {
+        draft.submitting = false;
+        const msg = err?.error?.message || 'No se pudo enviar la valoración';
+        this.snackBar.open(msg, undefined, { duration: 4000 });
+      }
+    });
+  }
+
+  openRatingDialog(tirito: Tirito): void {
+    const dialogRef = this.dialog.open(RatingDialogComponent, {
+      width: '520px',
+      data: { tiritoId: tirito.id, targetId: this.user?.id, targetName: this.user?.name }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+      const { score, comment } = result;
+      // submit via ratingService
+      this.ratingService.createRating({ tiritoId: tirito.id, targetId: this.user!.id, score, comment }).subscribe({
+        next: () => {
+          this.snackBar.open('Valoración enviada', undefined, { duration: 3000 });
+          if (this.user) this.loadRatings(this.user.id);
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Error al enviar valoración';
+          this.snackBar.open(msg, undefined, { duration: 4000 });
+        }
+      });
     });
   }
 
@@ -102,6 +197,7 @@ export class ProfileViewComponent implements OnInit {
             updatedAt: matches[0].createdAt
           } as any;
           this.error = null; // mostrar contenido parcial
+          this.loadRatings(creatorId);
         }
         this.loadingTiritos = false;
       },

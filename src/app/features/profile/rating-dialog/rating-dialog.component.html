@@ -1,0 +1,27 @@
+<div class="rating-dialog">
+  <div class="header">
+    <div class="avatar">{{ data.targetName ? (data.targetName.charAt(0) | uppercase) : 'U' }}</div>
+    <div class="meta">
+      <h3>Valora a {{ data.targetName || 'usuario' }}</h3>
+      <p class="sub">¿Cómo fue la experiencia?</p>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="stars" role="radiogroup" aria-label="Puntuación">
+      <button mat-icon-button *ngFor="let s of [1,2,3,4,5]" [disabled]="submitting" (click)="setScore(s)" [attr.aria-checked]="score===s" [class.selected]="score===s">
+        <mat-icon>{{ score >= s ? 'star' : 'star_border' }}</mat-icon>
+      </button>
+    </div>
+
+    <mat-form-field appearance="fill" class="comment">
+      <textarea matInput maxlength="300" placeholder="Comentario (opcional)" [(ngModel)]="comment"></textarea>
+      <mat-hint align="end">{{ comment.length }}/300</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <div class="footer">
+    <button mat-button (click)="cancel()" [disabled]="submitting">Cancelar</button>
+    <button mat-flat-button color="primary" (click)="submit()" [disabled]="submitting">Enviar valoración</button>
+  </div>
+</div>

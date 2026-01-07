@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
@@ -18,6 +19,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // UI Components
 import { LoadingSpinnerComponent } from './ui/loading-spinner/loading-spinner.component';
@@ -49,6 +51,7 @@ const MATERIAL_MODULES = [
   MatToolbarModule,
   MatSidenavModule,
   MatListModule
+  ,MatButtonToggleModule
 ];
 
 const UI_COMPONENTS = [
@@ -80,12 +83,16 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
-    ...MATERIAL_MODULES
+    ...MATERIAL_MODULES,
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports: [
     CommonModule,
     RouterModule,
     ...MATERIAL_MODULES,
+    FormsModule,
+    ReactiveFormsModule,
     ...UI_COMPONENTS,
     ...PIPES
   ]
