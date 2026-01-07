@@ -113,6 +113,76 @@
   }
 }
 
+// Ratings section inside tirito card
+.tirito-ratings {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.ratings-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+
+  .rating-label {
+    color: #666;
+    min-width: 130px;
+  }
+
+  .rating-value {
+    font-weight: 600;
+    color: #f9a825;
+  }
+
+  .rating-pending {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #ff9800;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    button {
+      margin-left: 0.5rem;
+      font-size: 0.8rem;
+      padding: 0 8px;
+      min-height: 28px;
+      line-height: 28px;
+    }
+  }
+
+  &.received .rating-pending {
+    color: #9e9e9e;
+  }
+}
+
+.no-counterpart {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9e9e9e;
+  font-size: 0.85rem;
+  font-style: italic;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 // Mobile responsiveness
 @media (max-width: 480px) {
   .profile-container {

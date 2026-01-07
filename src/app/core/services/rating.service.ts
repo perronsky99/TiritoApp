@@ -35,4 +35,24 @@ export class RatingService {
       catchError(() => of({ avgScore: 0, count: 0 }))
     );
   }
+
+  getPendingRatings() {
+    return this.http.get<{ data: Array<any>; total: number }>(`${this.API}/pending`);
+  }
+
+  getRatingsForTirito(tiritoId: string) {
+    return this.http.get<{
+      tiritoId: string;
+      isParticipant: boolean;
+      isCreator: boolean;
+      counterpartId: string | null;
+      counterpartName: string | null;
+      givenRating: { score: number; comment?: string; createdAt: string } | null;
+      receivedRating: { score: number; comment?: string; createdAt: string } | null;
+    }>(`${this.API}/tirito/${tiritoId}`);
+  }
+
+  requestRating(tiritoId: string) {
+    return this.http.post<{ message: string }>(`${this.API}/request`, { tiritoId });
+  }
 }

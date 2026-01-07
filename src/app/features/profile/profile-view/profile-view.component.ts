@@ -32,6 +32,14 @@ export class ProfileViewComponent implements OnInit {
   ratingSummary: { avgScore?: number; count?: number } = {};
   showRatingForm: { [tiritoId: string]: boolean } = {};
   ratingDrafts: { [tiritoId: string]: { score: number; comment: string; submitting?: boolean } } = {};
+  // Ratings info por tirito (dado/recibido)
+  tiritoRatings: { [tiritoId: string]: {
+    givenRating: { score: number; comment?: string } | null;
+    receivedRating: { score: number; comment?: string } | null;
+    counterpartName: string | null;
+    loading?: boolean;
+    requestingRating?: boolean;
+  } } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -91,6 +99,9 @@ export class ProfileViewComponent implements OnInit {
           this.loadingTiritos = false;
           this.tiritos.forEach(t => {
             this.ratingDrafts[t.id] = { score: 5, comment: '' };
+            if (t.status === 'closed') {
+              this.loadTiritoRatings(t.id);
+            }
           });
         },
         error: () => this.loadingTiritos = false
@@ -105,9 +116,48 @@ export class ProfileViewComponent implements OnInit {
         this.loadingTiritos = false;
         this.tiritos.forEach(t => {
           this.ratingDrafts[t.id] = { score: 5, comment: '' };
+          if (t.status === 'closed') {
+            this.loadTiritoRatings(t.id);
+          }
         });
       },
       error: () => this.loadingTiritos = false
+    });
+  }
+
+  // Cargar info de ratings para un tirito específico
+  loadTiritoRatings(tiritoId: string): void {
+    this.tiritoRatings[tiritoId] = { givenRating: null, receivedRating: null, counterpartName: null, loading: true };
+    this.ratingService.getRatingsForTirito(tiritoId).subscribe({
+      next: (res) => {
+        this.tiritoRatings[tiritoId] = {
+          givenRating: res.givenRating,
+          receivedRating: res.receivedRating,
+          counterpartName: res.counterpartName,
+          loading: false
+        };
+      },
+      error: () => {
+        this.tiritoRatings[tiritoId] = { givenRating: null, receivedRating: null, counterpartName: null, loading: false };
+      }
+    });
+  }
+
+  // Solicitar valoración a la contraparte
+  requestRatingFromCounterpart(tiritoId: string): void {
+    const info = this.tiritoRatings[tiritoId];
+    if (!info) return;
+    info.requestingRating = true;
+    this.ratingService.requestRating(tiritoId).subscribe({
+      next: () => {
+        info.requestingRating = false;
+        this.snackBar.open('Solicitud de valoración enviada', undefined, { duration: 3000 });
+      },
+      error: (err) => {
+        info.requestingRating = false;
+        const msg = err?.error?.message || 'No se pudo enviar la solicitud';
+        this.snackBar.open(msg, undefined, { duration: 4000 });
+      }
     });
   }
 

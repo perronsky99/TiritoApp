@@ -84,6 +84,55 @@
               </mat-card-header>
               <mat-card-content>
                 <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+                
+                <!-- Sección de calificaciones para tiritos cerrados -->
+                <div class="tirito-ratings" *ngIf="tirito.status === 'closed' && tiritoRatings[tirito.id]">
+                  <mat-spinner *ngIf="tiritoRatings[tirito.id]?.loading" diameter="20"></mat-spinner>
+                  
+                  <div class="ratings-info" *ngIf="!tiritoRatings[tirito.id]?.loading">
+                    <!-- Si no hay contraparte, mostrar mensaje -->
+                    <div *ngIf="!tiritoRatings[tirito.id]?.counterpartName" class="no-counterpart">
+                      <mat-icon>info</mat-icon>
+                      <span>Este tirito se cerró sin asignar</span>
+                    </div>
+
+                    <!-- Si hay contraparte, mostrar ratings -->
+                    <ng-container *ngIf="tiritoRatings[tirito.id]?.counterpartName">
+                      <!-- Calificación que di -->
+                      <div class="rating-row given">
+                        <span class="rating-label">Tu valoración:</span>
+                        <span *ngIf="tiritoRatings[tirito.id]?.givenRating" class="rating-value">
+                          {{ tiritoRatings[tirito.id].givenRating.score }}★
+                        </span>
+                        <span *ngIf="!tiritoRatings[tirito.id]?.givenRating" class="rating-pending">
+                          <mat-icon>warning</mat-icon> Pendiente
+                          <button mat-button color="primary" size="small" (click)="$event.stopPropagation(); openRatingDialog(tirito)">
+                            Valorar
+                          </button>
+                        </span>
+                      </div>
+                      
+                      <!-- Calificación que recibí -->
+                      <div class="rating-row received">
+                        <span class="rating-label">Valoración recibida:</span>
+                        <span *ngIf="tiritoRatings[tirito.id]?.receivedRating" class="rating-value">
+                          {{ tiritoRatings[tirito.id].receivedRating.score }}★
+                        </span>
+                        <span *ngIf="!tiritoRatings[tirito.id]?.receivedRating" class="rating-pending">
+                          <mat-icon>hourglass_empty</mat-icon> Sin valorar
+                          <button 
+                            mat-button 
+                            color="accent" 
+                            size="small" 
+                            (click)="$event.stopPropagation(); requestRatingFromCounterpart(tirito.id)"
+                            [disabled]="tiritoRatings[tirito.id]?.requestingRating">
+                            {{ tiritoRatings[tirito.id]?.requestingRating ? 'Enviando...' : 'Solicitar' }}
+                          </button>
+                        </span>
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
               </mat-card-content>
               <mat-card-actions>
                 <button mat-button color="primary" (click)="goToTirito(tirito)">Ver</button>

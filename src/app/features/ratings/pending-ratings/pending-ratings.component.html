@@ -1,0 +1,26 @@
+<div class="pending-ratings">
+  <h2>Valoraciones pendientes</h2>
+
+  <app-loading-spinner *ngIf="loading" [message]="'Cargando...'">
+  </app-loading-spinner>
+
+  <div *ngIf="error && !loading" class="error">
+    <p>{{ error }}</p>
+    <button mat-button color="primary" (click)="loadPending()">Reintentar</button>
+  </div>
+
+  <div *ngIf="!loading && pending.length === 0" class="empty">
+    <p>No tenés valoraciones pendientes. ¡Buen trabajo!</p>
+    <button mat-raised-button color="primary" routerLink="/tiritos">Buscar tiritos</button>
+  </div>
+
+  <div *ngIf="!loading && pending.length > 0" class="list">
+    <mat-card *ngFor="let p of pending" class="pending-card">
+      <mat-card-title>{{ p.tiritoTitle }}</mat-card-title>
+      <mat-card-subtitle>Valorá a: <strong>{{ p.targetName }}</strong></mat-card-subtitle>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="goToTirito(p.tiritoId)">Valorar</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
