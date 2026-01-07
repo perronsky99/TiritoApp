@@ -69,7 +69,7 @@
 
       <!-- Actions -->
       <div class="actions">
-        <!-- Si NO es el owner y está abierto -->
+        <!-- Si NO es el owner y está abierto: Contactar + Tomar trabajo -->
         <ng-container *ngIf="!isOwner && tirito.status === 'open'">
           <button 
             mat-raised-button 
@@ -77,6 +77,14 @@
             (click)="contact()">
             <mat-icon>chat</mat-icon>
             Contactar
+          </button>
+          <button 
+            mat-raised-button 
+            color="accent"
+            [disabled]="actionLoading"
+            (click)="acceptTirito()">
+            <mat-icon>work</mat-icon>
+            Tomar este trabajo
           </button>
         </ng-container>
 
@@ -102,10 +110,21 @@
           </button>
         </ng-container>
 
+        <!-- Tirito en progreso: mostrar quién lo está haciendo -->
+        <div class="assigned-info" *ngIf="tirito.status === 'in_progress' && tirito.assignedTo">
+          <mat-icon>person</mat-icon>
+          <span>Asignado a: <strong>{{ tirito.assignedToName || 'Usuario' }}</strong></span>
+        </div>
+
         <!-- Tirito cerrado -->
         <div class="closed-message" *ngIf="tirito.status === 'closed'">
           <mat-icon>check_circle</mat-icon>
           Este tirito ya fue resuelto
+        </div>
+
+        <!-- Valorar: mostrar si el usuario participó -->
+        <div *ngIf="canRate()" class="rate-action">
+          <button mat-stroked-button color="primary" (click)="openRating()">Valorar</button>
         </div>
       </div>
     </div>

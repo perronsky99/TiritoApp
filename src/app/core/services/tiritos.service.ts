@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { 
   Tirito, 
   CreateTiritoData, 
@@ -40,6 +41,14 @@ export class TiritosService {
   }
 
   /**
+   * Obtiene tiritos por creatorId (público)
+   */
+  getTiritosByCreator(creatorId: string, page = 1, limit = 12) {
+    let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+    return this.http.get<TiritosResponse>(`${this.API_URL}/creator/${creatorId}`, { params });
+  }
+
+  /**
    * Obtiene un tirito por ID
    */
   getTiritoById(id: string): Observable<Tirito> {
@@ -66,27 +75,33 @@ export class TiritosService {
       });
     }
 
-    return this.http.post<Tirito>(this.API_URL, formData);
+    return this.http.post<any>(this.API_URL, formData).pipe(
+      map(res => res.tirito as Tirito)
+    );
   }
 
   /**
    * Marca un tirito como "en progreso"
-   * Solo el creador puede hacerlo (validado en backend)
+   * Si lo hace alguien distinto al creador, se asigna como "assignedTo"
    */
   markInProgress(id: string): Observable<Tirito> {
-    return this.http.patch<Tirito>(`${this.API_URL}/${id}/status`, {
+    return this.http.patch<any>(`${this.API_URL}/${id}/status`, {
       status: 'in_progress'
-    });
+    }).pipe(
+      map(res => res.tirito as Tirito)
+    );
   }
 
   /**
    * Cierra un tirito
-   * Solo el creador puede hacerlo (validado en backend)
+   * Solo el creador o el assignedTo pueden cerrarlo
    */
   closeTirito(id: string): Observable<Tirito> {
-    return this.http.patch<Tirito>(`${this.API_URL}/${id}/status`, {
+    return this.http.patch<any>(`${this.API_URL}/${id}/status`, {
       status: 'closed'
-    });
+    }).pipe(
+      map(res => res.tirito as Tirito)
+    );
   }
 
   /**

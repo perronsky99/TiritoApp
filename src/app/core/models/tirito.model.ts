@@ -28,6 +28,7 @@ export interface Tirito {
   creatorName: string;
   creatorAvatar?: string;
   assignedTo?: string;
+  assignedToName?: string;
   location?: string;
   createdAt: string;
   updatedAt: string;

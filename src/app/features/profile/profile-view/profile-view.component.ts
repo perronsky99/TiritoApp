@@ -80,24 +80,34 @@ export class ProfileViewComponent implements OnInit {
 
   loadUserTiritos(): void {
     if (!this.user) return;
-    
+
     this.loadingTiritos = true;
-    
-    // Por ahora cargamos tiritos del usuario actual si es su perfil
-    // En producción, el backend filtraría por creatorId
-    this.tiritosService.getTiritos({ limit: 6 }).subscribe({
+
+    // Si es el propio perfil, usar el endpoint /me para obtener todos los tiritos (incluidos cerrados)
+    if (this.isOwnProfile) {
+      this.tiritosService.getMyTiritos().subscribe({
+        next: (response) => {
+          this.tiritos = response.data || [];
+          this.loadingTiritos = false;
+          this.tiritos.forEach(t => {
+            this.ratingDrafts[t.id] = { score: 5, comment: '' };
+          });
+        },
+        error: () => this.loadingTiritos = false
+      });
+      return;
+    }
+
+    // Perfil público: obtener tiritos por creatorId (incluye cerrados)
+    this.tiritosService.getTiritosByCreator(this.user.id, 1, 12).subscribe({
       next: (response) => {
-        // Filtrar solo los del usuario actual (temporal)
-        this.tiritos = response.data.filter(t => t.creatorId === this.user?.id);
+        this.tiritos = response.data || [];
         this.loadingTiritos = false;
-        // preparar borradores de valoración
         this.tiritos.forEach(t => {
           this.ratingDrafts[t.id] = { score: 5, comment: '' };
         });
       },
-      error: () => {
-        this.loadingTiritos = false;
-      }
+      error: () => this.loadingTiritos = false
     });
   }
 
@@ -181,9 +191,9 @@ export class ProfileViewComponent implements OnInit {
   // Intentar cargar tiritos usando un creatorId cuando el perfil no existe
   loadUserTiritosByCreator(creatorId: string): void {
     this.loadingTiritos = true;
-    this.tiritosService.getTiritos({ limit: 12 }).subscribe({
+    this.tiritosService.getTiritosByCreator(creatorId, 1, 12).subscribe({
       next: (response) => {
-        const matches = response.data.filter(t => t.creatorId === creatorId);
+        const matches = response.data || [];
         this.tiritos = matches;
         // Si encontramos al menos un tirito, usar el creatorName del primero como nombre del perfil
         if (matches.length > 0) {

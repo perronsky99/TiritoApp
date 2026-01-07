@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { RatingDialogComponent } from '../../profile/rating-dialog/rating-dialog.component';
+import { RatingService } from '../../../core/services/rating.service';
 import { TiritosService } from '../../../core/services/tiritos.service';
 import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -39,6 +41,9 @@ export class TiritoDetailComponent implements OnInit {
     private analyticsService: AnalyticsService,
     private notificationService: NotificationService,
     private snackBar: MatSnackBar
+    ,
+    private dialog: MatDialog,
+    private ratingService: RatingService
   ) {}
 
   ngOnInit(): void {
@@ -46,6 +51,51 @@ export class TiritoDetailComponent implements OnInit {
     if (id) {
       this.loadTirito(id);
     }
+  }
+
+  canRate(): boolean {
+    const me = this.authService.currentUser;
+    if (!me || !this.tirito) return false;
+    if (this.tirito.status !== 'closed') return false;
+    const isParticipant = me.id === this.tirito.creatorId || me.id === this.tirito.assignedTo;
+    return isParticipant;
+  }
+
+  openRating(): void {
+    if (!this.tirito || !this.authService.currentUser) return;
+
+    // determine target: if current user is creator, target is assignedTo; else target is creator
+    const me = this.authService.currentUser;
+    let targetId = '';
+    let targetName = '';
+    if (me.id === this.tirito.creatorId) {
+      targetId = this.tirito.assignedTo as any;
+      targetName = (this.tirito as any).assignedToName || 'Usuario';
+    } else {
+      targetId = this.tirito.creatorId;
+      targetName = this.tirito.creatorName || 'Usuario';
+    }
+
+    if (!targetId || targetId === me.id) return; // safety
+
+    const dialogRef = this.dialog.open(RatingDialogComponent, {
+      width: '520px',
+      data: { tiritoId: this.tirito.id, targetId, targetName }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) return;
+      const { score, comment } = result;
+      this.ratingService.createRating({ tiritoId: this.tirito!.id, targetId, score, comment }).subscribe({
+        next: () => {
+          this.snackBar.open('Valoración enviada', undefined, { duration: 3000 });
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'No se pudo enviar la valoración';
+          this.snackBar.open(msg, undefined, { duration: 4000 });
+        }
+      });
+    });
   }
 
   loadTirito(id: string): void {
@@ -169,6 +219,34 @@ export class TiritoDetailComponent implements OnInit {
         this.actionLoading = false;
         this.snackBar.open(
           err.error?.message || 'No pudimos cerrar el tirito',
+          'Cerrar',
+          { duration: 3000 }
+        );
+      }
+    });
+  }
+
+  /**
+   * Usuario acepta/toma el trabajo del tirito
+   * Marca el tirito como in_progress y asigna al usuario actual
+   */
+  acceptTirito(): void {
+    if (!this.tirito || !this.authService.isLoggedIn) return;
+
+    this.actionLoading = true;
+
+    this.tiritosService.markInProgress(this.tirito.id).subscribe({
+      next: (updated) => {
+        this.tirito = updated;
+        this.actionLoading = false;
+        this.snackBar.open('¡Tomaste este trabajo! Ahora está asignado a ti.', 'Cerrar', {
+          duration: 4000
+        });
+      },
+      error: (err) => {
+        this.actionLoading = false;
+        this.snackBar.open(
+          err.error?.message || 'No pudimos asignarte el tirito',
           'Cerrar',
           { duration: 3000 }
         );

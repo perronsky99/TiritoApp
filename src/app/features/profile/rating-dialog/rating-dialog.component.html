@@ -1,6 +1,6 @@
 <div class="rating-dialog">
   <div class="header">
-    <div class="avatar">{{ data.targetName ? (data.targetName.charAt(0) | uppercase) : 'U' }}</div>
+    <div class="avatar">{{ data.targetName ? data.targetName.charAt(0).toUpperCase() : 'U' }}</div>
     <div class="meta">
       <h3>Valora a {{ data.targetName || 'usuario' }}</h3>
       <p class="sub">¿Cómo fue la experiencia?</p>

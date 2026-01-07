@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -20,7 +22,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 // UI Components
 import { LoadingSpinnerComponent } from './ui/loading-spinner/loading-spinner.component';
@@ -30,6 +31,7 @@ import { VerificationBadgeComponent } from './ui/verification-badge/verification
 import { TiritoStatusBadgeComponent } from './ui/tirito-status-badge/tirito-status-badge.component';
 import { ImageUploadComponent } from './ui/image-upload/image-upload.component';
 import { NotificationDropdownComponent } from './ui/notification-dropdown/notification-dropdown.component';
+import { RatingDialogComponent } from '../features/profile/rating-dialog/rating-dialog.component';
 
 // Pipes
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
@@ -42,6 +44,7 @@ const MATERIAL_MODULES = [
   MatTooltipModule,
   MatInputModule,
   MatFormFieldModule,
+  MatButtonToggleModule,
   MatCardModule,
   MatChipsModule,
   MatMenuModule,
@@ -53,7 +56,6 @@ const MATERIAL_MODULES = [
   MatTabsModule,
   MatSidenavModule,
   MatListModule
-  ,MatButtonToggleModule
 ];
 
 const UI_COMPONENTS = [
@@ -63,15 +65,14 @@ const UI_COMPONENTS = [
   VerificationBadgeComponent,
   TiritoStatusBadgeComponent,
   ImageUploadComponent,
-  NotificationDropdownComponent
+  NotificationDropdownComponent,
+  RatingDialogComponent
 ];
 
 const PIPES = [
   RelativeTimePipe,
   TruncatePipe
 ];
-
-import { RouterModule } from '@angular/router';
 
 /**
  * Shared Module - Se importa en cada feature module
@@ -85,16 +86,16 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
-    ...MATERIAL_MODULES,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ...MATERIAL_MODULES
   ],
   exports: [
     CommonModule,
     RouterModule,
-    ...MATERIAL_MODULES,
     FormsModule,
     ReactiveFormsModule,
+    ...MATERIAL_MODULES,
     ...UI_COMPONENTS,
     ...PIPES
   ]
