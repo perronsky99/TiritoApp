@@ -29,6 +29,11 @@
       <ng-container *ngIf="authService.isLoggedIn">
         <mat-divider></mat-divider>
         
+        <a mat-list-item (click)="goToRequests()">
+          <mat-icon matListItemIcon>inbox</mat-icon>
+          <span matListItemTitle>Solicitudes</span>
+        </a>
+        
         <a mat-list-item (click)="goToChat()">
           <mat-icon matListItemIcon [matBadge]="(unreadCount$ | async) || null" matBadgeColor="accent">
             chat
@@ -98,6 +103,10 @@
         </ng-container>
 
         <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="goToRequests()">
+            <mat-icon>inbox</mat-icon>
+            <span>Solicitudes</span>
+          </button>
           <button mat-menu-item (click)="goToChat()">
             <mat-icon>chat</mat-icon>
             <span>Mis chats</span>

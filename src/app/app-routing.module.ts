@@ -56,6 +56,11 @@ const routes: Routes = [
         canActivate: [AuthGuard]
       },
       {
+        path: 'solicitudes',
+        loadChildren: () => import('./features/requests/requests.module').then(m => m.RequestsModule),
+        canActivate: [AuthGuard]
+      },
+      {
         path: 'perfil',
         loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule)
       }

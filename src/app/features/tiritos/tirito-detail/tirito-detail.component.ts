@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { RatingDialogComponent } from '../../profile/rating-dialog/rating-dialog.component';
 import { RatingService } from '../../../core/services/rating.service';
 import { TiritosService } from '../../../core/services/tiritos.service';
+import { TiritoRequestsService } from '../../../core/services/tirito-requests.service';
 import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
@@ -36,6 +37,7 @@ export class TiritoDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private tiritosService: TiritosService,
+    private tiritoRequestsService: TiritoRequestsService,
     private chatService: ChatService,
     public authService: AuthService,
     private analyticsService: AnalyticsService,
@@ -227,26 +229,25 @@ export class TiritoDetailComponent implements OnInit {
   }
 
   /**
-   * Usuario acepta/toma el trabajo del tirito
-   * Marca el tirito como in_progress y asigna al usuario actual
+   * Usuario solicita tomar el trabajo del tirito
+   * Envía una solicitud que el creador debe aprobar
    */
   acceptTirito(): void {
     if (!this.tirito || !this.authService.isLoggedIn) return;
 
     this.actionLoading = true;
 
-    this.tiritosService.markInProgress(this.tirito.id).subscribe({
-      next: (updated) => {
-        this.tirito = updated;
+    this.tiritoRequestsService.createRequest(this.tirito.id, '¡Me interesa hacer este tirito!').subscribe({
+      next: () => {
         this.actionLoading = false;
-        this.snackBar.open('¡Tomaste este trabajo! Ahora está asignado a ti.', 'Cerrar', {
-          duration: 4000
+        this.snackBar.open('¡Solicitud enviada! El creador revisará tu perfil y decidirá.', 'Cerrar', {
+          duration: 5000
         });
       },
       error: (err) => {
         this.actionLoading = false;
         this.snackBar.open(
-          err.error?.message || 'No pudimos asignarte el tirito',
+          err.error?.message || 'No pudimos enviar la solicitud',
           'Cerrar',
           { duration: 3000 }
         );

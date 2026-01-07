@@ -75,6 +75,11 @@ export class MainLayoutComponent implements OnInit {
     this.closeSidenav();
   }
 
+  goToRequests(): void {
+    this.router.navigate(['/solicitudes']);
+    this.closeSidenav();
+  }
+
   goToProfile(): void {
     if (this.authService.currentUser) {
       this.router.navigate(['/perfil', this.authService.currentUser.id]);
