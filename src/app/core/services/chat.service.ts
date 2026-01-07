@@ -26,6 +26,14 @@ export interface IMessage {
   createdAt: string;
 }
 
+export interface IChatResponse {
+  chat: IChat;
+  messages: IMessage[];
+  chatEnabled: boolean;
+  chatDisabledReason?: string;
+  tiritoStatus?: string;
+}
+
 /**
  * Servicio para gestionar Chat
  * Alineado al backend v1.0
@@ -53,9 +61,14 @@ export class ChatService {
   /**
    * Obtiene chat y mensajes de un tirito
    * GET /api/chats/:tiritoId
+   * @param withUser ID del usuario con quien chatear (opcional, para creadores con múltiples solicitantes)
    */
-  getChat(tiritoId: string): Observable<{ chat: IChat; messages: IMessage[] }> {
-    return this.http.get<{ chat: IChat; messages: IMessage[] }>(`${this.API_URL}/${tiritoId}`);
+  getChat(tiritoId: string, withUser?: string): Observable<IChatResponse> {
+    let url = `${this.API_URL}/${tiritoId}`;
+    if (withUser) {
+      url += `?withUser=${withUser}`;
+    }
+    return this.http.get<IChatResponse>(url);
   }
 
   /**

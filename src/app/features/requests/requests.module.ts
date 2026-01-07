@@ -5,16 +5,21 @@ import { SharedModule } from '../../shared/shared.module';
 import { AuthGuard } from '../../core/guards/auth.guard';
 import { RequestsInboxComponent } from './requests-inbox/requests-inbox.component';
 import { MyRequestsComponent } from './my-requests/my-requests.component';
+import { RequestsUnifiedComponent } from './requests-unified/requests-unified.component';
 
 const routes: Routes = [
-  { path: '', component: RequestsInboxComponent, canActivate: [AuthGuard] },
-  { path: 'enviadas', component: MyRequestsComponent, canActivate: [AuthGuard] }
+  // Ruta principal unificada
+  { path: '', component: RequestsUnifiedComponent, canActivate: [AuthGuard] },
+  // Rutas legacy (redirigen a la unificada)
+  { path: 'enviadas', redirectTo: '?tab=enviadas', pathMatch: 'full' },
+  { path: 'recibidas', redirectTo: '?tab=recibidas', pathMatch: 'full' }
 ];
 
 @NgModule({
   declarations: [
     RequestsInboxComponent,
-    MyRequestsComponent
+    MyRequestsComponent,
+    RequestsUnifiedComponent
   ],
   imports: [
     SharedModule,

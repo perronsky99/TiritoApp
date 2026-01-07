@@ -150,6 +150,13 @@ export class TiritoDetailComponent implements OnInit {
   }
 
   /**
+   * Verifica si el usuario actual es el worker asignado
+   */
+  get isAssignedWorker(): boolean {
+    return this.authService.currentUser?.id === this.tirito?.assignedTo;
+  }
+
+  /**
    * Inicia contacto con el creador del tirito
    * Backend v1.0: Enviar mensaje crea el chat automáticamente
    */
@@ -163,36 +170,8 @@ export class TiritoDetailComponent implements OnInit {
 
     if (!this.tirito) return;
 
-    // Enviar primer mensaje - el backend crea el chat automáticamente
-    const initialMessage = `Hola! Me interesa tu tirito "${this.tirito.title}"`;
-    
-    this.chatService.sendMessage(this.tirito.id, initialMessage).subscribe({
-      next: (response) => {
-        // Backend devuelve { message: string, data: IMessage, isNewChat: boolean }
-        this.analyticsService.trackChatStarted(response.data.chatId, this.tirito!.id);
-        this.analyticsService.trackContactInitiated(this.tirito!.id);
-        
-        // Mostrar toast de confirmación
-        this.snackBar.open('¡Mensaje enviado! El dueño del tirito recibirá una notificación.', 'Ver chat', {
-          duration: 5000,
-          panelClass: ['success-snackbar']
-        }).onAction().subscribe(() => {
-          this.router.navigate(['/chat', this.tirito!.id]);
-        });
-
-        // Refrescar contador de notificaciones (por si el usuario también tiene notificaciones)
-        this.notificationService.refreshUnreadCount();
-        
-        // Navegar al chat usando el tiritoId
-        this.router.navigate(['/chat', this.tirito!.id]);
-      },
-      error: () => {
-        this.snackBar.open('No pudimos iniciar el chat', 'Cerrar', {
-          duration: 3000,
-          panelClass: ['error-snackbar']
-        });
-      }
-    });
+    // Navegar directamente al chat - el usuario puede escribir ahí
+    this.router.navigate(['/chat', this.tirito.id]);
   }
 
   /**

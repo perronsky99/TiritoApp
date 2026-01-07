@@ -45,6 +45,11 @@ export class RequestsInboxComponent implements OnInit {
     this.router.navigate(['/tiritos', tiritoId]);
   }
 
+  openChat(tiritoId: string, requesterId: string): void {
+    // Navegar al chat con el parámetro withUser para especificar con quién chatear
+    this.router.navigate(['/chat', tiritoId], { queryParams: { withUser: requesterId } });
+  }
+
   acceptRequest(request: TiritoRequest): void {
     this.requestsService.acceptRequest(request.id).subscribe({
       next: () => {

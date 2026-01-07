@@ -30,13 +30,8 @@
         <mat-divider></mat-divider>
         
         <a mat-list-item (click)="goToRequests()">
-          <mat-icon matListItemIcon>inbox</mat-icon>
-          <span matListItemTitle>Solicitudes recibidas</span>
-        </a>
-        
-        <a mat-list-item (click)="goToMyRequests()">
-          <mat-icon matListItemIcon>send</mat-icon>
-          <span matListItemTitle>Mis solicitudes enviadas</span>
+          <mat-icon matListItemIcon>assignment</mat-icon>
+          <span matListItemTitle>Solicitudes</span>
         </a>
         
         <a mat-list-item (click)="goToChat()">
@@ -109,12 +104,8 @@
 
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item (click)="goToRequests()">
-            <mat-icon>inbox</mat-icon>
-            <span>Solicitudes recibidas</span>
-          </button>
-          <button mat-menu-item (click)="goToMyRequests()">
-            <mat-icon>send</mat-icon>
-            <span>Mis solicitudes enviadas</span>
+            <mat-icon>assignment</mat-icon>
+            <span>Solicitudes</span>
           </button>
           <button mat-menu-item (click)="goToChat()">
             <mat-icon>chat</mat-icon>

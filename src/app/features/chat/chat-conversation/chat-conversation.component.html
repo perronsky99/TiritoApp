@@ -62,15 +62,21 @@
 
   <!-- Input -->
   <div class="chat-input" *ngIf="!loading && !error && chat">
+    <!-- Chat disabled banner -->
+    <div class="chat-disabled-banner" *ngIf="!chatEnabled">
+      <mat-icon>lock</mat-icon>
+      <span>{{ getDisabledReasonText() }}</span>
+    </div>
+
     <!-- Selected image preview -->
-    <div class="image-preview" *ngIf="selectedImage">
+    <div class="image-preview" *ngIf="selectedImage && chatEnabled">
       <img [src]="selectedImage | async" alt="Preview">
       <button mat-icon-button (click)="removeSelectedImage()">
         <mat-icon>close</mat-icon>
       </button>
     </div>
 
-    <div class="input-row">
+    <div class="input-row" *ngIf="chatEnabled">
       <input 
         type="file" 
         #imageInput

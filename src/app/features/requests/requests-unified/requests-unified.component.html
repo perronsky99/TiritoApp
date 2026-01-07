@@ -1,0 +1,179 @@
+<div class="requests-unified">
+  <div class="header">
+    <h2>
+      <mat-icon>assignment</mat-icon>
+      Solicitudes
+    </h2>
+    <p class="subtitle">Gestiona las solicitudes de tiritos</p>
+  </div>
+
+  <mat-tab-group 
+    [selectedIndex]="selectedTabIndex"
+    (selectedIndexChange)="onTabChange($event)"
+    animationDuration="200ms">
+    
+    <!-- Tab: Solicitudes Recibidas -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">inbox</mat-icon>
+        Recibidas
+        <span class="badge" *ngIf="receivedCount > 0">{{ receivedCount }}</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Loading -->
+        <div *ngIf="loadingReceived" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Cargando solicitudes...</p>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="errorReceived && !loadingReceived" class="error-container">
+          <mat-icon color="warn">error</mat-icon>
+          <p>{{ errorReceived }}</p>
+          <button mat-button color="primary" (click)="loadReceivedRequests()">Reintentar</button>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!loadingReceived && !errorReceived && receivedRequests.length === 0" class="empty-state">
+          <mat-icon>hourglass_empty</mat-icon>
+          <h3>Sin solicitudes pendientes</h3>
+          <p>Cuando alguien quiera hacer uno de tus tiritos, aparecerá aquí.</p>
+        </div>
+
+        <!-- Requests list -->
+        <div *ngIf="!loadingReceived && receivedRequests.length > 0" class="requests-list">
+          <mat-card *ngFor="let request of receivedRequests" class="request-card">
+            <mat-card-header>
+              <div mat-card-avatar class="avatar">
+                {{ request.requester.name.charAt(0).toUpperCase() }}
+              </div>
+              <mat-card-title>{{ request.requester.name }}</mat-card-title>
+              <mat-card-subtitle>
+                Quiere hacer: <strong>{{ request.tirito.title }}</strong>
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <p *ngIf="request.message" class="message">
+                <mat-icon>format_quote</mat-icon>
+                "{{ request.message }}"
+              </p>
+              <p class="date">
+                <mat-icon>schedule</mat-icon>
+                {{ request.createdAt | date:'short' }}
+              </p>
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+              <button mat-button color="primary" (click)="viewProfile(request.requester.id)">
+                <mat-icon>person</mat-icon>
+                Perfil
+              </button>
+              <button mat-button (click)="viewTirito(request.tirito.id)">
+                <mat-icon>visibility</mat-icon>
+                Tirito
+              </button>
+              <button mat-button color="accent" (click)="openChat(request.tirito.id, request.requester.id)">
+                <mat-icon>chat</mat-icon>
+                Chat
+              </button>
+              <button mat-raised-button color="warn" (click)="rejectRequest(request)">
+                <mat-icon>close</mat-icon>
+                Rechazar
+              </button>
+              <button mat-raised-button color="primary" (click)="acceptRequest(request)">
+                <mat-icon>check</mat-icon>
+                Aceptar
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab: Solicitudes Enviadas -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">send</mat-icon>
+        Enviadas
+        <span class="badge" *ngIf="sentCount > 0">{{ sentCount }}</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Loading -->
+        <div *ngIf="loadingSent" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Cargando solicitudes...</p>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="errorSent && !loadingSent" class="error-container">
+          <mat-icon color="warn">error</mat-icon>
+          <p>{{ errorSent }}</p>
+          <button mat-button color="primary" (click)="loadSentRequests()">Reintentar</button>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!loadingSent && !errorSent && sentRequests.length === 0" class="empty-state">
+          <mat-icon>inbox</mat-icon>
+          <h3>No has enviado solicitudes</h3>
+          <p>Cuando solicites hacer un tirito, aparecerá aquí para que puedas ver su estado.</p>
+          <button mat-raised-button color="primary" routerLink="/tiritos">
+            <mat-icon>search</mat-icon>
+            Buscar tiritos
+          </button>
+        </div>
+
+        <!-- Requests list -->
+        <div *ngIf="!loadingSent && sentRequests.length > 0" class="requests-list">
+          <mat-card *ngFor="let request of sentRequests" class="request-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar class="tirito-icon">work</mat-icon>
+              <mat-card-title>{{ request.tirito.title }}</mat-card-title>
+              <mat-card-subtitle>
+                Solicitado el {{ request.createdAt | date:'short' }}
+              </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+              <div class="status-container">
+                <span class="status-label">Estado:</span>
+                <span class="status-badge" [ngClass]="getStatusClass(request.status)">
+                  <mat-icon *ngIf="request.status === 'pending'">hourglass_empty</mat-icon>
+                  <mat-icon *ngIf="request.status === 'accepted'">check_circle</mat-icon>
+                  <mat-icon *ngIf="request.status === 'rejected'">cancel</mat-icon>
+                  {{ getStatusLabel(request.status) }}
+                </span>
+              </div>
+
+              <p class="status-description" *ngIf="request.status === 'pending'">
+                <mat-icon>info</mat-icon>
+                Tu solicitud está siendo revisada por el creador del tirito.
+              </p>
+              <p class="status-description success" *ngIf="request.status === 'accepted'">
+                <mat-icon>celebration</mat-icon>
+                ¡Felicitaciones! Tu solicitud fue aceptada. Ya podés empezar a trabajar.
+              </p>
+              <p class="status-description error" *ngIf="request.status === 'rejected'">
+                <mat-icon>sentiment_dissatisfied</mat-icon>
+                Tu solicitud fue rechazada. Podés intentar con otro tirito.
+              </p>
+
+              <p *ngIf="request.message" class="message sent-message">
+                <strong>Tu mensaje:</strong> "{{ request.message }}"
+              </p>
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+              <button mat-button color="primary" (click)="viewTirito(request.tirito.id)">
+                <mat-icon>visibility</mat-icon>
+                Ver tirito
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

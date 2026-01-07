@@ -69,16 +69,8 @@
 
       <!-- Actions -->
       <div class="actions">
-        <!-- Si NO es el owner y está abierto: Contactar + Solicitar trabajo -->
+        <!-- Si NO es el owner y está abierto: Solicitar trabajo + Chatear (si ya solicitó) -->
         <ng-container *ngIf="!isOwner && tirito.status === 'open'">
-          <button 
-            mat-raised-button 
-            color="primary"
-            (click)="contact()">
-            <mat-icon>chat</mat-icon>
-            Contactar
-          </button>
-          
           <!-- Mostrar botón según estado de solicitud -->
           <ng-container *ngIf="!myRequest">
             <button 
@@ -91,27 +83,43 @@
             </button>
           </ng-container>
           
-          <!-- Solicitud pendiente -->
-          <button 
-            *ngIf="myRequest?.status === 'pending'"
-            mat-raised-button 
-            class="request-pending-btn"
-            disabled>
-            <mat-icon>hourglass_empty</mat-icon>
-            Solicitud enviada - En espera de aprobación
-          </button>
+          <!-- Solicitud pendiente: puede chatear -->
+          <ng-container *ngIf="myRequest?.status === 'pending'">
+            <button 
+              mat-raised-button 
+              class="request-pending-btn"
+              disabled>
+              <mat-icon>hourglass_empty</mat-icon>
+              Solicitud enviada - En espera
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="contact()">
+              <mat-icon>chat</mat-icon>
+              Enviar mensaje
+            </button>
+          </ng-container>
           
-          <!-- Solicitud aceptada -->
-          <button 
-            *ngIf="myRequest?.status === 'accepted'"
-            mat-raised-button 
-            class="request-accepted-btn"
-            disabled>
-            <mat-icon>check_circle</mat-icon>
-            ¡Tu solicitud fue aceptada!
-          </button>
+          <!-- Solicitud aceptada: puede chatear -->
+          <ng-container *ngIf="myRequest?.status === 'accepted'">
+            <button 
+              mat-raised-button 
+              class="request-accepted-btn"
+              disabled>
+              <mat-icon>check_circle</mat-icon>
+              ¡Solicitud aceptada!
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="contact()">
+              <mat-icon>chat</mat-icon>
+              Enviar mensaje
+            </button>
+          </ng-container>
           
-          <!-- Solicitud rechazada -->
+          <!-- Solicitud rechazada: NO puede chatear -->
           <button 
             *ngIf="myRequest?.status === 'rejected'"
             mat-raised-button 
@@ -120,6 +128,27 @@
             <mat-icon>cancel</mat-icon>
             Solicitud rechazada
           </button>
+        </ng-container>
+
+        <!-- Si NO es el owner y tirito está en progreso -->
+        <ng-container *ngIf="!isOwner && tirito.status === 'in_progress'">
+          <!-- Si es el worker asignado: puede chatear -->
+          <ng-container *ngIf="isAssignedWorker">
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="contact()">
+              <mat-icon>chat</mat-icon>
+              Enviar mensaje
+            </button>
+          </ng-container>
+          <!-- Si tenía solicitud aceptada pero no es el asignado, mostrar info -->
+          <ng-container *ngIf="myRequest?.status === 'accepted' && !isAssignedWorker">
+            <div class="info-message">
+              <mat-icon>info</mat-icon>
+              <span>Este tirito está en progreso con otro usuario</span>
+            </div>
+          </ng-container>
         </ng-container>
 
         <!-- Si es el owner -->
