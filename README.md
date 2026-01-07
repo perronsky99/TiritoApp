@@ -4,77 +4,87 @@ Plataforma C2C/B2C para publicación y gestión de “tiritos” (trabajos rápi
 
 ---
 
-## Índice
+# Tirito App — Frontend (UI)
 
-- [Descripción General](#descripción-general)
-- [Tecnologías](#tecnologías)
-- [Arquitectura](#arquitectura)
-- [Estructura de Carpetas](#estructura-de-carpetas)
-- [Instalación y Uso](#instalación-y-uso)
-- [Scripts Disponibles](#scripts-disponibles)
-- [Módulos y Funcionalidades](#módulos-y-funcionalidades)
-- [Estilos y Temas](#estilos-y-temas)
-- [Ambientes](#ambientes)
-- [Contribuir](#contribuir)
-- [Licencia](#licencia)
+Este repositorio contiene el cliente Angular de Tirito App: publicación y búsqueda de tiritos, chat, perfil y notificaciones.
 
----
+Este README explica cómo preparar, ejecutar y conectar el frontend con el backend en un entorno de desarrollo.
 
-## Descripción General
+## Resumen rápido
 
-Tirito App es una plataforma web para conectar personas que ofrecen y buscan trabajos rápidos (“tiritos”), sin burocracia, pagos ni panel de administración. El frontend está construido en Angular 14+ siguiendo arquitectura modular y buenas prácticas.
+- Tech stack: Angular 14, TypeScript, Angular Material, RxJS
+- Dev URL: http://localhost:4200
+- API backend: configurada en `src/environments/*` (clave `apiUrl`)
 
-**Características principales:**
-- Publicar, buscar y contactar por tiritos
-- Chat en tiempo real (simulado)
-- Perfil de usuario y verificación
-- Estado de tiritos (abierto, en curso, cerrado)
-- UI moderna, responsiva y accesible
+- Historial de cambios: ver `CHANGELOG.md` en la raíz del proyecto para notas de versión.
 
----
+## Requisitos
 
-## Tecnologías
+- Node.js >=16
+- npm (o equivalentes: yarn, pnpm)
 
-- Angular 14.2.x
-- Angular Material 14.2.x
-- RxJS 7.5.x
-- TypeScript 4.7.4
-- SCSS (NO Tailwind)
-- JWT Bearer Auth (interceptor)
-- Lazy loading de módulos
+## Instalación
 
----
-
-## Arquitectura
-
-El proyecto sigue una arquitectura modular basada en features:
-
-- **core/**: Servicios, modelos, guards, interceptores, lógica de negocio
-- **shared/**: Componentes UI reutilizables y pipes
-- **features/**: Módulos funcionales (auth, home, tiritos, chat, profile)
-- **layouts/**: Componentes de layout (toolbar, sidenav)
-
----
-
-## Estructura de Carpetas
-
+```bash
+cd TiritoApp
+npm install
 ```
-src/
-	app/
-		core/         # Servicios, modelos, guards, interceptores
-		shared/       # Componentes y pipes reutilizables
-		features/
-			auth/       # Login, registro
-			home/       # Landing page
-			tiritos/    # Listado, detalle, creación
-			chat/       # Conversaciones, chat
-			profile/    # Perfil de usuario
-		layouts/      # MainLayout (toolbar, sidenav)
-		app-routing.module.ts
-		app.module.ts
-	assets/
-		img/, scss/, css/
-	environments/
+
+## Configuración
+
+Edita `src/environments/environment.ts` y `src/environments/environment.prod.ts` y ajusta `apiUrl` al host del backend (por ejemplo `http://localhost:3000/api`).
+
+Ejemplo (desarrollo):
+
+```ts
+export const environment = {
+	production: false,
+	apiUrl: 'http://localhost:3000/api'
+};
+```
+
+## Ejecutar en desarrollo
+
+```bash
+npm start
+# o
+ng serve
+```
+
+Abrir `http://localhost:4200`.
+
+## Build (producción)
+
+```bash
+npm run build
+```
+
+## Rutas y vistas importantes
+
+- `/notificaciones` — Buzón completo de notificaciones (requiere sesión)
+- `/chat` — Conversaciones y mensajes
+- `/perfil/:id` — Perfil público/privado
+
+## Integración realtime y autenticación
+
+- El cliente usa `socket.io-client` y envía el JWT en el handshake: `io(apiSocketUrl, { auth: { token } })`.
+- En esta app el token suele almacenarse en `localStorage` bajo la clave `tirito_jwt_token`. `AuthService` expone el token para la conexión socket.
+
+## Notas de desarrollo
+
+- Asegúrate de que el backend esté corriendo y la variable `apiUrl` apunte correctamente.
+- Si el socket no conecta revisa el token y los logs del backend (handshake JWT).
+
+## Tests
+
+- Ejecuta `npm test` si hay tests unitarios configurados.
+
+## Contribuir
+
+- Fork → rama `feature/xxx` → PR.
+
+---
+Mantén este README enfocado en cómo ejecutar y desarrollar el frontend; la documentación de terceros o assets de template han sido eliminados.
 ```
 
 ---
