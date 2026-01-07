@@ -22,6 +22,9 @@ export class RequestsUnifiedComponent implements OnInit {
   loadingSent = true;
   errorSent: string | null = null;
 
+  // Track de solicitudes en proceso (para loading individual)
+  processingRequests: Set<string> = new Set();
+
   constructor(
     private requestsService: TiritoRequestsService,
     private route: ActivatedRoute,
@@ -80,27 +83,39 @@ export class RequestsUnifiedComponent implements OnInit {
   }
 
   acceptRequest(request: TiritoRequest): void {
+    this.processingRequests.add(request.id);
     this.requestsService.acceptRequest(request.id).subscribe({
       next: () => {
+        this.processingRequests.delete(request.id);
+        // Actualizar el estado localmente sin recargar todo
+        request.status = 'accepted';
         this.snackBar.open('¡Solicitud aceptada! El usuario puede comenzar a trabajar.', 'Cerrar', { duration: 3000 });
-        this.loadReceivedRequests();
       },
       error: (err) => {
+        this.processingRequests.delete(request.id);
         this.snackBar.open(err.error?.message || 'Error al aceptar', 'Cerrar', { duration: 3000 });
       }
     });
   }
 
   rejectRequest(request: TiritoRequest): void {
+    this.processingRequests.add(request.id);
     this.requestsService.rejectRequest(request.id).subscribe({
       next: () => {
+        this.processingRequests.delete(request.id);
+        // Actualizar el estado localmente sin recargar todo
+        request.status = 'rejected';
         this.snackBar.open('Solicitud rechazada', 'Cerrar', { duration: 3000 });
-        this.loadReceivedRequests();
       },
       error: (err) => {
+        this.processingRequests.delete(request.id);
         this.snackBar.open(err.error?.message || 'Error al rechazar', 'Cerrar', { duration: 3000 });
       }
     });
+  }
+
+  isProcessing(requestId: string): boolean {
+    return this.processingRequests.has(requestId);
   }
 
   // === SOLICITUDES ENVIADAS ===

@@ -43,7 +43,7 @@
 
         <!-- Requests list -->
         <div *ngIf="!loadingReceived && receivedRequests.length > 0" class="requests-list">
-          <mat-card *ngFor="let request of receivedRequests" class="request-card">
+          <mat-card *ngFor="let request of receivedRequests" class="request-card" [class.processed]="request.status !== 'pending'">
             <mat-card-header>
               <div mat-card-avatar class="avatar">
                 {{ request.requester.name.charAt(0).toUpperCase() }}
@@ -52,6 +52,12 @@
               <mat-card-subtitle>
                 Quiere hacer: <strong>{{ request.tirito.title }}</strong>
               </mat-card-subtitle>
+              <!-- Badge de estado si ya fue procesada -->
+              <span *ngIf="request.status !== 'pending'" class="status-badge-header" [ngClass]="getStatusClass(request.status)">
+                <mat-icon *ngIf="request.status === 'accepted'">check_circle</mat-icon>
+                <mat-icon *ngIf="request.status === 'rejected'">cancel</mat-icon>
+                {{ getStatusLabel(request.status) }}
+              </span>
             </mat-card-header>
 
             <mat-card-content>
@@ -78,14 +84,23 @@
                 <mat-icon>chat</mat-icon>
                 Chat
               </button>
-              <button mat-raised-button color="warn" (click)="rejectRequest(request)">
-                <mat-icon>close</mat-icon>
-                Rechazar
-              </button>
-              <button mat-raised-button color="primary" (click)="acceptRequest(request)">
-                <mat-icon>check</mat-icon>
-                Aceptar
-              </button>
+              <!-- Solo mostrar botones si está pendiente -->
+              <ng-container *ngIf="request.status === 'pending'">
+                <button mat-raised-button color="warn" 
+                        (click)="rejectRequest(request)"
+                        [disabled]="isProcessing(request.id)">
+                  <mat-spinner *ngIf="isProcessing(request.id)" diameter="18" class="btn-spinner"></mat-spinner>
+                  <mat-icon *ngIf="!isProcessing(request.id)">close</mat-icon>
+                  {{ isProcessing(request.id) ? 'Procesando...' : 'Rechazar' }}
+                </button>
+                <button mat-raised-button color="primary" 
+                        (click)="acceptRequest(request)"
+                        [disabled]="isProcessing(request.id)">
+                  <mat-spinner *ngIf="isProcessing(request.id)" diameter="18" class="btn-spinner"></mat-spinner>
+                  <mat-icon *ngIf="!isProcessing(request.id)">check</mat-icon>
+                  {{ isProcessing(request.id) ? 'Procesando...' : 'Aceptar' }}
+                </button>
+              </ng-container>
             </mat-card-actions>
           </mat-card>
         </div>
