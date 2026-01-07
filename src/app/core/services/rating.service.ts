@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface Rating {
   _id?: string;
@@ -24,10 +25,14 @@ export class RatingService {
   }
 
   getRatingsForUser(userId: string) {
-    return this.http.get<{ data: Rating[] }>(`${this.API}/user/${userId}`);
+    return this.http.get<{ data: Rating[] }>(`${this.API}/user/${userId}`).pipe(
+      catchError(() => of({ data: [] }))
+    );
   }
 
   getSummary(userId: string) {
-    return this.http.get<{ avgScore: number; count: number }>(`${this.API}/summary/${userId}`);
+    return this.http.get<{ avgScore: number; count: number }>(`${this.API}/summary/${userId}`).pipe(
+      catchError(() => of({ avgScore: 0, count: 0 }))
+    );
   }
 }
