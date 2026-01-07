@@ -132,6 +132,8 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
         return 'Aún no hay solicitudes para este tirito. El chat se habilitará cuando alguien solicite trabajar.';
       case 'not_assigned':
         return 'Este tirito está en progreso con otro usuario.';
+      case 'waiting_creator_message':
+        return 'Tu solicitud está pendiente. El creador del tirito debe escribirte primero o aprobar tu solicitud.';
       case 'unknown_status':
         return 'El chat no está disponible en este momento.';
       default:

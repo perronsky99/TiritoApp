@@ -83,7 +83,7 @@
             </button>
           </ng-container>
           
-          <!-- Solicitud pendiente: puede chatear -->
+          <!-- Solicitud pendiente: NO puede chatear hasta que el creador le escriba o apruebe -->
           <ng-container *ngIf="myRequest?.status === 'pending'">
             <button 
               mat-raised-button 
@@ -92,13 +92,10 @@
               <mat-icon>hourglass_empty</mat-icon>
               Solicitud enviada - En espera
             </button>
-            <button 
-              mat-raised-button 
-              color="primary"
-              (click)="contact()">
-              <mat-icon>chat</mat-icon>
-              Enviar mensaje
-            </button>
+            <p class="info-text">
+              <mat-icon>info</mat-icon>
+              El creador del tirito puede contactarte o aprobar tu solicitud.
+            </p>
           </ng-container>
           
           <!-- Solicitud aceptada: puede chatear -->
