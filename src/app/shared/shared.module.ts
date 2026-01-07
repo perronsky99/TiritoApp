@@ -17,6 +17,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatSelectModule } from '@angular/material/select';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -49,6 +50,7 @@ const MATERIAL_MODULES = [
   MatBadgeModule,
   MatSelectModule,
   MatToolbarModule,
+  MatTabsModule,
   MatSidenavModule,
   MatListModule
   ,MatButtonToggleModule
