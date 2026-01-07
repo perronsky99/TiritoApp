@@ -54,10 +54,21 @@ export class ChatListComponent implements OnInit {
   }
 
   getOtherParticipant(chat: IChat): string {
-    // participants viene populado con { _id, name, email }
+    // participants viene poblado con { _id, name, email, username }
     const currentUserId = this.authService.currentUser?.id;
     const other = chat.participants.find(p => p._id !== currentUserId);
-    return other?.name || 'Usuario';
+    if (!other) return 'Usuario';
+    return other.username ? other.username : (other.name || 'Usuario');
+  }
+
+  getOtherParticipantInitial(chat: IChat): string {
+    const currentUserId = this.authService.currentUser?.id;
+    const other = chat.participants.find(p => p._id !== currentUserId);
+    if (!other) return 'U';
+    const source = other.username || other.name || 'U';
+    // If username starts with '@', strip it
+    const clean = source.charAt(0) === '@' ? source.substring(1) : source;
+    return clean.charAt(0).toUpperCase();
   }
 
   getTiritoTitle(chat: IChat): string {
