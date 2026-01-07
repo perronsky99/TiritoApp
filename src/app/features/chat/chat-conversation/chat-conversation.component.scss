@@ -24,9 +24,37 @@
   display: flex;
   flex-direction: column;
 
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   .participant-name {
     font-weight: 500;
     color: #333;
+  }
+
+  .tirito-status-badge {
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+
+    &.status-open {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    &.status-in_progress {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    &.status-closed {
+      background: #ffebee;
+      color: #c62828;
+    }
   }
 
   .tirito-link {

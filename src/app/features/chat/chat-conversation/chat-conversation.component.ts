@@ -71,9 +71,15 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
         // Backend v1.0: mensajes vienen en respuesta separada
         this.messages = response.messages || [];
         // Estado del chat (permisos)
-        this.chatEnabled = response.chatEnabled !== false;
-        this.chatDisabledReason = response.chatDisabledReason || '';
         this.tiritoStatus = response.tiritoStatus || '';
+        // Forzar chatEnabled a false si el tirito está cerrado (doble validación)
+        if (this.tiritoStatus === 'closed') {
+          this.chatEnabled = false;
+          this.chatDisabledReason = response.chatDisabledReason || 'tirito_closed';
+        } else {
+          this.chatEnabled = response.chatEnabled === true;
+          this.chatDisabledReason = response.chatDisabledReason || '';
+        }
         this.loading = false;
         this.shouldScroll = true;
       },
@@ -130,6 +136,15 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
         return 'El chat no está disponible en este momento.';
       default:
         return 'El chat no está disponible en este momento.';
+    }
+  }
+
+  getStatusLabel(): string {
+    switch (this.tiritoStatus) {
+      case 'open': return 'Abierto';
+      case 'in_progress': return 'En progreso';
+      case 'closed': return 'Cerrado';
+      default: return '';
     }
   }
 

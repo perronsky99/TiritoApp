@@ -6,7 +6,15 @@
     </button>
     
     <div class="header-info" *ngIf="chat">
-      <span class="participant-name">{{ getOtherParticipantName() }}</span>
+      <div class="header-top">
+        <span class="participant-name">{{ getOtherParticipantName() }}</span>
+        <span 
+          class="tirito-status-badge"
+          [ngClass]="'status-' + tiritoStatus"
+          *ngIf="tiritoStatus">
+          {{ getStatusLabel() }}
+        </span>
+      </div>
       <span class="tirito-link" (click)="goToTirito()">
         {{ chat.tiritoTitle | truncate:30 }}
       </span>

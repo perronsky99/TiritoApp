@@ -75,21 +75,44 @@
 
 .chat-preview {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
 
   .tirito-ref {
     font-size: 0.8rem;
     color: #7b1fa2;
   }
 
-  .last-message {
-    font-size: 0.85rem;
-    color: #666;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .tirito-status {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+
+    &.status-open {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    &.status-progress {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    &.status-closed {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
   }
+}
+
+.last-message {
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .unread-badge {

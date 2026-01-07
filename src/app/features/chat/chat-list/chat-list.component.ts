@@ -78,4 +78,29 @@ export class ChatListComponent implements OnInit {
     }
     return '';
   }
+
+  getTiritoStatus(chat: IChat): string {
+    if (typeof chat.tiritoId === 'object') {
+      return chat.tiritoId.status || '';
+    }
+    return '';
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'open': return 'Abierto';
+      case 'in_progress': return 'En progreso';
+      case 'closed': return 'Cerrado';
+      default: return '';
+    }
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'open': return 'status-open';
+      case 'in_progress': return 'status-progress';
+      case 'closed': return 'status-closed';
+      default: return '';
+    }
+  }
 }

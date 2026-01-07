@@ -35,10 +35,16 @@
         </div>
         <div class="chat-preview">
           <span class="tirito-ref">{{ getTiritoTitle(chat) | truncate:25 }}</span>
-          <span class="last-message" *ngIf="chat.lastMessage">
-            {{ chat.lastMessage.content | truncate:40 }}
+          <span 
+            class="tirito-status" 
+            [ngClass]="getStatusClass(getTiritoStatus(chat))"
+            *ngIf="getTiritoStatus(chat)">
+            {{ getStatusLabel(getTiritoStatus(chat)) }}
           </span>
         </div>
+        <span class="last-message" *ngIf="chat.lastMessage">
+          {{ chat.lastMessage.content | truncate:40 }}
+        </span>
       </div>
 
       <div class="unread-badge" *ngIf="chat.unreadCount > 0">
