@@ -76,11 +76,11 @@
 
       <mat-card-header>
         <div mat-card-avatar class="tirito-avatar">
-          {{ tirito.creatorName.charAt(0).toUpperCase() }}
+          {{ tirito.creatorInitials || tirito.creatorName.substring(0, 2).toUpperCase() }}
         </div>
         <mat-card-title>{{ tirito.title | truncate:50 }}</mat-card-title>
         <mat-card-subtitle>
-          {{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
+          @{{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
         </mat-card-subtitle>
       </mat-card-header>
 

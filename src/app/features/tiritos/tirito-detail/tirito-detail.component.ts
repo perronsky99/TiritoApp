@@ -30,6 +30,9 @@ export class TiritoDetailComponent implements OnInit {
   // Para acciones del owner
   actionLoading = false;
   
+  // Estado de la solicitud del usuario actual
+  myRequest: { id: string; status: string; createdAt: string } | null = null;
+  
   // Galería de imágenes
   selectedImageIndex = 0;
 
@@ -108,6 +111,11 @@ export class TiritoDetailComponent implements OnInit {
       next: (tirito) => {
         this.tirito = tirito;
         this.loading = false;
+        
+        // Si el usuario está logueado y no es el owner, verificar si ya tiene una solicitud
+        if (this.authService.isLoggedIn && tirito.creatorId !== this.authService.currentUser?.id) {
+          this.loadMyRequest(id);
+        }
       },
       error: (err) => {
         if (err.status === 404) {
@@ -116,6 +124,20 @@ export class TiritoDetailComponent implements OnInit {
           this.error = 'No pudimos cargar el tirito';
         }
         this.loading = false;
+      }
+    });
+  }
+
+  /**
+   * Carga la solicitud del usuario actual para este tirito (si existe)
+   */
+  loadMyRequest(tiritoId: string): void {
+    this.tiritoRequestsService.getMyRequestForTirito(tiritoId).subscribe({
+      next: (res) => {
+        this.myRequest = res.request;
+      },
+      error: () => {
+        // Ignorar errores - simplemente no mostramos estado de solicitud
       }
     });
   }
@@ -238,8 +260,14 @@ export class TiritoDetailComponent implements OnInit {
     this.actionLoading = true;
 
     this.tiritoRequestsService.createRequest(this.tirito.id, '¡Me interesa hacer este tirito!').subscribe({
-      next: () => {
+      next: (res) => {
         this.actionLoading = false;
+        // Actualizar el estado local para reflejar la solicitud enviada
+        this.myRequest = {
+          id: res.request.id,
+          status: 'pending',
+          createdAt: res.request.createdAt || new Date().toISOString()
+        };
         this.snackBar.open('¡Solicitud enviada! El creador revisará tu perfil y decidirá.', 'Cerrar', {
           duration: 5000
         });

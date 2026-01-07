@@ -50,10 +50,10 @@
 
       <div class="creator" (click)="goToProfile()">
         <div class="avatar">
-          {{ tirito.creatorName ? tirito.creatorName.charAt(0).toUpperCase() : 'U' }}
+          {{ tirito.creatorInitials || (tirito.creatorName ? tirito.creatorName.substring(0, 2).toUpperCase() : 'US') }}
         </div>
         <div class="creator-info">
-          <span class="name">{{ tirito.creatorName || 'Usuario' }}</span>
+          <span class="name">@{{ tirito.creatorName || 'Usuario' }}</span>
           <span class="label">Publicado por</span>
         </div>
       </div>
@@ -78,13 +78,47 @@
             <mat-icon>chat</mat-icon>
             Contactar
           </button>
+          
+          <!-- Mostrar botón según estado de solicitud -->
+          <ng-container *ngIf="!myRequest">
+            <button 
+              mat-raised-button 
+              color="accent"
+              [disabled]="actionLoading"
+              (click)="acceptTirito()">
+              <mat-icon>send</mat-icon>
+              Solicitar este trabajo
+            </button>
+          </ng-container>
+          
+          <!-- Solicitud pendiente -->
           <button 
+            *ngIf="myRequest?.status === 'pending'"
             mat-raised-button 
-            color="accent"
-            [disabled]="actionLoading"
-            (click)="acceptTirito()">
-            <mat-icon>send</mat-icon>
-            Solicitar este trabajo
+            class="request-pending-btn"
+            disabled>
+            <mat-icon>hourglass_empty</mat-icon>
+            Solicitud enviada - En espera de aprobación
+          </button>
+          
+          <!-- Solicitud aceptada -->
+          <button 
+            *ngIf="myRequest?.status === 'accepted'"
+            mat-raised-button 
+            class="request-accepted-btn"
+            disabled>
+            <mat-icon>check_circle</mat-icon>
+            ¡Tu solicitud fue aceptada!
+          </button>
+          
+          <!-- Solicitud rechazada -->
+          <button 
+            *ngIf="myRequest?.status === 'rejected'"
+            mat-raised-button 
+            class="request-rejected-btn"
+            disabled>
+            <mat-icon>cancel</mat-icon>
+            Solicitud rechazada
           </button>
         </ng-container>
 

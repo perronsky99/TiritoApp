@@ -18,6 +18,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  /** Alias público del usuario (para privacidad) */
+  username?: string;
   role: Role;
   verificationStatus: VerificationStatus;
   avatar?: string;

@@ -24,13 +24,13 @@
     <!-- Header -->
     <div class="profile-header">
       <div class="avatar">
-        <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.name">
-        <span *ngIf="!user.avatar">{{ user.name.charAt(0).toUpperCase() }}</span>
+        <img *ngIf="user.avatar" [src]="user.avatar" [alt]="user.username || user.name">
+        <span *ngIf="!user.avatar">{{ (user.username || user.name).substring(0, 2).toUpperCase() }}</span>
       </div>
       
       <div class="user-info">
         <h1>
-          {{ user.name }}
+          @{{ user.username || user.name }}
           <app-verification-badge 
             *ngIf="user.verificationStatus !== 'unverified'"
             [status]="user.verificationStatus">

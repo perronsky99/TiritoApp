@@ -14,6 +14,7 @@ export interface TiritoRequest {
   requester: {
     id: string;
     name: string;
+    username?: string;
     email: string;
   };
   message: string;
@@ -56,6 +57,13 @@ export class TiritoRequestsService {
    */
   getMySentRequests(): Observable<TiritoRequestsResponse> {
     return this.http.get<TiritoRequestsResponse>(`${this.API_URL}/sent`);
+  }
+
+  /**
+   * Verificar si tengo una solicitud pendiente para un tirito específico
+   */
+  getMyRequestForTirito(tiritoId: string): Observable<{ request: TiritoRequest | null }> {
+    return this.http.get<{ request: TiritoRequest | null }>(`${this.API_URL}/tirito/${tiritoId}/mine`);
   }
 
   /**

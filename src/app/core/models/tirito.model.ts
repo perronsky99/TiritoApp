@@ -25,10 +25,16 @@ export interface Tirito {
   status: TiritoStatus;
   images: TiritoImage[];
   creatorId: string;
+  /** Username/alias público del creador */
   creatorName: string;
+  /** Iniciales del creador para avatar */
+  creatorInitials?: string;
   creatorAvatar?: string;
   assignedTo?: string;
+  /** Username/alias público del asignado */
   assignedToName?: string;
+  /** Iniciales del asignado para avatar */
+  assignedToInitials?: string;
   location?: string;
   createdAt: string;
   updatedAt: string;

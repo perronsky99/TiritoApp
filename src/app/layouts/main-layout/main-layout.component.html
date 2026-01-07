@@ -31,7 +31,12 @@
         
         <a mat-list-item (click)="goToRequests()">
           <mat-icon matListItemIcon>inbox</mat-icon>
-          <span matListItemTitle>Solicitudes</span>
+          <span matListItemTitle>Solicitudes recibidas</span>
+        </a>
+        
+        <a mat-list-item (click)="goToMyRequests()">
+          <mat-icon matListItemIcon>send</mat-icon>
+          <span matListItemTitle>Mis solicitudes enviadas</span>
         </a>
         
         <a mat-list-item (click)="goToChat()">
@@ -98,14 +103,18 @@
           <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
             <img *ngIf="user?.avatar" [src]="user.avatar" class="user-avatar" alt="avatar"/>
             <mat-icon *ngIf="!user?.avatar">account_circle</mat-icon>
-            <span class="user-name">{{ user?.name || 'Usuario' }}</span>
+            <span class="user-name">{{ user?.username || user?.name || 'Usuario' }}</span>
           </button>
         </ng-container>
 
         <mat-menu #userMenu="matMenu">
           <button mat-menu-item (click)="goToRequests()">
             <mat-icon>inbox</mat-icon>
-            <span>Solicitudes</span>
+            <span>Solicitudes recibidas</span>
+          </button>
+          <button mat-menu-item (click)="goToMyRequests()">
+            <mat-icon>send</mat-icon>
+            <span>Mis solicitudes enviadas</span>
           </button>
           <button mat-menu-item (click)="goToChat()">
             <mat-icon>chat</mat-icon>

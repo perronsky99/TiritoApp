@@ -168,6 +168,49 @@
   }
 }
 
+// Botones de estado de solicitud
+.request-pending-btn {
+  background-color: #ff9800 !important;
+  color: white !important;
+  
+  &:disabled {
+    opacity: 1 !important;
+  }
+}
+
+.request-accepted-btn {
+  background-color: #4caf50 !important;
+  color: white !important;
+  
+  &:disabled {
+    opacity: 1 !important;
+  }
+}
+
+.request-rejected-btn {
+  background-color: #f44336 !important;
+  color: white !important;
+  
+  &:disabled {
+    opacity: 1 !important;
+  }
+}
+
+.assigned-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1976d2;
+  font-weight: 500;
+  padding: 1rem;
+  background: #e3f2fd;
+  border-radius: 8px;
+
+  mat-icon {
+    color: #1976d2;
+  }
+}
+
 .closed-message {
   display: flex;
   align-items: center;
