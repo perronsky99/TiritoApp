@@ -55,15 +55,19 @@ export class ChatListComponent implements OnInit {
 
   getOtherParticipant(chat: IChat): string {
     // participants viene poblado con { _id, name, email, username }
-    const currentUserId = this.authService.currentUser?.id;
-    const other = chat.participants.find(p => p._id !== currentUserId);
+    const currentUserId = this.authService.currentUser?.id || '';
+    const other = chat.participants.find(p => 
+      String(p._id || p.id || '') !== String(currentUserId)
+    );
     if (!other) return 'Usuario';
     return other.username ? other.username : (other.name || 'Usuario');
   }
 
   getOtherParticipantInitial(chat: IChat): string {
-    const currentUserId = this.authService.currentUser?.id;
-    const other = chat.participants.find(p => p._id !== currentUserId);
+    const currentUserId = this.authService.currentUser?.id || '';
+    const other = chat.participants.find(p => 
+      String(p._id || p.id || '') !== String(currentUserId)
+    );
     if (!other) return 'U';
     const source = other.username || other.name || 'U';
     // If username starts with '@', strip it

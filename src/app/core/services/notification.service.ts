@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, interval, of, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, interval, of, Subscription, Subject } from 'rxjs';
 import { tap, switchMap, startWith, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { io, Socket } from 'socket.io-client';
+
+/**
+ * Interface para mensaje de chat en tiempo real
+ */
+export interface IChatMessageEvent {
+  chatId: string;
+  tiritoId: string;
+  message: any;
+}
 
 /**
  * Tipos de notificación
@@ -60,6 +69,10 @@ export class NotificationService {
   // Lista de notificaciones
   private notificationsSubject = new BehaviorSubject<INotification[]>([]);
   public notifications$ = this.notificationsSubject.asObservable();
+
+  // Mensajes de chat en tiempo real
+  private chatMessageSubject = new Subject<IChatMessageEvent>();
+  public chatMessage$ = this.chatMessageSubject.asObservable();
 
   // Polling interval (30 segundos)
   private readonly POLL_INTERVAL = 30000;
@@ -128,6 +141,12 @@ export class NotificationService {
         this.notificationsSubject.next([payload, ...current]);
         const unread = this.unreadCountSubject.value + (payload.read ? 0 : 1);
         this.unreadCountSubject.next(unread);
+      });
+
+      // Escuchar mensajes de chat en tiempo real
+      this.socket.on('chat_message', (payload: IChatMessageEvent) => {
+        //console.log('Socket: chat_message recibido', payload);
+        this.chatMessageSubject.next(payload);
       });
     } catch (err) {
       console.warn('Socket connect error', err);

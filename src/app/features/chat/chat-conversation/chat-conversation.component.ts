@@ -1,7 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ChatService, IChat, IMessage } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { NotificationService, IChatMessageEvent } from '../../../core/services/notification.service';
 
 /**
  * Conversación de chat
@@ -15,7 +17,7 @@ import { AuthService } from '../../../core/auth/auth.service';
   templateUrl: './chat-conversation.component.html',
   styleUrls: ['./chat-conversation.component.scss']
 })
-export class ChatConversationComponent implements OnInit, AfterViewChecked {
+export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('messagesContainer') messagesContainer!: ElementRef;
   
   chat: IChat | null = null;
@@ -35,12 +37,16 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
   
   // Auto scroll
   private shouldScroll = true;
+  
+  // Suscripción a mensajes en tiempo real
+  private chatMessageSub: Subscription | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private chatService: ChatService,
-    public authService: AuthService
+    public authService: AuthService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +58,49 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
     if (tiritoId) {
       this.tiritoId = tiritoId;
       this.loadChat(tiritoId, withUser || undefined);
+      this.subscribeToRealTimeMessages();
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.chatMessageSub) {
+      this.chatMessageSub.unsubscribe();
+    }
+  }
+
+  /**
+   * Suscribirse a mensajes de chat en tiempo real via Socket.IO
+   */
+  private subscribeToRealTimeMessages(): void {
+    this.chatMessageSub = this.notificationService.chatMessage$.subscribe((event: IChatMessageEvent) => {
+      console.log('Chat recibió evento socket:', { 
+        eventTiritoId: event.tiritoId, 
+        thisTiritoId: this.tiritoId,
+        match: String(event.tiritoId) === String(this.tiritoId)
+      });
+      
+      // Solo procesar mensajes para este tirito (comparar como strings)
+      if (String(event.tiritoId) === String(this.tiritoId) && event.message) {
+        // Verificar que no sea un mensaje propio (ya agregado localmente)
+        const senderId = typeof event.message.sender === 'object' 
+          ? (event.message.sender._id || event.message.sender.id || '')
+          : (event.message.sender || '');
+        const currentUserId = this.authService.currentUser?.id || '';
+        
+        console.log('Comparando sender:', { senderId, currentUserId, isOwn: String(senderId) === String(currentUserId) });
+        
+        // Si el mensaje es de otro usuario, agregarlo
+        if (String(senderId) !== String(currentUserId)) {
+          // Verificar que no exista ya (por si acaso)
+          const exists = this.messages.some(m => m._id === event.message._id);
+          if (!exists) {
+            console.log('Agregando mensaje de otro usuario:', event.message);
+            this.messages = [...this.messages, event.message];
+            this.shouldScroll = true;
+          }
+        }
+      }
+    });
   }
 
   ngAfterViewChecked(): void {
@@ -152,15 +200,21 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked {
 
   isOwnMessage(message: IMessage): boolean {
     // El sender viene populado con { _id, name, email }
-    const senderId = typeof message.sender === 'object' ? message.sender._id : message.sender;
-    return senderId === this.authService.currentUser?.id;
+    const senderId = typeof message.sender === 'object' 
+      ? (message.sender._id || message.sender.id || '')
+      : (message.sender || '');
+    const currentUserId = this.authService.currentUser?.id || '';
+    // Comparar como strings para evitar problemas de tipos
+    return String(senderId) === String(currentUserId);
   }
 
   getOtherParticipantName(): string {
     if (!this.chat) return '';
-    const currentUserId = this.authService.currentUser?.id;
+    const currentUserId = this.authService.currentUser?.id || '';
     // El backend retorna participants: [{_id, name, email}]
-    const other = this.chat.participants.find(p => p._id !== currentUserId);
+    const other = this.chat.participants.find(p => 
+      String(p._id || p.id || '') !== String(currentUserId)
+    );
     if (!other) return 'Usuario';
     return other.username ? other.username : (other.name || 'Usuario');
   }
