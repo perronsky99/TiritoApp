@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { User } from '../models/user.model';
+import { User, RegisterData } from '../models/user.model';
 
 interface AuthResponse {
   token: string;
@@ -39,12 +39,7 @@ export class AuthService {
       .pipe(tap(res => this.setSession(res)));
   }
 
-  register(payload: {
-    name: string;
-    email: string;
-    password: string;
-    role?: string;
-  }): Observable<AuthResponse> {
+  register(payload: RegisterData): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.API_URL}/register`, payload)
       .pipe(tap(res => this.setSession(res)));

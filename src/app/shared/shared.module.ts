@@ -22,6 +22,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
 
 // UI Components
 import { LoadingSpinnerComponent } from './ui/loading-spinner/loading-spinner.component';
@@ -55,7 +57,9 @@ const MATERIAL_MODULES = [
   MatToolbarModule,
   MatTabsModule,
   MatSidenavModule,
-  MatListModule
+  MatListModule,
+  MatDatepickerModule,
+  MatNativeDateModule
 ];
 
 const UI_COMPONENTS = [
@@ -98,6 +102,9 @@ const PIPES = [
     ...MATERIAL_MODULES,
     ...UI_COMPONENTS,
     ...PIPES
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-VE' }
   ]
 })
 export class SharedModule { }

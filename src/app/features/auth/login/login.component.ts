@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ESTADOS_VENEZUELA, TIPOS_DOCUMENTO, getMunicipiosByEstado, Municipio } from '../../../shared/data/venezuela-locations';
 
 /**
  * Componente de Login
@@ -21,6 +22,14 @@ export class LoginComponent implements OnInit {
   loading = false;
   hidePassword = true;
   
+  // Datos de Venezuela
+  estados = ESTADOS_VENEZUELA;
+  tiposDocumento = TIPOS_DOCUMENTO;
+  municipios: Municipio[] = [];
+  
+  // Fecha máxima (debe ser mayor de 18 años)
+  maxDate = new Date();
+  
   private returnUrl: string;
 
   constructor(
@@ -30,13 +39,25 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private snackBar: MatSnackBar
   ) {
+    // Calcular fecha máxima (18 años atrás)
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 18);
+    
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
 
     this.registerForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      documentType: ['V', Validators.required],
+      documentNumber: ['', [Validators.required, Validators.pattern(/^\d{6,10}$/)]],
+      birthDate: ['', Validators.required],
+      estado: ['', Validators.required],
+      municipio: ['', Validators.required],
+      direccion: ['', [Validators.required, Validators.minLength(10)]],
+      phoneMobile: ['', [Validators.required, Validators.pattern(/^(0414|0424|0412|0416|0426)\d{7}$/)]],
+      phoneLocal: ['', [Validators.pattern(/^(0\d{3})\d{7}$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       role: ['user', Validators.required]
@@ -50,6 +71,12 @@ export class LoginComponent implements OnInit {
     if (this.authService.isLoggedIn) {
       this.router.navigate([this.returnUrl]);
     }
+    
+    // Escuchar cambios en el estado para cargar municipios
+    this.registerForm.get('estado')?.valueChanges.subscribe(estadoId => {
+      this.municipios = getMunicipiosByEstado(estadoId);
+      this.registerForm.get('municipio')?.setValue('');
+    });
   }
 
   toggleMode(): void {
@@ -105,10 +132,21 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Getters para validación en template
+  // Getters para validación en template - Login
   get loginEmail() { return this.loginForm.get('email'); }
   get loginPassword() { return this.loginForm.get('password'); }
-  get registerName() { return this.registerForm.get('name'); }
+  
+  // Getters para validación en template - Registro
+  get registerFirstName() { return this.registerForm.get('firstName'); }
+  get registerLastName() { return this.registerForm.get('lastName'); }
+  get registerDocumentType() { return this.registerForm.get('documentType'); }
+  get registerDocumentNumber() { return this.registerForm.get('documentNumber'); }
+  get registerBirthDate() { return this.registerForm.get('birthDate'); }
+  get registerEstado() { return this.registerForm.get('estado'); }
+  get registerMunicipio() { return this.registerForm.get('municipio'); }
+  get registerDireccion() { return this.registerForm.get('direccion'); }
+  get registerPhoneMobile() { return this.registerForm.get('phoneMobile'); }
+  get registerPhoneLocal() { return this.registerForm.get('phoneLocal'); }
   get registerEmail() { return this.registerForm.get('email'); }
   get registerPassword() { return this.registerForm.get('password'); }
 }
