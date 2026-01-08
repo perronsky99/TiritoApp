@@ -19,6 +19,39 @@
         {{ chat.tiritoTitle | truncate:30 }}
       </span>
     </div>
+
+    <!-- Botón de completar tirito en el header (para creador) -->
+    <button 
+      *ngIf="canCompleteTirito()"
+      mat-raised-button 
+      color="primary"
+      class="complete-btn-header"
+      [disabled]="closingTirito"
+      (click)="completeTirito()">
+      <mat-spinner *ngIf="closingTirito" diameter="18" class="btn-spinner"></mat-spinner>
+      <mat-icon *ngIf="!closingTirito">check_circle</mat-icon>
+      {{ closingTirito ? 'Completando...' : 'Completar' }}
+    </button>
+  </div>
+
+  <!-- Banner prominente para completar tirito (solo creador, solo in_progress) -->
+  <div class="complete-tirito-banner" *ngIf="canCompleteTirito() && !loading">
+    <div class="banner-content">
+      <mat-icon>celebration</mat-icon>
+      <div class="banner-text">
+        <strong>¿Ya terminaron el trabajo?</strong>
+        <span>Marca este tirito como completado para cerrarlo y poder valorar.</span>
+      </div>
+    </div>
+    <button 
+      mat-raised-button 
+      color="accent"
+      [disabled]="closingTirito"
+      (click)="completeTirito()">
+      <mat-spinner *ngIf="closingTirito" diameter="18" class="btn-spinner"></mat-spinner>
+      <mat-icon *ngIf="!closingTirito">check_circle</mat-icon>
+      {{ closingTirito ? 'Completando...' : 'Completar tirito' }}
+    </button>
   </div>
 
   <!-- Loading -->

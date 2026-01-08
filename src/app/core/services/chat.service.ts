@@ -32,6 +32,7 @@ export interface IChatResponse {
   chatEnabled: boolean;
   chatDisabledReason?: string;
   tiritoStatus?: string;
+  tiritoCreatorId?: string;
 }
 
 /**

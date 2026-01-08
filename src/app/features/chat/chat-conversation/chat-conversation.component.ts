@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { ChatService, IChat, IMessage } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { NotificationService, IChatMessageEvent } from '../../../core/services/notification.service';
+import { TiritosService } from '../../../core/services/tiritos.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /**
  * Conversación de chat
@@ -31,6 +33,10 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
   chatDisabledReason = '';
   tiritoStatus = '';
   
+  // Creador del tirito (para mostrar botón de cerrar)
+  tiritoCreatorId = '';
+  closingTirito = false;
+  
   // Nuevo mensaje
   newMessage = '';
   sending = false;
@@ -46,7 +52,9 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
     private router: Router,
     private chatService: ChatService,
     public authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private tiritosService: TiritosService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -120,6 +128,7 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
         this.messages = response.messages || [];
         // Estado del chat (permisos)
         this.tiritoStatus = response.tiritoStatus || '';
+        this.tiritoCreatorId = response.tiritoCreatorId || '';
         // Forzar chatEnabled a false si el tirito está cerrado (doble validación)
         if (this.tiritoStatus === 'closed') {
           this.chatEnabled = false;
@@ -241,5 +250,43 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
       event.preventDefault();
       this.sendMessage();
     }
+  }
+
+  /**
+   * Verifica si el usuario actual es el creador del tirito
+   */
+  isCreator(): boolean {
+    const currentUserId = this.authService.currentUser?.id || '';
+    return String(this.tiritoCreatorId) === String(currentUserId);
+  }
+
+  /**
+   * Verifica si se puede mostrar el botón de completar tirito
+   * Solo el creador y cuando el tirito está in_progress
+   */
+  canCompleteTirito(): boolean {
+    return this.isCreator() && this.tiritoStatus === 'in_progress';
+  }
+
+  /**
+   * Cierra/completa el tirito
+   */
+  completeTirito(): void {
+    if (!this.tiritoId || this.closingTirito) return;
+
+    this.closingTirito = true;
+    this.tiritosService.closeTirito(this.tiritoId).subscribe({
+      next: () => {
+        this.closingTirito = false;
+        this.tiritoStatus = 'closed';
+        this.chatEnabled = false;
+        this.chatDisabledReason = 'tirito_closed';
+        this.snackBar.open('¡Tirito completado exitosamente! 🎉', 'Cerrar', { duration: 4000 });
+      },
+      error: (err) => {
+        this.closingTirito = false;
+        this.snackBar.open(err.error?.message || 'Error al completar el tirito', 'Cerrar', { duration: 3000 });
+      }
+    });
   }
 }
