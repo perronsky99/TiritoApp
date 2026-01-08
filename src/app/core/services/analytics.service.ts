@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -17,31 +16,24 @@ export type AnalyticsEvent =
 /**
  * Servicio de Analytics básico
  * Solo eventos mínimos requeridos para MVP
- * No analytics pesado
+ * No analytics pesado - por ahora solo logging local
  */
 @Injectable({
   providedIn: 'root'
 })
 export class AnalyticsService {
-  private readonly API_URL = `${environment.apiUrl}/analytics`;
+  private readonly enabled = !environment.production; // Solo log en desarrollo
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
   /**
-   * Registra un evento
+   * Registra un evento (solo logging local por ahora)
    */
   trackEvent(event: AnalyticsEvent, metadata?: Record<string, unknown>): void {
-    // Fire and forget - no bloqueamos UI por analytics
-    this.http.post(`${this.API_URL}/events`, {
-      event,
-      metadata,
-      timestamp: new Date().toISOString()
-    }).subscribe({
-      error: () => {
-        // Silenciar errores de analytics - no son críticos
-        console.warn('Analytics event failed:', event);
-      }
-    });
+    if (this.enabled) {
+      console.log('[Analytics]', event, metadata || '');
+    }
+    // TODO: Implementar backend de analytics cuando sea necesario
   }
 
   /**

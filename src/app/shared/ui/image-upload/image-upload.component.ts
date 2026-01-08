@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 /**
  * Componente para upload de imágenes
@@ -12,7 +13,7 @@ import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@
         <div 
           class="image-item" 
           *ngFor="let image of images; let i = index">
-          <img [src]="getImagePreview(image)" alt="Preview">
+          <img [src]="imagePreviews.get(image)" alt="Preview">
           <button 
             mat-icon-button 
             class="remove-btn"
@@ -110,7 +111,7 @@ import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@
     }
   `]
 })
-export class ImageUploadComponent {
+export class ImageUploadComponent implements OnDestroy {
   @Input() images: File[] = [];
   @Input() maxImages = 5;
   @Input() maxSizeMB = 5;
@@ -119,6 +120,12 @@ export class ImageUploadComponent {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   
   error: string | null = null;
+  
+  // Cache de URLs sanitizadas para evitar crear nuevas en cada detección de cambios
+  imagePreviews = new Map<File, SafeUrl>();
+  private objectUrls: string[] = [];
+
+  constructor(private sanitizer: DomSanitizer) {}
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -163,18 +170,32 @@ export class ImageUploadComponent {
       }
       
       this.images.push(file);
+      // Crear y cachear la URL sanitizada
+      this.createImagePreview(file);
     }
     
     this.imagesChange.emit(this.images);
   }
 
   removeImage(index: number): void {
+    const file = this.images[index];
     this.images.splice(index, 1);
+    // Limpiar el preview del archivo eliminado
+    this.imagePreviews.delete(file);
     this.imagesChange.emit(this.images);
     this.error = null;
   }
 
-  getImagePreview(file: File): string {
-    return URL.createObjectURL(file);
+  private createImagePreview(file: File): void {
+    const url = URL.createObjectURL(file);
+    this.objectUrls.push(url);
+    const safeUrl = this.sanitizer.bypassSecurityTrustUrl(url);
+    this.imagePreviews.set(file, safeUrl);
+  }
+
+  ngOnDestroy(): void {
+    // Liberar todas las URLs de objeto al destruir el componente
+    this.objectUrls.forEach(url => URL.revokeObjectURL(url));
+    this.imagePreviews.clear();
   }
 }
