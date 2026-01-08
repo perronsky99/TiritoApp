@@ -120,4 +120,15 @@ export class TiritosService {
       `${this.API_URL}/can-create`
     );
   }
+
+  /**
+   * Verifica si existe al menos un tirito compartido (in_progress o closed)
+   * entre el usuario actual y otro usuario.
+   * Usado para determinar si se pueden mostrar datos sensibles.
+   */
+  checkSharedTiritos(otherUserId: string): Observable<{ hasSharedTiritos: boolean }> {
+    return this.http.get<{ hasSharedTiritos: boolean }>(
+      `${this.API_URL}/shared/${otherUserId}`
+    );
+  }
 }

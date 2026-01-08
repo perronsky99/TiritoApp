@@ -29,6 +29,10 @@ export class ProfileViewComponent implements OnInit {
   loadingTiritos = false;
   // Ratings
   ratings: any[] = [];
+  
+  // Para datos sensibles: indica si hay un tirito completado/aceptado entre ambos usuarios
+  canViewSensitiveData = false;
+  checkingSensitiveAccess = false;
   ratingSummary: { avgScore?: number; count?: number } = {};
   showRatingForm: { [tiritoId: string]: boolean } = {};
   ratingDrafts: { [tiritoId: string]: { score: number; comment: string; submitting?: boolean } } = {};
@@ -70,6 +74,7 @@ export class ProfileViewComponent implements OnInit {
         this.loading = false;
         this.loadUserTiritos();
         this.loadRatings(user.id);
+        this.checkSensitiveDataAccess(user.id);
       },
       error: (err) => {
         if (err.status === 404) {
@@ -269,6 +274,60 @@ export class ProfileViewComponent implements OnInit {
 
   get isOwnProfile(): boolean {
     return this.authService.currentUser?.id === this.user?.id;
+  }
+
+  /**
+   * Verifica si el usuario actual puede ver datos sensibles del perfil.
+   * Solo puede ver si:
+   * 1. Es su propio perfil
+   * 2. Tiene un tirito aceptado (in_progress) o cerrado (closed) con este usuario
+   */
+  checkSensitiveDataAccess(profileUserId: string): void {
+    // Si es el propio perfil, siempre puede ver
+    if (this.isOwnProfile) {
+      this.canViewSensitiveData = true;
+      return;
+    }
+
+    this.checkingSensitiveAccess = true;
+    
+    // Verificar si hay tiritos donde ambos usuarios participan y el estado es 'in_progress' o 'closed'
+    this.tiritosService.checkSharedTiritos(profileUserId).subscribe({
+      next: (response) => {
+        this.canViewSensitiveData = response.hasSharedTiritos;
+        this.checkingSensitiveAccess = false;
+      },
+      error: () => {
+        this.canViewSensitiveData = false;
+        this.checkingSensitiveAccess = false;
+      }
+    });
+  }
+
+  /**
+   * Calcula la edad a partir de la fecha de nacimiento
+   */
+  calculateAge(birthDate: string): number | null {
+    if (!birthDate) return null;
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  /**
+   * Formatea el nombre del estado para mostrar
+   */
+  formatEstado(estado: string): string {
+    if (!estado) return '';
+    // Capitalizar primera letra de cada palabra
+    return estado.split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
   }
 
   getRoleLabel(role: string): string {

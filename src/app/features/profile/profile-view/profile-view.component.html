@@ -56,11 +56,87 @@
     <mat-tab-group>
       <mat-tab label="Datos">
         <div class="profile-personal">
-          <h3>Acerca de</h3>
-          <p *ngIf="user?.bio; else noBio">{{ user?.bio }}</p>
-          <ng-template #noBio><p>Sin descripción</p></ng-template>
-          <div class="contact">
-            <p *ngIf="user?.email">{{ user?.email }}</p>
+          <!-- Acerca de -->
+          <div class="data-section">
+            <h3><mat-icon>person</mat-icon> Acerca de</h3>
+            <p *ngIf="user?.bio; else noBio" class="bio-text">{{ user?.bio }}</p>
+            <ng-template #noBio><p class="no-data">Sin descripción</p></ng-template>
+          </div>
+
+          <!-- Datos Públicos (siempre visibles) -->
+          <div class="data-section">
+            <h3><mat-icon>badge</mat-icon> Información básica</h3>
+            <div class="data-grid">
+              <div class="data-item" *ngIf="user?.firstName || user?.lastName">
+                <span class="data-label">Nombre completo</span>
+                <span class="data-value">{{ user?.firstName }} {{ user?.lastName }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.birthDate">
+                <span class="data-label">Edad</span>
+                <span class="data-value">{{ calculateAge(user.birthDate) }} años</span>
+              </div>
+              <div class="data-item" *ngIf="user?.estado">
+                <span class="data-label">Estado</span>
+                <span class="data-value">{{ formatEstado(user.estado) }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.municipio">
+                <span class="data-label">Municipio</span>
+                <span class="data-value">{{ user?.municipio }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Datos Sensibles (solo visibles con permiso) -->
+          <div class="data-section sensitive-section" *ngIf="!checkingSensitiveAccess">
+            <h3>
+              <mat-icon>{{ canViewSensitiveData ? 'lock_open' : 'lock' }}</mat-icon> 
+              Datos de contacto
+            </h3>
+            
+            <!-- Si puede ver los datos -->
+            <div class="data-grid" *ngIf="canViewSensitiveData">
+              <div class="data-item" *ngIf="user?.documentType && user?.documentNumber">
+                <span class="data-label">Cédula</span>
+                <span class="data-value">{{ user?.documentType }}-{{ user?.documentNumber }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.birthDate">
+                <span class="data-label">Fecha de nacimiento</span>
+                <span class="data-value">{{ user?.birthDate | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.direccion">
+                <span class="data-label">Dirección</span>
+                <span class="data-value">{{ user?.direccion }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.phoneMobile">
+                <span class="data-label">Teléfono celular</span>
+                <span class="data-value">{{ user?.phoneMobile }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.phoneLocal">
+                <span class="data-label">Teléfono local</span>
+                <span class="data-value">{{ user?.phoneLocal }}</span>
+              </div>
+              <div class="data-item" *ngIf="user?.email">
+                <span class="data-label">Correo electrónico</span>
+                <span class="data-value">{{ user?.email }}</span>
+              </div>
+            </div>
+
+            <!-- Si NO puede ver los datos -->
+            <div class="locked-data" *ngIf="!canViewSensitiveData">
+              <mat-icon class="lock-icon">visibility_off</mat-icon>
+              <p class="lock-message">
+                Los datos de contacto están protegidos por privacidad.
+              </p>
+              <p class="lock-hint">
+                Podrás ver esta información cuando se acepte un tirito entre ustedes.
+              </p>
+            </div>
+          </div>
+
+          <!-- Loading sensitive access check -->
+          <div class="data-section" *ngIf="checkingSensitiveAccess">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span class="checking-text">Verificando acceso...</span>
           </div>
         </div>
       </mat-tab>
