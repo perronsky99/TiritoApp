@@ -8,6 +8,8 @@ import { TiritosService } from '../../../core/services/tiritos.service';
 import { TiritoRequestsService } from '../../../core/services/tirito-requests.service';
 import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { FavoritesService } from '../../../core/services/favorites.service';
+import { FavoritesStateService } from '../../../core/services/favorites-state.service';
 import { AnalyticsService } from '../../../core/services/analytics.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Tirito } from '../../../core/models';
@@ -53,7 +55,9 @@ export class TiritoDetailComponent implements OnInit {
     private snackBar: MatSnackBar
     ,
     private dialog: MatDialog,
-    private ratingService: RatingService
+    private ratingService: RatingService,
+    private favoritesService: FavoritesService,
+    private favoritesState: FavoritesStateService
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +70,26 @@ export class TiritoDetailComponent implements OnInit {
 
   private loadFavorites(): void {
     try {
+      // If logged in, try to load from server into local cache
+      if (this.authService.isLoggedIn) {
+        this.favoritesService.getFavorites(1, 1000).subscribe({
+          next: (res) => {
+            const ids = (res.favorites || res.items || []).map((f: any) => f._id || f.id || f);
+            this.favorites = new Set(ids);
+            this.saveFavorites();
+          },
+          error: () => {
+            // Fallback to localStorage
+            const raw = localStorage.getItem('tirito_favorites');
+            if (raw) {
+              const arr = JSON.parse(raw) as string[];
+              this.favorites = new Set(arr);
+            }
+          }
+        });
+        return;
+      }
+
       const raw = localStorage.getItem('tirito_favorites');
       if (raw) {
         const arr = JSON.parse(raw) as string[];
@@ -93,6 +117,36 @@ export class TiritoDetailComponent implements OnInit {
     event.stopPropagation();
     if (!this.tirito || !this.tirito.id) return;
     const id = this.tirito.id;
+    // If user is logged in, sync with backend; otherwise persist locally
+    if (this.authService.isLoggedIn) {
+      if (this.favorites.has(id)) {
+        this.favoritesService.removeFavorite(id).subscribe({
+          next: () => {
+            this.favorites.delete(id);
+            this.snackBar.open('Quitado de favoritos', undefined, { duration: 1500 });
+            this.saveFavorites();
+            try { this.favoritesState.notifyChange(); } catch (e) {}
+          },
+          error: () => {
+            this.snackBar.open('No se pudo quitar de favoritos', undefined, { duration: 2000 });
+          }
+        });
+      } else {
+        this.favoritesService.addFavorite(id).subscribe({
+          next: () => {
+            this.favorites.add(id);
+            this.snackBar.open('Agregado a favoritos', undefined, { duration: 1500 });
+            this.saveFavorites();
+            try { this.favoritesState.notifyChange(); } catch (e) {}
+          },
+          error: () => {
+            this.snackBar.open('No se pudo agregar a favoritos', undefined, { duration: 2000 });
+          }
+        });
+      }
+      return;
+    }
+
     if (this.favorites.has(id)) {
       this.favorites.delete(id);
       this.snackBar.open('Quitado de favoritos', undefined, { duration: 1500 });

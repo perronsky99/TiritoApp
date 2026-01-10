@@ -22,18 +22,24 @@
     </ng-container>
 
     <mat-list *ngIf="!loading && favorites.length > 0">
-      <mat-list-item *ngFor="let t of favorites" (click)="openTirito(t.id)">
-        <img matListAvatar *ngIf="t.images?.length" [src]="t.images[0].url" alt="Imagen"/>
+      <mat-list-item *ngFor="let t of favorites" (click)="openTirito(t.id || t._id)">
+        <img matListAvatar *ngIf="t.images?.length" [src]="t.images[0].thumbnailUrl || t.images[0].url || t.images[0]" alt="Imagen"/>
         <div matLine class="title">{{ t.title }}</div>
         <div matLine class="meta">
           <span class="price">{{ t.price | currency:'CLP' }}</span>
           <app-tirito-status-badge [status]="t.status"></app-tirito-status-badge>
         </div>
 
-        <button mat-icon-button matSuffix aria-label="Eliminar favorito" (click)="removeFavorite(t.id, $event)">
+        <button mat-icon-button matSuffix aria-label="Eliminar favorito" (click)="removeFavorite(t.id || t._id, $event)">
           <mat-icon>favorite</mat-icon>
         </button>
       </mat-list-item>
     </mat-list>
+    <div class="drawer-footer" *ngIf="!loading">
+      <div #sentinel class="sentinel" aria-hidden="true"></div>
+      <div *ngIf="hasMore" class="loading-more">
+        <mat-progress-spinner diameter="28" mode="indeterminate"></mat-progress-spinner>
+      </div>
+    </div>
   </div>
 </div>

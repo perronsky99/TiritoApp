@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
+import { FavoritesDrawerComponent } from '../favorites-drawer/favorites-drawer.component';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -20,6 +21,7 @@ import { User } from '../../core/models/user.model';
 export class MainLayoutComponent implements OnInit {
   isSidenavOpen = false;
   @ViewChild('favoritesSidenav') favoritesSidenav?: MatSidenav;
+  @ViewChild('favoritesDrawer') favoritesDrawer?: FavoritesDrawerComponent;
   
   currentUser$: Observable<User | null>;
   unreadCount$: Observable<number>;
@@ -49,6 +51,15 @@ export class MainLayoutComponent implements OnInit {
     // open right drawer
     if (this.favoritesSidenav) {
       this.favoritesSidenav.open();
+    }
+  }
+
+  onFavoritesOpened(): void {
+    // ask drawer to reload current favorites
+    try {
+      this.favoritesDrawer?.loadFavorites();
+    } catch (e) {
+      // ignore
     }
   }
 

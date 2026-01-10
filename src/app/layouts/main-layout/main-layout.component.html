@@ -72,9 +72,9 @@
   <!-- Main Content -->
   
   <!-- Favoritos drawer (right) -->
-  <mat-sidenav #favoritesSidenav position="end" mode="over" class="favorites-sidenav">
-    <app-favorites-drawer (close)="favoritesSidenav.close()"></app-favorites-drawer>
-  </mat-sidenav>
+    <mat-sidenav #favoritesSidenav position="end" mode="over" class="favorites-sidenav" (opened)="onFavoritesOpened()">
+      <app-favorites-drawer #favoritesDrawer (close)="favoritesSidenav.close()"></app-favorites-drawer>
+    </mat-sidenav>
 
   <!-- Main Content -->
   <mat-sidenav-content>

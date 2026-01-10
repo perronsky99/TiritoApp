@@ -9,3 +9,6 @@ mat-list-item { cursor: pointer; }
 .meta { display:flex; align-items:center; gap:8px; font-size: 0.9rem; color: rgba(0,0,0,0.7); }
 .price { color: var(--accent-color, #1976d2); font-weight:600; }
 mat-list-item img[matListAvatar] { width:56px; height:56px; object-fit:cover; border-radius:4px; }
+.drawer-footer { display:flex; align-items:center; justify-content:center; padding: 8px 0; }
+.sentinel { height: 1px; width:100%; }
+.loading-more { display:flex; align-items:center; justify-content:center; padding:8px 0; }

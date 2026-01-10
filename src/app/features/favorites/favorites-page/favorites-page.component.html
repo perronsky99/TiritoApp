@@ -1,0 +1,26 @@
+<div class="favorites-page">
+  <h1>Mis Favoritos</h1>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <app-error-state *ngIf="error && !loading" [message]="error"></app-error-state>
+
+  <div class="favorites-grid" *ngIf="!loading && !error">
+    <mat-card *ngFor="let t of favorites" class="tirito-card" (click)="null">
+      <div class="tirito-images" *ngIf="t.images?.length">
+        <img [src]="t.images[0].thumbnailUrl || t.images[0].url || t.images[0]" [alt]="t.title">
+      </div>
+      <mat-card-header>
+        <mat-card-title>{{ t.title }}</mat-card-title>
+        <mat-card-subtitle>{{ t.createdAt | date }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ t.description | truncate:120 }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="load-more" *ngIf="hasMore && !loading">
+    <button mat-stroked-button (click)="loadMore()">Ver más</button>
+  </div>
+</div>
