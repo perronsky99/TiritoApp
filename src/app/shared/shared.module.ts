@@ -38,6 +38,7 @@ import { TiritoStatusBadgeComponent } from './ui/tirito-status-badge/tirito-stat
 import { ImageUploadComponent } from './ui/image-upload/image-upload.component';
 import { NotificationDropdownComponent } from './ui/notification-dropdown/notification-dropdown.component';
 import { RatingDialogComponent } from '../features/profile/rating-dialog/rating-dialog.component';
+import { SearchBarComponent } from '../core/components/search-bar/search-bar.component';
 
 // Pipes
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
@@ -77,7 +78,8 @@ const UI_COMPONENTS = [
   TiritoStatusBadgeComponent,
   ImageUploadComponent,
   NotificationDropdownComponent,
-  RatingDialogComponent
+  RatingDialogComponent,
+  SearchBarComponent
 ];
 
 const PIPES = [

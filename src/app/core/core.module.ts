@@ -9,6 +9,7 @@ import { TiritosService } from './services/tiritos.service';
 import { ChatService } from './services/chat.service';
 import { AnalyticsService } from './services/analytics.service';
 import { ProfileService } from './services/profile.service';
+import { SearchService } from './services/search.service';
 
 /**
  * Core Module - Solo se importa en AppModule
@@ -26,6 +27,7 @@ import { ProfileService } from './services/profile.service';
     ChatService,
     AnalyticsService,
     ProfileService,
+    SearchService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

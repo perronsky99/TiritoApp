@@ -1,0 +1,17 @@
+<div class="search-bar">
+  <input #input type="text" [formControl]="control" placeholder="Buscar tiritos, ejemplo: 'plomería'" (keydown.enter)="onSubmit()" />
+  <button mat-icon-button aria-label="Buscar" (click)="onSubmit()">
+    <mat-icon>search</mat-icon>
+  </button>
+
+  <div class="suggestions" *ngIf="suggestions.length || loading">
+    <div *ngIf="loading" class="loading">Cargando...</div>
+    <button class="suggestion" *ngFor="let s of suggestions" (click)="onSelect(s)">
+      <img *ngIf="s.images?.length" [src]="s.images[0].thumbnailUrl || s.images[0].url || s.images[0]" alt="" />
+      <div class="meta">
+        <div class="title">{{ s.title }}</div>
+        <div class="subtitle">{{ s.creatorName || '' }}</div>
+      </div>
+    </button>
+  </div>
+</div>
