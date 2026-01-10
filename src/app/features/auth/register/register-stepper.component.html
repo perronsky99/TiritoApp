@@ -21,8 +21,8 @@
     <mat-step [stepControl]="stepDocForm">
       <form [formGroup]="stepDocForm" class="step-form">
         <ng-template matStepLabel>Documento</ng-template>
-        <div class="row">
-          <mat-form-field appearance="outline">
+        <div class="row lookup-row">
+          <mat-form-field appearance="outline" class="doc-type">
             <mat-label>Tipo</mat-label>
             <mat-select formControlName="docType">
               <mat-option value="V">V</mat-option>
@@ -31,17 +31,17 @@
             </mat-select>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="flex">
+          <mat-form-field appearance="outline" class="flex doc-number">
             <mat-label>Número de cédula</mat-label>
             <input matInput formControlName="docNumber" (input)="onDocInput($event)" inputmode="numeric" />
           </mat-form-field>
-        </div>
 
-        <div class="lookup-actions">
-          <button mat-flat-button color="primary" (click)="onLookup()" [disabled]="lookupInProgress || !stepDocForm.valid" class="search-btn">
-            <span class="btn-label">Buscar</span>
-            <mat-spinner *ngIf="lookupInProgress" diameter="18" class="btn-spinner-inline"></mat-spinner>
-          </button>
+          <div class="doc-search">
+            <button mat-flat-button color="primary" (click)="onLookup()" [disabled]="lookupInProgress || !stepDocForm.valid" class="search-btn">
+              <span class="btn-label">Buscar</span>
+              <mat-spinner *ngIf="lookupInProgress" diameter="18" class="btn-spinner-inline"></mat-spinner>
+            </button>
+          </div>
         </div>
 
         <!-- Loading placeholder (skeleton) -->
