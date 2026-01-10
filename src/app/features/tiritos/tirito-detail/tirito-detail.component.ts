@@ -36,6 +36,8 @@ export class TiritoDetailComponent implements OnInit {
   // Galería de imágenes
   selectedImageIndex = 0;
 
+  // Depuración: mostrar objeto tirito en JSON
+  showRaw = false;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -264,6 +266,10 @@ export class TiritoDetailComponent implements OnInit {
 
   selectImage(index: number): void {
     this.selectedImageIndex = index;
+  }
+
+  toggleRaw(): void {
+    this.showRaw = !this.showRaw;
   }
 
   goToProfile(): void {

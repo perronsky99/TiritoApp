@@ -62,7 +62,7 @@
         <p>{{ tirito.description }}</p>
       </div>
 
-      <div class="location" *ngIf="tirito.location">
+      <div class="location" *ngIf="tirito.location || tirito['locationName'] || tirito['place']">
         <mat-icon>location_on</mat-icon>
         <span>{{ tirito.location }}</span>
       </div>
