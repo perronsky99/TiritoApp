@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,6 +10,7 @@ import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { FavoritesStateService } from '../../../core/services/favorites-state.service';
+import { Subscription } from 'rxjs';
 import { AnalyticsService } from '../../../core/services/analytics.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Tirito } from '../../../core/models';
@@ -24,7 +25,8 @@ import { Tirito } from '../../../core/models';
   templateUrl: './tirito-detail.component.html',
   styleUrls: ['./tirito-detail.component.scss']
 })
-export class TiritoDetailComponent implements OnInit {
+export class TiritoDetailComponent implements OnInit, OnDestroy {
+  private _favSub?: Subscription;
   tirito: Tirito | null = null;
   loading = true;
   error: string | null = null;
@@ -62,6 +64,12 @@ export class TiritoDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFavorites();
+    // update local favorites when other components change favorites
+    try {
+      this._favSub = this.favoritesState.onChange().subscribe(() => {
+        this.loadFavorites();
+      });
+    } catch (e) {}
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadTirito(id);
@@ -155,6 +163,10 @@ export class TiritoDetailComponent implements OnInit {
       this.snackBar.open('Agregado a favoritos', undefined, { duration: 1500 });
     }
     this.saveFavorites();
+  }
+
+  ngOnDestroy(): void {
+    if (this._favSub) this._favSub.unsubscribe();
   }
 
   canRate(): boolean {

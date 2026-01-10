@@ -175,6 +175,7 @@ export class FavoritesDrawerComponent implements OnInit {
         next: () => {
           this.favorites = this.favorites.filter(f => f.id !== tiritoId);
           this.snackBar.open('Quitado de Favoritos', undefined, { duration: 1400 });
+          try { this.favoritesState.notifyChange(); } catch (e) {}
         },
         error: () => {
           this.snackBar.open('No se pudo quitar de favoritos', undefined, { duration: 2000 });
@@ -189,6 +190,7 @@ export class FavoritesDrawerComponent implements OnInit {
     const filtered = ids.filter(id => id !== tiritoId);
     localStorage.setItem('tirito_favorites', JSON.stringify(filtered));
     this.favorites = this.favorites.filter(f => f.id !== tiritoId);
+    try { this.favoritesState.notifyChange(); } catch (e) {}
     this.snackBar.open('Quitado de Favoritos', undefined, { duration: 1400 });
   }
 
