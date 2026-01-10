@@ -26,8 +26,10 @@ export class AuthService {
     );
   }
 
-  requestPasswordReset(email: string): Observable<any> {
-    return this.http.post<any>(`${this.API}/password/request`, { email });
+  requestPasswordReset(email: string, captchaToken?: string): Observable<any> {
+    const body: any = { email };
+    if (captchaToken) body.captchaToken = captchaToken;
+    return this.http.post<any>(`${this.API}/password/request`, body);
   }
 
   resetPassword(token: string, password: string): Observable<any> {
