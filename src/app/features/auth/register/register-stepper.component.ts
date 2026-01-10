@@ -47,7 +47,8 @@ export class RegisterStepperComponent implements OnInit {
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       id: ['', Validators.required],
-      birthDate: ['', Validators.required]
+      birthDate: ['', Validators.required],
+      gender: ['']
     });
 
     this.addressForm = this.fb.group({
@@ -106,6 +107,7 @@ export class RegisterStepperComponent implements OnInit {
       let ln = this.lookupResult.lastName || '';
       if (this.lookupResult.fullName) {
         const parts = this.lookupResult.fullName.replace(/\s+/g, ' ').trim().split(' ');
+        const particles = ['DE','DEL','LA','LAS','LOS','Y','VAN','VON','MC','MAC','SAN','SANTA'];
         if (parts.length === 1) {
           fn = parts[0];
           ln = '';
@@ -113,13 +115,31 @@ export class RegisterStepperComponent implements OnInit {
           fn = parts[0];
           ln = parts[1];
         } else {
-          ln = parts.slice(-2).join(' ');
-          fn = parts.slice(0, -2).join(' ');
+          // default pick last two, but include particle before them if present
+          let lastParts = parts.slice(-2);
+          const maybeParticle = parts[parts.length - 3] ? parts[parts.length - 3].toUpperCase() : '';
+          if (particles.includes(maybeParticle)) {
+            lastParts = parts.slice(-3);
+          }
+          ln = lastParts.join(' ');
+          fn = parts.slice(0, parts.length - lastParts.length).join(' ');
         }
       }
-      this.personalForm.patchValue({ firstName: fn, lastName: ln, id: this.lookupResult.id });
+      this.personalForm.patchValue({ firstName: fn, lastName: ln, id: this.lookupResult.id, birthDate: this.lookupResult.birthDate ? new Date(this.lookupResult.birthDate) : '', gender: this.lookupResult.gender || '' });
     }
     // advance to next step regardless — user can still edit
+    this.stepper.next();
+  }
+
+  useOnlyName() {
+    if (!this.lookupResult) return;
+    const full = this.lookupResult.fullName || `${this.lookupResult.firstName} ${this.lookupResult.lastName}`;
+    this.personalForm.patchValue({ firstName: full, lastName: '', id: this.lookupResult.id, birthDate: this.lookupResult.birthDate ? new Date(this.lookupResult.birthDate) : '', gender: this.lookupResult.gender || '' });
+    this.stepper.next();
+  }
+
+  editName() {
+    // Go to identity step so user can edit name manually; do not modify values
     this.stepper.next();
   }
 

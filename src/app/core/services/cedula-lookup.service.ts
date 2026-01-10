@@ -8,6 +8,8 @@ export interface CedulaResult {
   lastName: string;
   id: string;
   fullName?: string;
+  birthDate?: string; // ISO YYYY-MM-DD
+  gender?: string; // 'M'|'F' or other
   raw?: any;
 }
 

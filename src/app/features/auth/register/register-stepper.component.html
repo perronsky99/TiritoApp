@@ -53,14 +53,22 @@
             <div class="suggestion-card">
               <div class="name">{{ lookupResult.fullName ? (lookupResult.fullName | uppercase) : (lookupResult.firstName + ' ' + lookupResult.lastName) }}</div>
               <div class="meta">ID: <span class="id">{{ lookupResult.id }}</span></div>
-              <div class="actions">
-                <div class="left">
-                  <button mat-flat-button color="primary" (click)="useSuggested(true)">Confirmar y continuar</button>
-                </div>
-                <div class="right">
-                  <button mat-button (click)="useSuggested(false)">Editar manualmente</button>
-                </div>
+              <div class="meta">
+                <span *ngIf="lookupResult.birthDate">Nacimiento: {{ lookupResult.birthDate | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="lookupResult.gender"> &nbsp;•&nbsp; Género: {{ lookupResult.gender === 'M' ? 'Masculino' : (lookupResult.gender === 'F' ? 'Femenino' : lookupResult.gender) }}</span>
               </div>
+                <div class="actions">
+                  <div class="left">
+                    <button mat-flat-button color="primary" (click)="useSuggested(true)">Confirmar y continuar</button>
+                  </div>
+                  <div class="center">
+                    <button mat-stroked-button color="accent" (click)="useOnlyName()">Usar sólo nombre</button>
+                    <button mat-button (click)="editName()">Editar nombre</button>
+                  </div>
+                  <div class="right">
+                    <button mat-button (click)="useSuggested(false)">Editar manualmente</button>
+                  </div>
+                </div>
             </div>
           <p class="disclaimer">Estos datos no provienen de una fuente oficial y deben ser confirmados por el usuario.</p>
         </div>
@@ -99,6 +107,15 @@
           <input matInput [matDatepicker]="picker" formControlName="birthDate" placeholder="DD/MM/AAAA">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Género</mat-label>
+          <mat-select formControlName="gender">
+            <mat-option value="M">Masculino</mat-option>
+            <mat-option value="F">Femenino</mat-option>
+            <mat-option value="O">Otro</mat-option>
+          </mat-select>
         </mat-form-field>
 
         <div class="buttons">
