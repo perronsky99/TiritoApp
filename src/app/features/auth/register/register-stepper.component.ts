@@ -86,8 +86,8 @@ export class RegisterStepperComponent implements OnInit {
       this.lookupInProgress = false;
       if (res) {
         this.lookupResult = res;
-        // Pre-fill personal form with suggestion but do NOT mark as confirmed
-        this.personalForm.patchValue({ firstName: res.firstName || '', lastName: res.lastName || '', id: res.id || num });
+        // Do NOT overwrite the personal form yet; show suggestion card and let user confirm
+        // (the form will be patched when the user confirms)
       } else {
         this.lookupResult = null;
         this.lookupError = true;
@@ -101,7 +101,23 @@ export class RegisterStepperComponent implements OnInit {
 
   useSuggested(confirm: boolean) {
     if (this.lookupResult && confirm) {
-      this.personalForm.patchValue({ firstName: this.lookupResult.firstName, lastName: this.lookupResult.lastName, id: this.lookupResult.id });
+      // prefer `fullName` when available, otherwise fall back to firstName/lastName
+      let fn = this.lookupResult.firstName || '';
+      let ln = this.lookupResult.lastName || '';
+      if (this.lookupResult.fullName) {
+        const parts = this.lookupResult.fullName.replace(/\s+/g, ' ').trim().split(' ');
+        if (parts.length === 1) {
+          fn = parts[0];
+          ln = '';
+        } else if (parts.length === 2) {
+          fn = parts[0];
+          ln = parts[1];
+        } else {
+          ln = parts.slice(-2).join(' ');
+          fn = parts.slice(0, -2).join(' ');
+        }
+      }
+      this.personalForm.patchValue({ firstName: fn, lastName: ln, id: this.lookupResult.id });
     }
     // advance to next step regardless — user can still edit
     this.stepper.next();

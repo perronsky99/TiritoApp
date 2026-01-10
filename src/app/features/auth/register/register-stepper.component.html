@@ -50,14 +50,18 @@
               <li>Permitir al usuario confirmar los datos sugeridos o editarlos manualmente si no coinciden.</li>
             </ul>
           </div>
-          <div class="suggestion-card">
-            <div><strong>{{ lookupResult.firstName }}</strong> <span>{{ lookupResult.lastName }}</span></div>
-            <div>ID: {{ lookupResult.id }}</div>
-            <div class="actions">
-              <button mat-button color="primary" (click)="useSuggested(true)">Confirmar y continuar</button>
-              <button mat-button (click)="useSuggested(false)">Editar manualmente</button>
+            <div class="suggestion-card">
+              <div class="name">{{ lookupResult.fullName ? (lookupResult.fullName | uppercase) : (lookupResult.firstName + ' ' + lookupResult.lastName) }}</div>
+              <div class="meta">ID: <span class="id">{{ lookupResult.id }}</span></div>
+              <div class="actions">
+                <div class="left">
+                  <button mat-flat-button color="primary" (click)="useSuggested(true)">Confirmar y continuar</button>
+                </div>
+                <div class="right">
+                  <button mat-button (click)="useSuggested(false)">Editar manualmente</button>
+                </div>
+              </div>
             </div>
-          </div>
           <p class="disclaimer">Estos datos no provienen de una fuente oficial y deben ser confirmados por el usuario.</p>
         </div>
 

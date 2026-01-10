@@ -12,6 +12,28 @@
 .actions { margin-top:8px; display:flex; gap:8px }
 .fallback { margin-top:12px; }
 
+/* Improved suggestion card styling */
+.suggestion-card {
+  border: 1px solid rgba(0,0,0,0.06);
+  background: #fff;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  margin-top: 12px;
+}
+.suggestion-card .name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 6px;
+}
+.suggestion-card .meta { color: #666; font-size: 0.95rem; margin-bottom: 12px; }
+.suggestion-card .meta .id { font-weight: 600; color: #333; }
+.suggestion-card .actions { display:flex; justify-content:space-between; align-items:center; }
+.suggestion-card .actions .left { }
+.suggestion-card .actions .right { }
+
+
 /* Deshabilitar interacción con los headers del stepper para forzar navegación por botones */
 ::ng-deep .mat-horizontal-stepper-header .mat-step-header { pointer-events: none; }
 

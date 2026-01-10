@@ -7,6 +7,7 @@ export interface CedulaResult {
   firstName: string;
   lastName: string;
   id: string;
+  fullName?: string;
   raw?: any;
 }
 
