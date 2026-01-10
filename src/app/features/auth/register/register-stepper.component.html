@@ -1,0 +1,201 @@
+<div class="auth-container">
+  <div class="auth-card register-card">
+    <div class="auth-header">
+      <h1 class="logo">Tirito</h1>
+      <p class="tagline">Registro rápido — te guiaremos paso a paso</p>
+    </div>
+
+    <div class="register-stepper">
+      <mat-progress-bar class="top-progress" mode="determinate" [value]="((stepper?.selectedIndex || 0) + 1) / 5 * 100"></mat-progress-bar>
+      <div class="submitting-overlay" *ngIf="isSubmitting">
+        <div class="inner">
+          <mat-spinner diameter="48"></mat-spinner>
+          <div class="text">Enviando registro…</div>
+        </div>
+      </div>
+
+      <mat-horizontal-stepper #stepper linear>
+    <mat-step [stepControl]="stepDocForm">
+      <form [formGroup]="stepDocForm" class="step-form">
+        <ng-template matStepLabel>Documento</ng-template>
+        <div class="row">
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="docType">
+              <mat-option value="V">V</mat-option>
+              <mat-option value="E">E</mat-option>
+              <mat-option value="P">P</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="flex">
+            <mat-label>Número de documento</mat-label>
+            <input matInput formControlName="docNumber" />
+          </mat-form-field>
+        </div>
+
+        <div class="lookup-actions">
+          <button mat-flat-button color="primary" (click)="onLookup()" [disabled]="lookupInProgress || !stepDocForm.valid">
+            Buscar
+            <mat-icon *ngIf="lookupInProgress">autorenew</mat-icon>
+          </button>
+        </div>
+
+        <div *ngIf="lookupResult" class="suggestion">
+          <p class="muted">Según registros externos, estos podrían ser tus datos</p>
+          <div class="legal-notes">
+            <ul>
+              <li>El consumo es SOLO para UX (no verificación legal).</li>
+              <li>Mostrar los datos devueltos como sugerencia visual: “Según registros externos, estos podrían ser tus datos”.</li>
+              <li>Permitir al usuario confirmar los datos sugeridos o editarlos manualmente si no coinciden.</li>
+            </ul>
+          </div>
+          <div class="suggestion-card">
+            <div><strong>{{ lookupResult.firstName }}</strong> <span>{{ lookupResult.lastName }}</span></div>
+            <div>ID: {{ lookupResult.id }}</div>
+            <div class="actions">
+              <button mat-button color="primary" (click)="useSuggested(true)">Confirmar y continuar</button>
+              <button mat-button (click)="useSuggested(false)">Editar manualmente</button>
+            </div>
+          </div>
+          <p class="disclaimer">Estos datos no provienen de una fuente oficial y deben ser confirmados por el usuario.</p>
+        </div>
+
+        <div *ngIf="lookupError" class="fallback">
+          <p class="muted">No se pudo obtener sugerencias. Puedes introducir tus datos manualmente.</p>
+          <button mat-stroked-button color="accent" (click)="stepper.next()">Ingresar datos manualmente</button>
+        </div>
+
+        <div class="buttons">
+          <button mat-button matStepperNext [disabled]="isSubmitting || !stepDocForm.valid">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="personalForm">
+      <form [formGroup]="personalForm" class="step-form">
+        <ng-template matStepLabel>Identidad</ng-template>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="firstName" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Apellido</mat-label>
+          <input matInput formControlName="lastName" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Cédula / ID</mat-label>
+          <input matInput formControlName="id" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Fecha de Nacimiento</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="birthDate" placeholder="DD/MM/AAAA">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="buttons">
+          <button mat-button matStepperPrevious [disabled]="isSubmitting">Anterior</button>
+          <button mat-button matStepperNext [disabled]="isSubmitting || !personalForm.valid">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="addressForm">
+      <form [formGroup]="addressForm" class="step-form">
+        <ng-template matStepLabel>Ubicación</ng-template>
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Estado</mat-label>
+          <mat-select formControlName="estado" (selectionChange)="onEstadoChange($event.value)">
+            <mat-option *ngFor="let e of estados" [value]="e.id">{{ e.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Municipio</mat-label>
+          <mat-select formControlName="municipio">
+            <mat-option *ngFor="let m of municipios" [value]="m.id">{{ m.nombre }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Dirección</mat-label>
+          <textarea matInput formControlName="direccion"></textarea>
+        </mat-form-field>
+
+        <div class="buttons">
+          <button mat-button matStepperPrevious [disabled]="isSubmitting">Anterior</button>
+          <button mat-button matStepperNext [disabled]="isSubmitting || !addressForm.valid">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="contactForm">
+      <form [formGroup]="contactForm" class="step-form">
+        <ng-template matStepLabel>Contacto y Cuenta</ng-template>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Confirmar contraseña</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" />
+          <mat-error *ngIf="contactForm?.hasError('mismatch')">Las contraseñas no coinciden</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Teléfono celular</mat-label>
+          <input matInput formControlName="phoneMobile" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Teléfono local (opcional)</mat-label>
+          <input matInput formControlName="phoneLocal" />
+        </mat-form-field>
+
+        <div class="buttons">
+          <button mat-button matStepperPrevious>Anterior</button>
+          <button mat-button matStepperNext [disabled]="!contactForm.valid">Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step [stepControl]="verificacionForm">
+      <form [formGroup]="verificacionForm" class="step-form">
+        <ng-template matStepLabel>Verificación</ng-template>
+
+        <mat-checkbox formControlName="acceptedTerms">
+          Acepto que la búsqueda de documento fue usada solo para sugerir mis datos y no constituye verificación legal.
+        </mat-checkbox>
+
+        <p class="muted">Revisa tus datos antes de enviar. Puedes volver atrás para corregirlos.</p>
+
+        <div class="buttons">
+          <button mat-button matStepperPrevious [disabled]="isSubmitting">Anterior</button>
+          <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!verificacionForm.valid || isSubmitting">
+            <mat-icon *ngIf="isSubmitting" class="btn-spinner"><mat-spinner diameter="18"></mat-spinner></mat-icon>
+            {{ isSubmitting ? 'Enviando...' : 'Enviar registro' }}
+          </button>
+        </div>
+      </form>
+    </mat-step>
+
+    <mat-step>
+      <ng-template matStepLabel>Listo</ng-template>
+      <p>Gracias — tu solicitud de registro fue enviada (simulación).</p>
+      <div class="buttons">
+        <button mat-button (click)="stepper.reset()">Registrar otro</button>
+      </div>
+    </mat-step>
+  </mat-horizontal-stepper>
+</div>

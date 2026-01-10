@@ -4,14 +4,17 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 
 import { LoginComponent } from './login/login.component';
+import { RegisterStepperComponent } from './register/register-stepper.component';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent }
+  { path: '', component: LoginComponent },
+  { path: 'register', component: RegisterStepperComponent }
 ];
 
 @NgModule({
   declarations: [
-    LoginComponent
+    LoginComponent,
+    RegisterStepperComponent
   ],
   imports: [
     SharedModule,

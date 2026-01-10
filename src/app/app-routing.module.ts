@@ -32,6 +32,11 @@ const routes: Routes = [
     path: 'login',
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },
+  // Also expose auth module under /auth so links like /auth/register work
+  {
+    path: 'auth',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
   
   // Main routes (con layout)
   {

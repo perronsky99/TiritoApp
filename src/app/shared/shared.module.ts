@@ -24,6 +24,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { HttpClientModule } from '@angular/common/http';
 
 // UI Components
 import { LoadingSpinnerComponent } from './ui/loading-spinner/loading-spinner.component';
@@ -60,6 +64,9 @@ const MATERIAL_MODULES = [
   MatListModule,
   MatDatepickerModule,
   MatNativeDateModule
+  ,MatStepperModule,
+  MatProgressBarModule,
+  MatCheckboxModule
 ];
 
 const UI_COMPONENTS = [
@@ -92,7 +99,8 @@ const PIPES = [
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    ...MATERIAL_MODULES
+    ...MATERIAL_MODULES,
+    HttpClientModule
   ],
   exports: [
     CommonModule,
