@@ -221,9 +221,9 @@
 
         <div class="buttons">
           <button mat-button matStepperPrevious [disabled]="isSubmitting">Anterior</button>
-          <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!verificacionForm.valid || isSubmitting">
-            <mat-icon *ngIf="isSubmitting" class="btn-spinner"><mat-spinner diameter="18"></mat-spinner></mat-icon>
-            {{ isSubmitting ? 'Enviando...' : 'Enviar registro' }}
+          <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="!verificacionForm.valid || isSubmitting" class="search-btn">
+            <span class="btn-label">{{ isSubmitting ? 'Enviando...' : 'Enviar registro' }}</span>
+            <mat-spinner *ngIf="isSubmitting" diameter="18" class="btn-spinner-inline"></mat-spinner>
           </button>
         </div>
       </form>
