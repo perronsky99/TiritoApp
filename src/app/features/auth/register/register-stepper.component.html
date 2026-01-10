@@ -69,8 +69,12 @@
         </div>
 
         <div *ngIf="lookupError" class="fallback">
-          <p class="muted">No se pudo obtener sugerencias. Puedes introducir tus datos manualmente.</p>
-          <button mat-stroked-button color="accent" (click)="stepper.next()">Ingresar datos manualmente</button>
+          <p class="muted">{{ lookupError }}</p>
+          <div class="fallback-actions">
+            <button mat-stroked-button color="primary" (click)="onLookup()" [disabled]="lookupInProgress">Reintentar</button>
+            <button mat-stroked-button color="accent" (click)="stepper.next()">Ingresar datos manualmente</button>
+            <button mat-button color="warn" (click)="snack.open('Si el problema persiste, contactá soporte.', 'Cerrar', {duration:4000})">Contactar soporte</button>
+          </div>
         </div>
 
         <div class="buttons">
