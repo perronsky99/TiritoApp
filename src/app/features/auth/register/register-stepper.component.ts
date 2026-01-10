@@ -25,6 +25,8 @@ export class RegisterStepperComponent implements OnInit {
   lookupResult: CedulaResult | null = null;
   lookupError: string | null = null; // descriptive message
   isSubmitting = false;
+  // Store raw numeric document number (no thousands separators) when formatting is applied
+  rawDocumentNumber: string | null = null;
 
   estados = ESTADOS_VENEZUELA;
   municipios: { id: string; nombre: string }[] = [];
@@ -87,7 +89,16 @@ export class RegisterStepperComponent implements OnInit {
     this.lookupInProgress = true;
     this.lookupError = null;
 
-    this.lookup.lookup(type, num).subscribe(res => {
+    // normalize digits (remove formatting) for lookup
+    const rawNum = String(num).replace(/\D/g, '');
+    // keep raw number for submission
+    this.rawDocumentNumber = rawNum || null;
+    // format visually in the input as thousands (e.g. 12.544.260)
+    const formatted = rawNum ? this.formatDigits(rawNum) : num;
+    // update the visible input to the formatted version
+    this.stepDocForm.patchValue({ docNumber: formatted });
+
+    this.lookup.lookup(type, rawNum).subscribe(res => {
       const elapsed = Date.now() - start;
       const wait = Math.max(0, MIN_VISIBLE_MS - elapsed);
       setTimeout(() => {
@@ -133,6 +144,38 @@ export class RegisterStepperComponent implements OnInit {
     });
   }
 
+  private formatDigits(digits: string) {
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  formatId(id: string | undefined | null) {
+    if (!id) return '';
+    const s = String(id).trim();
+    const m = s.match(/^([A-Za-z]+)[-\s]?(\d+)$/);
+    if (m) {
+      const prefix = m[1].toUpperCase();
+      const nums = m[2];
+      return `${prefix}-${this.formatDigits(nums)}`;
+    }
+    const onlyDigits = s.replace(/\D/g, '');
+    if (onlyDigits) return this.formatDigits(onlyDigits);
+    return s;
+  }
+
+  onDocInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const val = input.value || '';
+    const raw = String(val).replace(/\D/g, '');
+    this.rawDocumentNumber = raw || null;
+    const formatted = raw ? this.formatDigits(raw) : '';
+    // update the form control without emitting another input event
+    this.stepDocForm.get('docNumber')?.setValue(formatted, { emitEvent: false });
+    // move caret to end for a predictable UX
+    setTimeout(() => {
+      try { input.setSelectionRange(formatted.length, formatted.length); } catch (e) { /* ignore */ }
+    });
+  }
+
   useSuggested(confirm: boolean) {
     if (this.lookupResult && confirm) {
       // prefer `fullName` when available, otherwise fall back to firstName/lastName
@@ -158,7 +201,7 @@ export class RegisterStepperComponent implements OnInit {
           fn = parts.slice(0, parts.length - lastParts.length).join(' ');
         }
       }
-      this.personalForm.patchValue({ firstName: fn, lastName: ln, id: this.lookupResult.id, birthDate: this.lookupResult.birthDate ? new Date(this.lookupResult.birthDate) : '', gender: this.lookupResult.gender || '' });
+      this.personalForm.patchValue({ firstName: fn, lastName: ln, id: this.formatId(this.lookupResult.id), birthDate: this.lookupResult.birthDate ? new Date(this.lookupResult.birthDate) : '', gender: this.lookupResult.gender || '' });
     }
     // advance to next step regardless — user can still edit
     this.stepper.next();
@@ -167,7 +210,7 @@ export class RegisterStepperComponent implements OnInit {
   useOnlyName() {
     if (!this.lookupResult) return;
     const full = this.lookupResult.fullName || `${this.lookupResult.firstName} ${this.lookupResult.lastName}`;
-    this.personalForm.patchValue({ firstName: full, lastName: '', id: this.lookupResult.id, birthDate: this.lookupResult.birthDate ? new Date(this.lookupResult.birthDate) : '', gender: this.lookupResult.gender || '' });
+    this.personalForm.patchValue({ firstName: full, lastName: '', id: this.formatId(this.lookupResult.id), birthDate: this.lookupResult.birthDate ? new Date(this.lookupResult.birthDate) : '', gender: this.lookupResult.gender || '' });
     this.stepper.next();
   }
 
@@ -193,7 +236,8 @@ export class RegisterStepperComponent implements OnInit {
       lastName: this.personalForm.value.lastName,
       name: `${this.personalForm.value.firstName} ${this.personalForm.value.lastName}`,
       documentType: this.stepDocForm.value.docType,
-      documentNumber: this.stepDocForm.value.docNumber,
+      // send raw numeric document number (no dots) if available
+      documentNumber: this.rawDocumentNumber || String(this.stepDocForm.value.docNumber).replace(/\D/g, ''),
       birthDate: this.personalForm.value.birthDate,
       estado: this.addressForm.value.estado,
       municipio: this.addressForm.value.municipio,

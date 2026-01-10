@@ -32,8 +32,8 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="flex">
-            <mat-label>Número de documento</mat-label>
-            <input matInput formControlName="docNumber" />
+            <mat-label>Número de cédula</mat-label>
+            <input matInput formControlName="docNumber" (input)="onDocInput($event)" inputmode="numeric" />
           </mat-form-field>
         </div>
 
@@ -60,9 +60,9 @@
         <div *ngIf="lookupResult && !lookupInProgress" class="suggestion">
           <div class="suggestion-card" [class.visible]="!!lookupResult">
               <div class="name">{{ lookupResult.fullName ? (lookupResult.fullName | uppercase) : (lookupResult.firstName + ' ' + lookupResult.lastName) }}</div>
-              <div class="meta">Cédula de Identidad: <span class="id">{{ lookupResult.id }}</span></div>
+              <div class="meta">Cédula de Identidad: <span class="id">{{ formatId(lookupResult.id) }}</span></div>
               <div class="meta">
-                <span *ngIf="lookupResult.birthDate">Nacimiento: {{ lookupResult.birthDate | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="lookupResult.birthDate">Fecha de Nacimiento: {{ lookupResult.birthDate | date:'dd/MM/yyyy' }}</span>
                 <span *ngIf="lookupResult.gender"> &nbsp;•&nbsp; Género: {{ lookupResult.gender === 'M' ? 'Masculino' : (lookupResult.gender === 'F' ? 'Femenino' : lookupResult.gender) }}</span>
               </div>
                 <div class="actions">
