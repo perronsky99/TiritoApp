@@ -8,6 +8,7 @@ import { FavoritesService } from '../../core/services/favorites.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { FavoritesStateService } from '../../core/services/favorites-state.service';
 import { Subscription } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-favorites-drawer',
@@ -117,8 +118,32 @@ export class FavoritesDrawerComponent implements OnInit {
     this.favoritesService.getFavorites(this.page, this.limit).subscribe({
       next: (res) => {
         // backend may return { favorites: [...], total, page }
-        const items = res.favorites || res.items || [];
+        const items = (res.favorites || res.items || []).map((it: any) => {
+          // Normalize images: backend may return string filenames or full objects
+          if (!it.images) return it;
+          // derive API host (strip trailing /api if present) so uploads are requested from host root
+          const apiHost = environment.apiUrl.replace(/\/api\/?$/, '');
+          it.images = it.images.map((img: any) => {
+            if (!img) return img;
+            if (typeof img === 'string') {
+              const src = img.startsWith('http') ? img : `${apiHost}${img.startsWith('/') ? img : '/' + img}`;
+              return { url: src, thumbnailUrl: src };
+            }
+            // if it's already an object with url, ensure it's absolute
+            if (img.url && !img.url.startsWith('http')) {
+              const src = `${apiHost}${String(img.url).startsWith('/') ? String(img.url) : '/' + String(img.url)}`;
+              const thumb = img.thumbnailUrl && img.thumbnailUrl.startsWith('http') ? img.thumbnailUrl : src;
+              return { ...img, url: src, thumbnailUrl: thumb };
+            }
+            return img;
+          });
+          return it;
+        });
         this.favorites = this.favorites.concat(items);
+        // Debug: log image URLs to help debug missing requests
+        try {
+          console.debug('Favorites drawer loaded items, image URLs:', this.favorites.map(f => ({ id: f._id || f.id, images: (f.images||[]).map((i:any)=> i.url || i) })));
+        } catch (e) {}
         const total = res.total || items.length;
         this.hasMore = (this.favorites.length < total);
         this.loading = false;
