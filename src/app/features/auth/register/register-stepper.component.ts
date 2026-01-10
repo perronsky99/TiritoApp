@@ -175,9 +175,29 @@ export class RegisterStepperComponent implements OnInit {
     this.isSubmitting = true;
     this.auth.register(payload).subscribe({
       next: (res) => {
-        this.isSubmitting = false;
-        this.snack.open('Registro exitoso. Bienvenido.', 'OK', { duration: 3000 });
-        this.router.navigate(['/']);
+        // If register returned auth token (AuthService.handleAuth has stored it), we're already logged in
+        if (this.auth.isAuthenticated()) {
+          this.isSubmitting = false;
+          this.snack.open('Registro exitoso. Bienvenido.', 'OK', { duration: 3000 });
+          this.router.navigate(['/']);
+          return;
+        }
+
+        // Otherwise attempt to login automatically using the provided credentials
+        this.auth.login({ email: payload.email, password: payload.password }).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.snack.open('Registro exitoso. Sesión iniciada.', 'OK', { duration: 3000 });
+            this.router.navigate(['/']);
+          },
+          error: (loginErr) => {
+            this.isSubmitting = false;
+            // Registration succeeded but auto-login failed — inform user and redirect to login
+            const msg = loginErr?.error?.message || 'Registro completado, pero no se pudo iniciar sesión automáticamente.';
+            this.snack.open(msg, 'OK', { duration: 6000 });
+            this.router.navigate(['/auth/login']);
+          }
+        });
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -185,5 +205,10 @@ export class RegisterStepperComponent implements OnInit {
         this.snack.open(msg, 'Cerrar', { duration: 5000 });
       }
     });
+  }
+
+  cancel() {
+    // Navigate back to the login page
+    this.router.navigate(['/auth/login']);
   }
 }

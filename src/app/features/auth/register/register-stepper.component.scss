@@ -85,6 +85,14 @@
   box-shadow: 0 12px 48px rgba(0,0,0,0.18);
 }
 
+.close-btn {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  z-index: 60;
+  color: rgba(0,0,0,0.6);
+}
+
 .auth-header { text-align: center; margin-bottom: 1rem; }
 .logo { font-size: 1.8rem; font-weight: 700; color: #7b1fa2; margin: 0; }
 .tagline { color: #666; margin: 0.25rem 0 0; font-size: 0.95rem; }
