@@ -8,7 +8,17 @@
 .doc-type { width: 110px; min-width: 90px; max-width: 140px; }
 .doc-number { min-width: 0; }
 .doc-search { display: flex; align-items: center; }
-.doc-search .search-btn { height: 40px; }
+/* Forzar altura igual entre input y botón */
+.doc-search .search-btn {
+  height: 40px !important;
+  min-height: 40px !important;
+  line-height: 40px !important;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
 .suggestion { margin-top: 12px; }
 .muted { color: rgba(0,0,0,0.6); }
 .suggestion-card { border: 1px solid #e0e0e0; padding: 12px; border-radius: 6px; }
