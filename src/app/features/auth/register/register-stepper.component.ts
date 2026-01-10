@@ -179,16 +179,20 @@ export class RegisterStepperComponent implements OnInit {
         if (this.auth.isAuthenticated()) {
           this.isSubmitting = false;
           this.snack.open('Registro exitoso. Bienvenido.', 'OK', { duration: 3000 });
-          this.router.navigate(['/']);
+          // Navegar al perfil del usuario recién autenticado
+          const me = this.auth.getUser();
+          this.router.navigate(['/perfil', me?.id || '']);
           return;
         }
 
         // Otherwise attempt to login automatically using the provided credentials
         this.auth.login({ email: payload.email, password: payload.password }).subscribe({
           next: () => {
-            this.isSubmitting = false;
-            this.snack.open('Registro exitoso. Sesión iniciada.', 'OK', { duration: 3000 });
-            this.router.navigate(['/']);
+              this.isSubmitting = false;
+              this.snack.open('Registro exitoso. Sesión iniciada.', 'OK', { duration: 3000 });
+              // Navegar al perfil del usuario
+              const me2 = this.auth.getUser();
+              this.router.navigate(['/perfil', me2?.id || '']);
           },
           error: (loginErr) => {
             this.isSubmitting = false;

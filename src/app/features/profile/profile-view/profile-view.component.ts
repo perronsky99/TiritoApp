@@ -68,7 +68,11 @@ export class ProfileViewComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.profileService.getProfile(userId).subscribe({
+    // Si es el propio perfil, usar el endpoint /api/users/me para obtener los datos completos
+    const isOwn = this.authService.currentUser?.id === userId;
+    const obs = isOwn ? this.profileService.getMyProfile() : this.profileService.getProfile(userId);
+
+    obs.subscribe({
       next: (user) => {
         this.user = user;
         this.loading = false;

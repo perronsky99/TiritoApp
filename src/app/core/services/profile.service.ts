@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { User, VerificationStatus } from '../models';
 import { environment } from '../../../environments/environment';
 
@@ -20,6 +21,14 @@ export class ProfileService {
    */
   getProfile(userId: string): Observable<User> {
     return this.http.get<User>(`${this.API_URL}/${userId}`);
+  }
+
+  /**
+   * Obtiene el perfil del usuario autenticado (/api/users/me)
+   */
+  getMyProfile(): Observable<User> {
+    return this.http.get<{ user: User }>(`${environment.apiUrl}/users/me`)
+      .pipe(map(res => res.user));
   }
 
   /**
