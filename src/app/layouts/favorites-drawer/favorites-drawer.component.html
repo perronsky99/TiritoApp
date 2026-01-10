@@ -1,0 +1,39 @@
+<div class="favorites-drawer">
+  <div class="drawer-header">
+    <h3>Favoritos</h3>
+    <button mat-icon-button (click)="closeDrawer()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    <ng-container *ngIf="loading">
+      <div class="loading">
+        <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+        <p>Cargando favoritos...</p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="!loading && favorites.length === 0">
+      <div class="empty">
+        <p>No tienes favoritos aún.</p>
+        <button mat-flat-button color="primary" (click)="explore()">Explorar tiritos</button>
+      </div>
+    </ng-container>
+
+    <mat-list *ngIf="!loading && favorites.length > 0">
+      <mat-list-item *ngFor="let t of favorites" (click)="openTirito(t.id)">
+        <img matListAvatar *ngIf="t.images?.length" [src]="t.images[0].url" alt="Imagen"/>
+        <div matLine class="title">{{ t.title }}</div>
+        <div matLine class="meta">
+          <span class="price">{{ t.price | currency:'CLP' }}</span>
+          <app-tirito-status-badge [status]="t.status"></app-tirito-status-badge>
+        </div>
+
+        <button mat-icon-button matSuffix aria-label="Eliminar favorito" (click)="removeFavorite(t.id, $event)">
+          <mat-icon>favorite</mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+  </div>
+</div>

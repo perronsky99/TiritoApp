@@ -36,6 +36,9 @@ export class TiritoDetailComponent implements OnInit {
   // Galería de imágenes
   selectedImageIndex = 0;
 
+  // Favoritos locales (persistidos en localStorage)
+  private favorites: Set<string> = new Set<string>();
+
   // Depuración: mostrar objeto tirito en JSON
   showRaw = false;
   constructor(
@@ -54,10 +57,50 @@ export class TiritoDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadFavorites();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadTirito(id);
     }
+  }
+
+  private loadFavorites(): void {
+    try {
+      const raw = localStorage.getItem('tirito_favorites');
+      if (raw) {
+        const arr = JSON.parse(raw) as string[];
+        this.favorites = new Set(arr);
+      }
+    } catch (e) {
+      this.favorites = new Set<string>();
+    }
+  }
+
+  private saveFavorites(): void {
+    try {
+      localStorage.setItem('tirito_favorites', JSON.stringify(Array.from(this.favorites)));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  isFavorited(id?: string | null): boolean {
+    if (!id) return false;
+    return this.favorites.has(id);
+  }
+
+  toggleFavorite(event: Event): void {
+    event.stopPropagation();
+    if (!this.tirito || !this.tirito.id) return;
+    const id = this.tirito.id;
+    if (this.favorites.has(id)) {
+      this.favorites.delete(id);
+      this.snackBar.open('Quitado de favoritos', undefined, { duration: 1500 });
+    } else {
+      this.favorites.add(id);
+      this.snackBar.open('Agregado a favoritos', undefined, { duration: 1500 });
+    }
+    this.saveFavorites();
   }
 
   canRate(): boolean {

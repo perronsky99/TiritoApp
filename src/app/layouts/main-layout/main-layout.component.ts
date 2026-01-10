@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSidenav } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -18,6 +19,7 @@ import { User } from '../../core/models/user.model';
 })
 export class MainLayoutComponent implements OnInit {
   isSidenavOpen = false;
+  @ViewChild('favoritesSidenav') favoritesSidenav?: MatSidenav;
   
   currentUser$: Observable<User | null>;
   unreadCount$: Observable<number>;
@@ -38,6 +40,15 @@ export class MainLayoutComponent implements OnInit {
     // Iniciar polling de notificaciones si el usuario está autenticado
     if (this.authService.isLoggedIn) {
       this.notificationService.startPolling();
+    }
+  }
+
+  openFavorites(): void {
+    // Close left sidenav if open
+    this.closeSidenav();
+    // open right drawer
+    if (this.favoritesSidenav) {
+      this.favoritesSidenav.open();
     }
   }
 

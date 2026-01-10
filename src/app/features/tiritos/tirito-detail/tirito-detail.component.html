@@ -27,6 +27,14 @@
         <img 
           [src]="tirito.images[selectedImageIndex]?.url" 
           [alt]="tirito.title">
+        <button
+          class="favorite-btn"
+          mat-icon-button
+          aria-label="Agregar a favoritos"
+          [attr.aria-pressed]="isFavorited(tirito?.id)"
+          (click)="toggleFavorite($event)">
+          <mat-icon color="warn">{{ isFavorited(tirito?.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+        </button>
       </div>
       <div class="thumbnails" *ngIf="tirito.images.length > 1">
         <button 
