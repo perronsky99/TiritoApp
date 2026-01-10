@@ -20,7 +20,11 @@
   border-radius: 10px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
   margin-top: 12px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
 }
+.suggestion-card.visible { opacity: 1; transform: translateY(0); }
 .suggestion-card .name {
   font-size: 1.15rem;
   font-weight: 700;
@@ -35,6 +39,23 @@
 
 .suggestion-card .actions .center { display:flex; gap:8px; align-items:center; }
 .suggestion-card .actions button[mat-stroked-button] { border-color: rgba(123,31,162,0.1); }
+
+/* Skeleton placeholder for loading */
+.skeleton { margin-top: 12px; }
+.skeleton-card { background: linear-gradient(90deg,#f6f7f8 25%, #ededf0 37%, #f6f7f8 63%); background-size: 400% 100%; border-radius: 10px; padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.03); }
+.skeleton-line { height: 14px; background: #eee; border-radius: 6px; margin-bottom: 10px; opacity: 0.9; }
+.skeleton-line.title { height: 18px; width: 60%; }
+.skeleton-line.meta { width: 40%; }
+.skeleton-line.meta.short { width: 25%; }
+.skeleton-actions { display:flex; gap:10px; margin-top:12px; }
+.skeleton-btn { width: 140px; height: 36px; background: rgba(255,255,255,0.5); border-radius: 6px; }
+.skeleton-btn.small { width: 100px; }
+.skeleton-card { animation: shimmer 1.6s linear infinite; }
+@keyframes shimmer { 0% { background-position: 0% 0%; } 100% { background-position: -135% 0%; } }
+
+/* Button spinner inline */
+.search-btn { display:inline-flex; align-items:center; gap:8px; }
+.btn-spinner-inline { display:inline-block; }
 
 
 /* Deshabilitar interacción con los headers del stepper para forzar navegación por botones */

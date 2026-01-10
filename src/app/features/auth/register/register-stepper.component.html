@@ -38,14 +38,27 @@
         </div>
 
         <div class="lookup-actions">
-          <button mat-flat-button color="primary" (click)="onLookup()" [disabled]="lookupInProgress || !stepDocForm.valid">
-            Buscar
-            <mat-icon *ngIf="lookupInProgress">autorenew</mat-icon>
+          <button mat-flat-button color="primary" (click)="onLookup()" [disabled]="lookupInProgress || !stepDocForm.valid" class="search-btn">
+            <span class="btn-label">Buscar</span>
+            <mat-spinner *ngIf="lookupInProgress" diameter="18" class="btn-spinner-inline"></mat-spinner>
           </button>
         </div>
 
-        <div *ngIf="lookupResult" class="suggestion">
-          <div class="suggestion-card">
+        <!-- Loading placeholder (skeleton) -->
+        <div *ngIf="lookupInProgress" class="skeleton">
+          <div class="skeleton-card">
+            <div class="skeleton-line title"></div>
+            <div class="skeleton-line meta short"></div>
+            <div class="skeleton-line meta"></div>
+            <div class="skeleton-actions">
+              <div class="skeleton-btn"></div>
+              <div class="skeleton-btn small"></div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="lookupResult && !lookupInProgress" class="suggestion">
+          <div class="suggestion-card" [class.visible]="!!lookupResult">
               <div class="name">{{ lookupResult.fullName ? (lookupResult.fullName | uppercase) : (lookupResult.firstName + ' ' + lookupResult.lastName) }}</div>
               <div class="meta">Cédula de Identidad: <span class="id">{{ lookupResult.id }}</span></div>
               <div class="meta">

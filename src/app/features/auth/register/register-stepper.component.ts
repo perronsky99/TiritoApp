@@ -105,7 +105,7 @@ export class RegisterStepperComponent implements OnInit {
         if (isPlaceholderDate) {
           // Treat as incomplete data: prefer manual entry and inform the user
           this.lookupResult = null;
-          this.lookupError = 'Los datos obtenidos parecen incompletos (fecha de nacimiento inválida). Ingresá los datos manualmente.';
+          this.lookupError = 'Numero de documento no encontrado o incorrecto.';
           return;
         }
 
