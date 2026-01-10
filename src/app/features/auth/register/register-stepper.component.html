@@ -42,17 +42,9 @@
         </div>
 
         <div *ngIf="lookupResult" class="suggestion">
-          <p class="muted">Según registros externos, estos podrían ser tus datos</p>
-          <div class="legal-notes">
-            <ul>
-              <li>El consumo es SOLO para UX (no verificación legal).</li>
-              <li>Mostrar los datos devueltos como sugerencia visual: “Según registros externos, estos podrían ser tus datos”.</li>
-              <li>Permitir al usuario confirmar los datos sugeridos o editarlos manualmente si no coinciden.</li>
-            </ul>
-          </div>
-            <div class="suggestion-card">
+          <div class="suggestion-card">
               <div class="name">{{ lookupResult.fullName ? (lookupResult.fullName | uppercase) : (lookupResult.firstName + ' ' + lookupResult.lastName) }}</div>
-              <div class="meta">ID: <span class="id">{{ lookupResult.id }}</span></div>
+              <div class="meta">Cédula de Identidad: <span class="id">{{ lookupResult.id }}</span></div>
               <div class="meta">
                 <span *ngIf="lookupResult.birthDate">Nacimiento: {{ lookupResult.birthDate | date:'dd/MM/yyyy' }}</span>
                 <span *ngIf="lookupResult.gender"> &nbsp;•&nbsp; Género: {{ lookupResult.gender === 'M' ? 'Masculino' : (lookupResult.gender === 'F' ? 'Femenino' : lookupResult.gender) }}</span>
