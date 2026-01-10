@@ -96,5 +96,6 @@ export class MainLayoutComponent implements OnInit {
     this.notificationService.reset();
     this.authService.logout();
     this.closeSidenav();
+    this.router.navigate(['/']);
   }
 }
