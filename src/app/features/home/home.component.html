@@ -80,11 +80,19 @@
         (click)="goToTirito(tirito)">
         <mat-card-header>
           <div mat-card-avatar class="tirito-avatar">
-            {{ tirito.creatorName.charAt(0).toUpperCase() }}
+            <ng-container *ngIf="authService.isLoggedIn; else anonAvatar">
+              {{ tirito.creatorName.charAt(0).toUpperCase() }}
+            </ng-container>
+            <ng-template #anonAvatar>?</ng-template>
           </div>
           <mat-card-title>{{ tirito.title | truncate:40 }}</mat-card-title>
           <mat-card-subtitle>
-            {{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
+            <ng-container *ngIf="authService.isLoggedIn; else anonName">
+              {{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
+            </ng-container>
+            <ng-template #anonName>
+              Usuario · {{ tirito.createdAt | relativeTime }}
+            </ng-template>
           </mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
