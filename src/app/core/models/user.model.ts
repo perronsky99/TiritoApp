@@ -49,6 +49,8 @@ export interface User {
   role: Role;
   verificationStatus: VerificationStatus;
   avatar?: string;
+  /** Biografía / Acerca de */
+  bio?: string | null;
   /** Campo legacy */
   phone?: string;
   createdAt: string;
@@ -77,6 +79,7 @@ export interface RegisterData {
   direccion: string;
   phoneMobile: string;
   phoneLocal?: string;
+  bio?: string;
   email: string;
   password: string;
   role: Role;

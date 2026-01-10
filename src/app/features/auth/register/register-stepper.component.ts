@@ -67,7 +67,8 @@ export class RegisterStepperComponent implements OnInit {
     }, { validators: this.passwordMatchValidator });
 
     this.verificacionForm = this.fb.group({
-      acceptedTerms: [false, Validators.requiredTrue]
+      acceptedTerms: [false, Validators.requiredTrue],
+      bio: ['', Validators.maxLength(1000)]
     });
   }
 
@@ -167,6 +168,7 @@ export class RegisterStepperComponent implements OnInit {
       direccion: this.addressForm.value.direccion,
       phoneMobile: this.contactForm.value.phoneMobile,
       phoneLocal: this.contactForm.value.phoneLocal,
+      bio: this.verificacionForm.value.bio || null,
       email: this.contactForm.value.email,
       password: this.contactForm.value.password,
       role: this.contactForm.value.role

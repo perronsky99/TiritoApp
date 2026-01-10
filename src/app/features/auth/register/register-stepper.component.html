@@ -190,6 +190,12 @@
       <form [formGroup]="verificacionForm" class="step-form">
         <ng-template matStepLabel>Verificación</ng-template>
 
+        <mat-form-field appearance="outline" class="full">
+          <mat-label>Acerca de (habilidades / destrezas)</mat-label>
+          <textarea matInput formControlName="bio" rows="4" placeholder="Contá tus habilidades, fortalezas y destrezas que quieras mostrar en tu perfil (opcional)"></textarea>
+          <mat-hint align="end">{{ verificacionForm.get('bio')?.value?.length || 0 }}/1000</mat-hint>
+        </mat-form-field>
+
         <mat-checkbox formControlName="acceptedTerms">
           Acepto que la búsqueda de documento fue usada solo para sugerir mis datos y no constituye verificación legal.
         </mat-checkbox>
