@@ -12,3 +12,14 @@ mat-list-item img[matListAvatar] { width:56px; height:56px; object-fit:cover; bo
 .drawer-footer { display:flex; align-items:center; justify-content:center; padding: 8px 0; }
 .sentinel { height: 1px; width:100%; }
 .loading-more { display:flex; align-items:center; justify-content:center; padding:8px 0; }
+
+/* Favorite heart styling */
+.fav-btn { padding: 6px; border-radius: 50%; transition: background-color 120ms ease; }
+.fav-btn:hover { background-color: rgba(233,30,99,0.06); }
+.fav-icon { color: #e91e63; transition: transform 140ms cubic-bezier(.2,.8,.2,1), filter 140ms; font-size: 20px; }
+.fav-btn:active .fav-icon { transform: scale(0.92); filter: drop-shadow(0 2px 6px rgba(233,30,99,0.18)); }
+.fav-btn:hover .fav-icon { transform: scale(1.08); }
+
+/* Ensure icon aligns visually with list item */
+mat-list-item { display: flex; align-items: center; }
+mat-list-item .fav-btn { margin-left: 8px; margin-right: 4px; }

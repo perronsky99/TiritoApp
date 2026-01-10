@@ -30,8 +30,8 @@
           <app-tirito-status-badge [status]="t.status"></app-tirito-status-badge>
         </div>
 
-        <button mat-icon-button matSuffix aria-label="Eliminar favorito" (click)="removeFavorite(t.id || t._id, $event)">
-          <mat-icon>favorite</mat-icon>
+        <button mat-icon-button matSuffix aria-label="Eliminar favorito" (click)="removeFavorite(t.id || t._id, $event)" class="fav-btn" title="Quitar de favoritos">
+          <mat-icon class="fav-icon">favorite</mat-icon>
         </button>
       </mat-list-item>
     </mat-list>
