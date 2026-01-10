@@ -82,43 +82,54 @@ export class RegisterStepperComponent implements OnInit {
     const num = this.stepDocForm.value.docNumber;
     const type = this.stepDocForm.value.docType;
     if (!num) return;
+    const MIN_VISIBLE_MS = 500; // min skeleton visible time to avoid flicker
+    const start = Date.now();
     this.lookupInProgress = true;
     this.lookupError = null;
+
     this.lookup.lookup(type, num).subscribe(res => {
-      this.lookupInProgress = false;
-      // If the service returned a structured error
-      if (res && (res as any).error) {
-        const err = res as any;
-        this.lookupResult = null;
-        this.lookupError = err.message || 'Error realizando la búsqueda';
-        return;
-      }
-
-      if (res && !(res as any).error) {
-        // safe to assign as CedulaResult
-        const candidate = res as CedulaResult;
-
-        // Validate common placeholder/invalid values (e.g. birthDate = 0001-01-01 or '01/01/0001')
-        const bdRaw = String(candidate.birthDate || '').trim();
-        const isPlaceholderDate = bdRaw.length > 0 && (bdRaw.includes('0001') || bdRaw.startsWith('0001') || bdRaw === '01/01/0001');
-
-        if (isPlaceholderDate) {
-          // Treat as incomplete data: prefer manual entry and inform the user
+      const elapsed = Date.now() - start;
+      const wait = Math.max(0, MIN_VISIBLE_MS - elapsed);
+      setTimeout(() => {
+        this.lookupInProgress = false;
+        // If the service returned a structured error
+        if (res && (res as any).error) {
+          const err = res as any;
           this.lookupResult = null;
-          this.lookupError = 'Numero de documento no encontrado o incorrecto.';
+          this.lookupError = err.message || 'Error realizando la búsqueda';
           return;
         }
 
-        this.lookupResult = candidate;
-        // Do NOT overwrite the personal form yet; show suggestion card and let user confirm
-      } else {
-        this.lookupResult = null;
-        this.lookupError = 'No se encontraron datos para esa cédula';
-      }
+        if (res && !(res as any).error) {
+          // safe to assign as CedulaResult
+          const candidate = res as CedulaResult;
+
+          // Validate common placeholder/invalid values (e.g. birthDate = 0001-01-01 or '01/01/0001')
+          const bdRaw = String(candidate.birthDate || '').trim();
+          const isPlaceholderDate = bdRaw.length > 0 && (bdRaw.includes('0001') || bdRaw.startsWith('0001') || bdRaw === '01/01/0001');
+
+          if (isPlaceholderDate) {
+            // Treat as incomplete data: prefer manual entry and inform the user
+            this.lookupResult = null;
+            this.lookupError = 'Numero de documento no encontrado o incorrecto.';
+            return;
+          }
+
+          this.lookupResult = candidate;
+          // Do NOT overwrite the personal form yet; show suggestion card and let user confirm
+        } else {
+          this.lookupResult = null;
+          this.lookupError = 'No se encontraron datos para esa cédula';
+        }
+      }, wait);
     }, (err) => {
-      this.lookupInProgress = false;
-      this.lookupResult = null;
-      this.lookupError = err?.message || 'Error de red al consultar la cédula';
+      const elapsed = Date.now() - start;
+      const wait = Math.max(0, MIN_VISIBLE_MS - elapsed);
+      setTimeout(() => {
+        this.lookupInProgress = false;
+        this.lookupResult = null;
+        this.lookupError = err?.message || 'Error de red al consultar la cédula';
+      }, wait);
     });
   }
 
