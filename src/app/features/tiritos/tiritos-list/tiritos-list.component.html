@@ -47,10 +47,22 @@
   </div>
 
   <!-- Loading -->
-  <app-loading-spinner 
-    *ngIf="loading"
-    [message]="'Cargando tiritos...'">
-  </app-loading-spinner>
+  <ng-container *ngIf="loading">
+    <app-loading-spinner [message]="'Cargando tiritos...'"></app-loading-spinner>
+    <div class="tiritos-grid skeletons" aria-hidden="true">
+      <mat-card class="tirito-card skeleton" *ngFor="let n of [1,2,3,4,5,6]">
+        <div class="skeleton-img"></div>
+        <mat-card-header>
+          <div mat-card-avatar class="skeleton-avatar"></div>
+          <mat-card-title class="skeleton-line"></mat-card-title>
+          <mat-card-subtitle class="skeleton-line short"></mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="skeleton-line"></p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </ng-container>
 
   <!-- Error -->
   <app-error-state 
@@ -78,14 +90,14 @@
         <div mat-card-avatar class="tirito-avatar">
           {{ tirito.creatorInitials || tirito.creatorName.substring(0, 2).toUpperCase() }}
         </div>
-        <mat-card-title>{{ tirito.title | truncate:50 }}</mat-card-title>
+        <mat-card-title [innerHTML]="highlight(tirito.title | truncate:50, searchQuery)"></mat-card-title>
         <mat-card-subtitle>
           @{{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
         </mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
-        <p>{{ tirito.description | truncate:120 }}</p>
+        <p [innerHTML]="highlight(tirito.description | truncate:120, searchQuery)"></p>
         <div class="tirito-footer">
           <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
           <span class="location" *ngIf="tirito.location">

@@ -198,6 +198,19 @@ export class FavoritesDrawerComponent implements OnInit {
     this.close.emit();
   }
 
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (!img) return;
+    const retry = parseInt(img.getAttribute('data-retry') || '0', 10) || 0;
+    if (retry < 2) {
+      img.setAttribute('data-retry', String(retry + 1));
+      const original = img.getAttribute('data-src') || img.src;
+      setTimeout(() => { try { img.src = original; } catch (e) {} }, 250 * (retry + 1));
+      return;
+    }
+    img.src = '/assets/img/placeholder.png';
+  }
+
   loadMore(): void {
     if (this.loading || !this.hasMore) return;
     this.page++;

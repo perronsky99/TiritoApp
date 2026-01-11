@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TiritosService } from '../../../core/services/tiritos.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Tirito, TiritoStatus, TiritoFilters } from '../../../core/models';
@@ -27,15 +28,26 @@ export class TiritosListComponent implements OnInit {
   page = 1;
   hasMore = false;
   loadingMore = false;
+  // page provided via route query param
+  private routePage = 1;
 
   constructor(
     private tiritosService: TiritosService,
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
-    this.loadTiritos();
+    // react to query params: `search` and `page`
+    this.route.queryParamMap.subscribe(q => {
+      const s = q.get('search') || '';
+      const p = parseInt(q.get('page') || '1', 10) || 1;
+      this.searchQuery = s;
+      this.routePage = p;
+      this.loadTiritos();
+    });
   }
 
   loadTiritos(loadMore = false): void {
@@ -44,7 +56,8 @@ export class TiritosListComponent implements OnInit {
       this.page++;
     } else {
       this.loading = true;
-      this.page = 1;
+      // use route-provided page when available (e.g. /tiritos?search=x&page=2)
+      this.page = this.routePage || 1;
       this.tiritos = [];
     }
     
@@ -73,6 +86,10 @@ export class TiritosListComponent implements OnInit {
         this.hasMore = response.hasMore;
         this.loading = false;
         this.loadingMore = false;
+        // keep route page in sync when loading more
+        if (loadMore) {
+          this.router.navigate([], { relativeTo: this.route, queryParams: { page: this.page }, queryParamsHandling: 'merge' });
+        }
       },
       error: () => {
         this.error = 'No pudimos cargar los tiritos';
@@ -84,11 +101,14 @@ export class TiritosListComponent implements OnInit {
 
   onFilterChange(status: TiritoStatus | 'all'): void {
     this.currentStatus = status;
+    // update query params to reset page
+    this.router.navigate([], { relativeTo: this.route, queryParams: { page: 1 }, queryParamsHandling: 'merge' });
     this.loadTiritos();
   }
 
   onSearch(): void {
-    this.loadTiritos();
+    // navigate with search query so url reflects current search
+    this.router.navigate([], { relativeTo: this.route, queryParams: { search: this.searchQuery || null, page: 1 }, queryParamsHandling: 'merge' });
   }
 
   goToTirito(tirito: Tirito): void {
@@ -109,5 +129,17 @@ export class TiritosListComponent implements OnInit {
     if (this.hasMore && !this.loadingMore) {
       this.loadTiritos(true);
     }
+  }
+
+  // Simple highlight helper used by template. Returns SafeHtml with <mark>
+  highlight(text: string | undefined, term: string | undefined): SafeHtml {
+    const t = text || '';
+    const q = (term || '').trim();
+    const escapeHtml = (s: string) => s.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'} as any)[c]);
+    const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!q) return this.sanitizer.bypassSecurityTrustHtml(escapeHtml(t));
+    const re = new RegExp(`(${escapeRegExp(q)})`, 'gi');
+    const html = escapeHtml(t).replace(re, '<mark>$1</mark>');
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }
