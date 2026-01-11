@@ -6,3 +6,8 @@
 .suggestion .meta .title { font-weight:600; }
 .suggestion .meta .subtitle { font-size:12px; color:rgba(0,0,0,0.6); }
 .loading { padding:8px; color:rgba(0,0,0,0.6); }
+
+.suggestion.active { background: rgba(0,0,0,0.04); }
+.suggestion mark { background: #ffefef; color: #c62828; padding:0 2px; border-radius:2px; }
+.no-results { padding:8px; color:rgba(0,0,0,0.6); display:flex; align-items:center; gap:8px; }
+

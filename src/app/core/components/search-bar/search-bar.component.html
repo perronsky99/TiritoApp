@@ -1,17 +1,25 @@
 <div class="search-bar">
-  <input #input type="text" [formControl]="control" placeholder="Buscar tiritos, ejemplo: 'plomería'" (keydown.enter)="onSubmit()" />
+  <input #input type="text" [formControl]="control" placeholder="Buscar tiritos, ejemplo: 'plomería'" (keydown)="onKeydown($event)" aria-autocomplete="list" [attr.aria-expanded]="suggestions.length>0" aria-owns="suggestions-list" />
   <button mat-icon-button aria-label="Buscar" (click)="onSubmit()">
     <mat-icon>search</mat-icon>
   </button>
 
-  <div class="suggestions" *ngIf="suggestions.length || loading">
+  <div class="suggestions" *ngIf="suggestions.length || loading" id="suggestions-list" role="listbox">
     <div *ngIf="loading" class="loading">Cargando...</div>
-    <button class="suggestion" *ngFor="let s of suggestions" (click)="onSelect(s)">
+    <button
+      class="suggestion"
+      *ngFor="let s of suggestions; let i = index"
+      (click)="onSelect(s)"
+      [attr.id]="'search-sugg-' + i"
+      [attr.role]="'option'"
+      [attr.aria-selected]="activeIndex === i"
+      [class.active]="activeIndex === i">
       <img *ngIf="s.images?.length" [src]="s.images[0].thumbnailUrl || s.images[0].url || s.images[0]" alt="" />
       <div class="meta">
-        <div class="title">{{ s.title }}</div>
+        <div class="title" [innerHTML]="highlight(s.title)"></div>
         <div class="subtitle">{{ s.creatorName || '' }}</div>
       </div>
     </button>
+    <div *ngIf="!loading && suggestions.length === 0" class="no-results">No se encontraron resultados. <button mat-button (click)="onSubmit()">Buscar de todos modos</button></div>
   </div>
 </div>
