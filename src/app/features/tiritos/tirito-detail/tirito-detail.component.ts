@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -65,6 +65,34 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     private favoritesService: FavoritesService,
     private favoritesState: FavoritesStateService
   ) {}
+
+  @ViewChild('mainImage', { static: false }) private _mainImage?: ElementRef<HTMLElement>;
+  @ViewChild('rightCol', { static: false }) private _rightCol?: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void {
+    // sync heights after view is ready
+    setTimeout(() => this.syncPanelHeight(), 120);
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    // small debounce
+    if ((this as any)._resizeTimer) clearTimeout((this as any)._resizeTimer);
+    (this as any)._resizeTimer = setTimeout(() => this.syncPanelHeight(), 120);
+  }
+
+  private syncPanelHeight(): void {
+    try {
+      const imgEl = this._mainImage?.nativeElement as HTMLElement | undefined;
+      const panelEl = this._rightCol?.nativeElement as HTMLElement | undefined;
+      if (!imgEl || !panelEl) return;
+      const h = imgEl.getBoundingClientRect().height;
+      // ensure the panel is at least the image height minus some padding
+      panelEl.style.height = `${Math.max(h, 260)}px`;
+    } catch (e) {
+      // ignore
+    }
+  }
 
   ngOnInit(): void {
     this.loadFavorites();

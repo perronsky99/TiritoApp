@@ -30,7 +30,7 @@
       <div class="left-col">
         <!-- Images Gallery -->
         <div class="images-section" *ngIf="images.length > 0">
-          <div class="main-image" (click)="openImageInNewTab(selectedImageIndex)">
+          <div #mainImage class="main-image" (click)="openImageInNewTab(selectedImageIndex)">
             <img [src]="images[selectedImageIndex]?.url" [alt]="tirito.title">
             <div class="image-actions">
               <button mat-icon-button (click)="shareTirito($event)" aria-label="Compartir">
@@ -64,7 +64,7 @@
         </section>
       </div>
 
-      <aside class="right-col mat-elevation-z2">
+      <aside #rightCol class="right-col mat-elevation-z2">
         <div class="panel">
           <div class="panel-header">
             <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>

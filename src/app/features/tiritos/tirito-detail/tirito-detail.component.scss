@@ -174,12 +174,20 @@
 .right-col {
   position: sticky;
   top: 96px;
-  height: fit-content;
+  /* height will be synced to image via component code */
+  min-height: 260px;
+  display: flex;
+  align-items: stretch;
 
   .panel {
     padding: 1.2rem;
     border-radius: 10px;
     background: #fff;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .panel-header { display:flex; align-items:center; justify-content:space-between; gap: 1rem; }
