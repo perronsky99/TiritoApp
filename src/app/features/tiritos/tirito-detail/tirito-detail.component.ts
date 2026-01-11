@@ -39,6 +39,10 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
   
   // Galería de imágenes
   selectedImageIndex = 0;
+  // Helper para la lista de imágenes segura
+  get images(): any[] {
+    return (this.tirito && Array.isArray(this.tirito.images)) ? this.tirito.images : [];
+  }
 
   // Favoritos locales (persistidos en localStorage)
   private favorites: Set<string> = new Set<string>();
@@ -389,5 +393,23 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/tiritos']);
+  }
+
+  shareTirito(event: Event): void {
+    event.stopPropagation();
+    const url = `${location.origin}/tiritos/${this.tirito?.id}`;
+    try {
+      navigator.clipboard?.writeText(url);
+      this.snackBar.open('Enlace copiado al portapapeles', undefined, { duration: 1500 });
+    } catch (e) {
+      // fallback: open native prompt
+      window.prompt('Copia el enlace', url);
+    }
+  }
+
+  openImageInNewTab(index = 0): void {
+    const img = this.images[index];
+    const src = img?.url || img?.thumbnailUrl || img;
+    if (src) window.open(src, '_blank');
   }
 }

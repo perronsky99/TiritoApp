@@ -6,10 +6,7 @@
   </button>
 
   <!-- Loading -->
-  <app-loading-spinner 
-    *ngIf="loading"
-    [message]="'Cargando tirito...'">
-  </app-loading-spinner>
+  <app-loading-spinner *ngIf="loading" [message]="'Cargando tirito...'"></app-loading-spinner>
 
   <!-- Error -->
   <app-error-state 
@@ -21,180 +18,167 @@
 
   <!-- Detail -->
   <div class="tirito-content" *ngIf="tirito && !loading && !error">
-    <!-- Images Gallery -->
-    <div class="images-section" *ngIf="tirito.images && tirito.images.length > 0">
-      <div class="main-image">
-        <img 
-          [src]="tirito.images[selectedImageIndex]?.url" 
-          [alt]="tirito.title">
-        <button
-          class="favorite-btn"
-          mat-icon-button
-          aria-label="Agregar a favoritos"
-          [attr.aria-pressed]="isFavorited(tirito?.id)"
-          (click)="toggleFavorite($event)">
-          <mat-icon color="warn">{{ isFavorited(tirito?.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
-        </button>
-      </div>
-      <div class="thumbnails" *ngIf="tirito.images.length > 1">
-        <button 
-          *ngFor="let image of tirito.images; let i = index"
-          class="thumbnail"
-          [class.active]="i === selectedImageIndex"
-          (click)="selectImage(i)">
-          <img [src]="image.thumbnailUrl || image.url" alt="Thumbnail">
-        </button>
-      </div>
-    </div>
+    <nav class="breadcrumbs">
+      <a routerLink="/">Inicio</a>
+      <span>›</span>
+      <a routerLink="/tiritos">Tiritos</a>
+      <span>›</span>
+      <span class="current">{{ tirito.title | truncate:40 }}</span>
+    </nav>
 
-    <!-- Info Section -->
-    <div class="info-section">
-      <div class="header">
-        <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
-        <span class="date">{{ tirito.createdAt | relativeTime }}</span>
-      </div>
-
-      <h1>{{ tirito.title }}</h1>
-
-      <div class="creator" (click)="goToProfile()">
-        <div class="avatar">
-          {{ tirito.creatorInitials || (tirito.creatorName ? tirito.creatorName.substring(0, 2).toUpperCase() : 'US') }}
-        </div>
-        <div class="creator-info">
-          <span class="name">@{{ tirito.creatorName || 'Usuario' }}</span>
-          <span class="label">Publicado por</span>
-        </div>
-      </div>
-
-      <div class="description">
-        <p>{{ tirito.description }}</p>
-      </div>
-
-      <div class="location" *ngIf="tirito.location || tirito['locationName'] || tirito['place']">
-        <mat-icon>location_on</mat-icon>
-        <span>{{ tirito.location }}</span>
-      </div>
-
-      <!-- Actions -->
-      <div class="actions">
-        <!-- Si NO es el owner y está abierto: Solicitar trabajo + Chatear (si ya solicitó) -->
-        <ng-container *ngIf="!isOwner && tirito.status === 'open'">
-          <!-- Mostrar botón según estado de solicitud -->
-          <ng-container *ngIf="!myRequest">
-            <button 
-              mat-raised-button 
-              color="accent"
-              [disabled]="actionLoading"
-              (click)="acceptTirito()">
-              <mat-icon>send</mat-icon>
-              Solicitar este trabajo
-            </button>
-          </ng-container>
-          
-          <!-- Solicitud pendiente: NO puede chatear hasta que el creador le escriba o apruebe -->
-          <ng-container *ngIf="myRequest?.status === 'pending'">
-            <button 
-              mat-raised-button 
-              class="request-pending-btn"
-              disabled>
-              <mat-icon>hourglass_empty</mat-icon>
-              Solicitud enviada - En espera
-            </button>
-            <p class="info-text">
-              <mat-icon>info</mat-icon>
-              El creador del tirito puede contactarte o aprobar tu solicitud.
-            </p>
-          </ng-container>
-          
-          <!-- Solicitud aceptada: puede chatear -->
-          <ng-container *ngIf="myRequest?.status === 'accepted'">
-            <button 
-              mat-raised-button 
-              class="request-accepted-btn"
-              disabled>
-              <mat-icon>check_circle</mat-icon>
-              ¡Solicitud aceptada!
-            </button>
-            <button 
-              mat-raised-button 
-              color="primary"
-              (click)="contact()">
-              <mat-icon>chat</mat-icon>
-              Enviar mensaje
-            </button>
-          </ng-container>
-          
-          <!-- Solicitud rechazada: NO puede chatear -->
-          <button 
-            *ngIf="myRequest?.status === 'rejected'"
-            mat-raised-button 
-            class="request-rejected-btn"
-            disabled>
-            <mat-icon>cancel</mat-icon>
-            Solicitud rechazada
-          </button>
-        </ng-container>
-
-        <!-- Si NO es el owner y tirito está en progreso -->
-        <ng-container *ngIf="!isOwner && tirito.status === 'in_progress'">
-          <!-- Si es el worker asignado: puede chatear -->
-          <ng-container *ngIf="isAssignedWorker">
-            <button 
-              mat-raised-button 
-              color="primary"
-              (click)="contact()">
-              <mat-icon>chat</mat-icon>
-              Enviar mensaje
-            </button>
-          </ng-container>
-          <!-- Si tenía solicitud aceptada pero no es el asignado, mostrar info -->
-          <ng-container *ngIf="myRequest?.status === 'accepted' && !isAssignedWorker">
-            <div class="info-message">
-              <mat-icon>info</mat-icon>
-              <span>Este tirito está en progreso con otro usuario</span>
+    <div class="layout">
+      <div class="left-col">
+        <!-- Images Gallery -->
+        <div class="images-section" *ngIf="images.length > 0">
+          <div class="main-image" (click)="openImageInNewTab(selectedImageIndex)">
+            <img [src]="images[selectedImageIndex]?.url" [alt]="tirito.title">
+            <div class="image-actions">
+              <button mat-icon-button (click)="shareTirito($event)" aria-label="Compartir">
+                <mat-icon>share</mat-icon>
+              </button>
+              <button
+                class="favorite-btn"
+                mat-icon-button
+                aria-label="Agregar a favoritos"
+                [attr.aria-pressed]="isFavorited(tirito?.id)"
+                (click)="toggleFavorite($event)">
+                <mat-icon color="warn">{{ isFavorited(tirito?.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+              </button>
             </div>
-          </ng-container>
-        </ng-container>
+          </div>
 
-        <!-- Si es el owner -->
-        <ng-container *ngIf="isOwner">
-          <button 
-            mat-raised-button 
-            color="accent"
-            *ngIf="tirito.status === 'open'"
-            [disabled]="actionLoading"
-            (click)="markInProgress()">
-            <mat-icon>play_arrow</mat-icon>
-            Marcar en progreso
-          </button>
-
-          <button 
-            mat-raised-button 
-            *ngIf="tirito.status !== 'closed'"
-            [disabled]="actionLoading"
-            (click)="closeTirito()">
-            <mat-icon>check</mat-icon>
-            Cerrar tirito
-          </button>
-        </ng-container>
-
-        <!-- Tirito en progreso: mostrar quién lo está haciendo -->
-        <div class="assigned-info" *ngIf="tirito.status === 'in_progress' && tirito.assignedTo">
-          <mat-icon>person</mat-icon>
-          <span>Asignado a: <strong>{{ tirito.assignedToName || 'Usuario' }}</strong></span>
+          <div class="thumbnails" *ngIf="images.length > 1">
+            <button
+              *ngFor="let image of images; let i = index"
+              class="thumbnail"
+              [class.active]="i === selectedImageIndex"
+              (click)="selectImage(i)">
+              <img [src]="image.thumbnailUrl || image.url" alt="Thumbnail">
+            </button>
+          </div>
         </div>
 
-        <!-- Tirito cerrado -->
-        <div class="closed-message" *ngIf="tirito.status === 'closed'">
-          <mat-icon>check_circle</mat-icon>
-          Este tirito ya fue resuelto
-        </div>
-
-        <!-- Valorar: mostrar si el usuario participó -->
-        <div *ngIf="canRate()" class="rate-action">
-          <button mat-stroked-button color="primary" (click)="openRating()">Valorar</button>
-        </div>
+        <section class="description-section">
+          <h2>Descripción</h2>
+          <p class="lead">{{ tirito.description }}</p>
+        </section>
       </div>
+
+      <aside class="right-col mat-elevation-z2">
+        <div class="panel">
+          <div class="panel-header">
+            <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+            <div class="meta">
+              <div class="date">{{ tirito.createdAt | relativeTime }}</div>
+              <div class="location" *ngIf="tirito.location"><mat-icon>location_on</mat-icon>{{ tirito.location }}</div>
+            </div>
+          </div>
+
+          <h1 class="panel-title">{{ tirito.title }}</h1>
+
+          <div class="price" *ngIf="tirito.price">
+            <span class="amount">{{ tirito.price | currency:'CLP':'symbol':'1.0-0' }}</span>
+          </div>
+
+          <div class="seller" (click)="goToProfile()">
+            <div class="avatar">{{ tirito.creatorInitials || (tirito.creatorName ? tirito.creatorName.substring(0,2).toUpperCase() : 'US') }}</div>
+            <div class="info">
+              <div class="name">@{{ tirito.creatorName || 'Usuario' }}</div>
+              <div class="rating"> <mat-icon>star</mat-icon> <strong>4.9</strong> · 120 pedidos</div>
+            </div>
+          </div>
+
+          <div class="panel-actions">
+            <!-- Non-owner & open -->
+            <ng-container *ngIf="!isOwner && tirito.status === 'open'">
+              <ng-container *ngIf="!myRequest">
+                <button mat-flat-button color="primary" class="action-primary" (click)="acceptTirito()" [disabled]="actionLoading">
+                  <mat-icon>send</mat-icon>
+                  Solicitar este trabajo
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="myRequest?.status === 'pending'">
+                <button mat-raised-button class="request-pending-btn" disabled>
+                  <mat-icon>hourglass_empty</mat-icon>
+                  Solicitud enviada - En espera
+                </button>
+                <p class="info-text">
+                  <mat-icon>info</mat-icon>
+                  El creador del tirito puede contactarte o aprobar tu solicitud.
+                </p>
+              </ng-container>
+
+              <ng-container *ngIf="myRequest?.status === 'accepted'">
+                <button mat-raised-button class="request-accepted-btn" disabled>
+                  <mat-icon>check_circle</mat-icon>
+                  ¡Solicitud aceptada!
+                </button>
+                <button mat-raised-button color="primary" (click)="contact()">
+                  <mat-icon>chat</mat-icon>
+                  Enviar mensaje
+                </button>
+              </ng-container>
+
+              <button *ngIf="myRequest?.status === 'rejected'" mat-raised-button class="request-rejected-btn" disabled>
+                <mat-icon>cancel</mat-icon>
+                Solicitud rechazada
+              </button>
+            </ng-container>
+
+            <!-- Non-owner & in_progress -->
+            <ng-container *ngIf="!isOwner && tirito.status === 'in_progress'">
+              <ng-container *ngIf="isAssignedWorker">
+                <button mat-raised-button color="primary" (click)="contact()">
+                  <mat-icon>chat</mat-icon>
+                  Enviar mensaje
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="myRequest?.status === 'accepted' && !isAssignedWorker">
+                <div class="info-message">
+                  <mat-icon>info</mat-icon>
+                  <span>Este tirito está en progreso con otro usuario</span>
+                </div>
+              </ng-container>
+            </ng-container>
+
+            <!-- Owner actions -->
+            <ng-container *ngIf="isOwner">
+              <button mat-raised-button color="accent" *ngIf="tirito.status === 'open'" [disabled]="actionLoading" (click)="markInProgress()">
+                <mat-icon>play_arrow</mat-icon>
+                Marcar en progreso
+              </button>
+
+              <button mat-raised-button *ngIf="tirito.status !== 'closed'" [disabled]="actionLoading" (click)="closeTirito()">
+                <mat-icon>check</mat-icon>
+                Cerrar tirito
+              </button>
+            </ng-container>
+
+          </div>
+
+          <div class="panel-footer">
+            <div class="small">Publicado por</div>
+            <button mat-button class="link" (click)="goToProfile()">Ver perfil del creador</button>
+          </div>
+
+          <div class="assigned-info" *ngIf="tirito.status === 'in_progress' && tirito.assignedTo">
+            <mat-icon>person</mat-icon>
+            <span>Asignado a: <strong>{{ tirito.assignedToName || 'Usuario' }}</strong></span>
+          </div>
+
+          <div class="closed-message" *ngIf="tirito.status === 'closed'">
+            <mat-icon>check_circle</mat-icon>
+            Este tirito ya fue resuelto
+          </div>
+
+          <div *ngIf="canRate()" class="rate-action">
+            <button mat-stroked-button color="primary" (click)="openRating()">Valorar</button>
+          </div>
+
+        </div>
+      </aside>
     </div>
   </div>
 </div>
