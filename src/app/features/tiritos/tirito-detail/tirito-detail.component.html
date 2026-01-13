@@ -175,11 +175,30 @@
         </div>
       </aside>
       <div class="description-row">
-        <section class="description-section">
-          <h2>Descripción</h2>
-          <p class="lead">{{ tirito.description }}</p>
-        </section>
+        <mat-card class="description-card">
+          <mat-card-header>
+            <mat-card-title>
+              <h2>Descripción</h2>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="lead">{{ tirito.description }}</p>
+          </mat-card-content>
+        </mat-card>
       </div>
     </div>
+    <!-- Site footer local to detail (light, professional) -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="left">
+          <strong>Tirito</strong> — Conecta vecinos y soluciones rápidamente.
+        </div>
+        <div class="right">
+          <a routerLink="/terminos">Términos</a>
+          <span class="sep">•</span>
+          <a routerLink="/privacidad">Privacidad</a>
+        </div>
+      </div>
+    </footer>
   </div>
 </div>
