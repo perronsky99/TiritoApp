@@ -1,13 +1,78 @@
+
 .search-bar { position: relative; display:flex; align-items:center; gap:8px; }
 .search-bar input { flex:1; padding:8px 10px; border-radius:4px; border:1px solid rgba(0,0,0,0.12); }
-.suggestions { position: absolute; left:0; right:0; top:42px; background:white; box-shadow: 0 6px 18px rgba(0,0,0,0.08); border-radius:6px; z-index: 1000; }
-.suggestion { display:flex; gap:8px; padding:8px; align-items:center; width:100%; border:none; background:transparent; text-align:left; }
-.suggestion img { width:48px; height:48px; object-fit:cover; border-radius:4px; }
-.suggestion .meta .title { font-weight:600; }
-.suggestion .meta .subtitle { font-size:12px; color:rgba(0,0,0,0.6); }
-.loading { padding:8px; color:rgba(0,0,0,0.6); }
 
-.suggestion.active { background: rgba(0,0,0,0.04); }
-.suggestion mark { background: #ffefef; color: #c62828; padding:0 2px; border-radius:2px; }
-.no-results { padding:8px; color:rgba(0,0,0,0.6); display:flex; align-items:center; gap:8px; }
+/* Suggestions dropdown: compact, card-like, rounded, with subtle dividers */
+.suggestions {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 42px;
+	background: #fff;
+	box-shadow: 0 10px 30px rgba(16,24,40,0.12);
+	border-radius: 8px;
+	z-index: 1000;
+	overflow: hidden;
+	max-height: 320px;
+}
+
+.suggestion {
+	display:flex;
+	gap:12px;
+	padding:10px 12px;
+	align-items:center;
+	width:100%;
+	border:0;
+	background:transparent;
+	text-align:left;
+	cursor: pointer;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.suggestion:last-child { border-bottom: none; }
+
+.suggestion img {
+	width:36px;
+	height:36px;
+	object-fit:cover;
+	border-radius:6px;
+}
+
+.suggestion .meta { overflow: hidden; }
+.suggestion .meta .title { font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.suggestion .meta .subtitle { font-size:12px; color:#757575; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.loading { padding:10px 12px; color:rgba(0,0,0,0.6); }
+
+.suggestion.active { background: rgba(99,102,241,0.06); }
+
+/* Highlight styling similar to search suggestions */
+.suggestion mark { background: #fff3cd; color: #7a4b00; padding:0 2px; border-radius:2px; }
+
+.no-results { padding:10px 12px; color:rgba(0,0,0,0.6); display:flex; align-items:center; gap:8px; }
+
+/* Make suggestions narrower on wide screens to mimic compact Meli dropdown */
+@media (min-width: 900px) {
+	.search-bar .suggestions { left: auto; right: 0; width: 360px; }
+}
+
+/* Mobile: make suggestions occupy almost full screen width under toolbar */
+@media (max-width: 768px) {
+	.search-bar .suggestions {
+		position: fixed;
+		top: 56px; /* toolbar height */
+		left: 8px;
+		right: 8px;
+		width: auto;
+		margin: 0;
+		border-radius: 10px;
+		max-height: 60vh;
+		overflow: auto;
+		box-shadow: 0 14px 40px rgba(16,24,40,0.18);
+	}
+
+	/* Slightly larger rows on mobile for touch */
+	.search-bar .suggestion { padding: 12px 14px; gap: 12px; }
+	.search-bar .suggestion img { width:44px; height:44px; }
+}
 
