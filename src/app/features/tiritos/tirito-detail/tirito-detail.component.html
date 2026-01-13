@@ -45,6 +45,15 @@
                 <mat-icon color="warn">{{ isFavorited(tirito?.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
               </button>
             </div>
+              <!-- Mobile floating actions: appear as vertically stacked buttons on the right of the image -->
+              <div class="mobile-actions" aria-hidden="false">
+                <button mat-fab class="mobile-fav" (click)="toggleFavorite($event)" aria-label="Favorito mobile">
+                  <mat-icon color="warn">{{ isFavorited(tirito?.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+                </button>
+                <button mat-mini-fab class="mobile-share" (click)="shareTirito($event)" aria-label="Compartir mobile">
+                  <mat-icon>share</mat-icon>
+                </button>
+              </div>
           </div>
 
           <div class="thumbnails" *ngIf="images.length > 1">

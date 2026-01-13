@@ -372,7 +372,7 @@
 // Mobile responsiveness
 @media (max-width: 768px) {
   .tirito-content {
-    grid-template-columns: 1fr;
+    .layout { display: block; }
   }
 
   .images-section {
@@ -380,6 +380,56 @@
       aspect-ratio: 16/9;
     }
   }
+}
+
+/* Mobile layout refinements to match reference */
+@media (max-width: 768px) {
+  .layout { display: block; }
+
+  .left-col, .images-section { width: 100%; }
+
+  .right-col {
+    position: relative;
+    top: auto;
+    min-height: auto;
+    margin-top: 12px;
+  }
+
+  .right-col .panel {
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .panel-title { font-size: 1.15rem; margin: 0.4rem 0; }
+
+  .price .amount {
+    font-size: 2rem;
+    color: #111;
+    font-weight: 800;
+    margin: 0.6rem 0 0.8rem;
+  }
+
+  .panel-actions {
+    display: flex;
+    gap: 0.6rem;
+    flex-direction: row;
+  }
+
+  .panel-actions button { flex: 1 1 auto; }
+
+  /* Mobile floating action buttons on the image */
+  .mobile-actions { display: flex; flex-direction: column; gap: 10px; position: absolute; right: 12px; top: 40%; transform: translateY(-40%); z-index: 20; }
+
+  .mobile-actions .mobile-fav { background: white; color: #e91e63; }
+  .mobile-actions .mobile-share { background: white; color: #1976d2; }
+
+  /* hide desktop image-actions on mobile (they are smaller) */
+  .images-section .image-actions { display: none; }
+
+  /* ensure thumbnails stay within container */
+  .thumbnails { padding-bottom: 0.5rem; }
+
+  .description-row { margin-top: 1rem; }
 }
 
 @media (max-width: 480px) {
