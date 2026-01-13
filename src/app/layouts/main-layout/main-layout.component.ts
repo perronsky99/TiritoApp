@@ -109,6 +109,11 @@ export class MainLayoutComponent implements OnInit {
     this.closeSidenav();
   }
 
+  goToNotifications(): void {
+    this.router.navigate(['/notificaciones']);
+    this.closeSidenav();
+  }
+
   goToLogin(): void {
     this.router.navigate(['/login']);
     this.closeSidenav();

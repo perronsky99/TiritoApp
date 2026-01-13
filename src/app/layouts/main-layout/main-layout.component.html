@@ -12,7 +12,7 @@
           <img *ngIf="user?.avatar" [src]="user.avatar" class="sidenav-avatar" alt="avatar" />
           <div class="sidenav-user-info">
             <div class="sidenav-user-name">{{ user?.username || user?.name || 'Usuario' }}</div>
-            <div class="sidenav-user-sub">Mi perfil ›</div>
+            <div class="sidenav-user-sub">{{ user?.name }}</div>
           </div>
         </div>
       </ng-container>
@@ -25,6 +25,11 @@
       <a mat-list-item (click)="goToHome()">
         <mat-icon matListItemIcon>home</mat-icon>
         <span matListItemTitle>Inicio</span>
+      </a>
+
+      <a mat-list-item (click)="goToNotifications()">
+        <mat-icon matListItemIcon [matBadge]="(notificationCount$ | async) || null" matBadgeColor="accent">notifications</mat-icon>
+        <span matListItemTitle>Notificaciones</span>
       </a>
 
       <a mat-list-item (click)="goToTiritos()">
@@ -139,6 +144,12 @@
 
             <mat-divider></mat-divider>
 
+            <button mat-menu-item (click)="goToNotifications()">
+              <mat-icon [matBadge]="(notificationCount$ | async) || null" matBadgeColor="accent">notifications</mat-icon>
+              <span>Notificaciones</span>
+            </button>
+            <mat-divider></mat-divider>
+
             <button mat-menu-item (click)="openFavorites()">
               <mat-icon>favorite</mat-icon>
               <span>Favoritos</span>
@@ -166,12 +177,14 @@
       </ng-container>
       
       <ng-template #loginBtn>
-        <button 
-          mat-button 
-          (click)="goToLogin()"
-          class="login-btn">
-          Ingresar
-        </button>
+        <div class="desktop-only">
+          <button 
+            mat-button 
+            (click)="goToLogin()"
+            class="login-btn">
+            Ingresar
+          </button>
+        </div>
       </ng-template>
     </mat-toolbar>
 
