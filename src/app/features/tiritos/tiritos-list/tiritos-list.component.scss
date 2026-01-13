@@ -49,6 +49,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  justify-content: space-between;
   background: white;
   position: sticky;
   top: 0.5rem;
@@ -69,6 +70,9 @@
   min-width: 200px;
   max-width: 400px;
 }
+
+.top-bar .search-field { flex: 1 1 auto; margin-right: 1rem; }
+.top-bar .sort-select { flex: 0 0 auto; min-width: 160px; }
 
 .status-chips {
   display: flex;
