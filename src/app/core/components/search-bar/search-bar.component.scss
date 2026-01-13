@@ -53,7 +53,7 @@
 
 /* Make suggestions narrower on wide screens to mimic compact Meli dropdown */
 @media (min-width: 900px) {
-	.search-bar .suggestions { left: auto; right: 0; width: 360px; }
+	.search-bar .suggestions { left: auto; right: 0; width: 425px; }
 }
 
 /* Mobile: make suggestions occupy almost full screen width under toolbar */

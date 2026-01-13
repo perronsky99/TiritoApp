@@ -30,7 +30,7 @@
       <div class="left-col">
         <!-- Images Gallery -->
         <div class="images-section" *ngIf="images.length > 0">
-          <div #mainImage class="main-image" (click)="openImageInNewTab(selectedImageIndex)">
+          <div #mainImage class="main-image" (click)="openGallery(selectedImageIndex)">
             <img [src]="images[selectedImageIndex]?.url" [alt]="tirito.title">
             <div class="image-actions">
               <button mat-icon-button (click)="shareTirito($event)" aria-label="Compartir">
@@ -55,7 +55,6 @@
                 </button>
               </div>
           </div>
-
           <div class="thumbnails" *ngIf="images.length > 1">
             <button
               *ngFor="let image of images; let i = index"
@@ -194,6 +193,33 @@
             <p class="lead">{{ tirito.description }}</p>
           </mat-card-content>
         </mat-card>
+      </div>
+    </div>
+    
+    <!-- Gallery overlay (lightbox) -->
+    <div class="gallery-overlay" *ngIf="galleryOpen" (click)="onGalleryBackdropClick($event)" role="dialog" aria-modal="true">
+      <div class="gallery-content">
+        <button class="gallery-close" mat-icon-button (click)="closeGallery()" aria-label="Cerrar galería">
+          <mat-icon>close</mat-icon>
+        </button>
+
+        <button class="gallery-nav prev" mat-icon-button (click)="prevImage()" aria-label="Anterior imagen">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+
+        <div class="gallery-image">
+          <img [src]="images[selectedImageIndex]?.url || images[selectedImageIndex]" [alt]="tirito.title">
+        </div>
+
+        <button class="gallery-nav next" mat-icon-button (click)="nextImage()" aria-label="Siguiente imagen">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+
+        <div class="gallery-thumbs" *ngIf="images.length > 1">
+          <button *ngFor="let img of images; let i = index" class="thumb" [class.active]="i === selectedImageIndex" (click)="selectImage(i); $event.stopPropagation()" aria-label="Seleccionar imagen">
+            <img [src]="img.thumbnailUrl || img.url || img" alt="thumb">
+          </button>
+        </div>
       </div>
     </div>
     <!-- Site footer local to detail (light, professional) -->

@@ -409,6 +409,55 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     this.selectedImageIndex = index;
   }
 
+  // Galería (overlay lightbox)
+  galleryOpen = false;
+
+  openGallery(index = 0): void {
+    if (!this.images || this.images.length === 0) return;
+    this.selectedImageIndex = Math.max(0, Math.min(index, this.images.length - 1));
+    this.galleryOpen = true;
+    try { document.body.style.overflow = 'hidden'; } catch (e) {}
+  }
+
+  closeGallery(): void {
+    this.galleryOpen = false;
+    try { document.body.style.overflow = ''; } catch (e) {}
+  }
+
+  nextImage(): void {
+    if (!this.images || this.images.length === 0) return;
+    this.selectedImageIndex = (this.selectedImageIndex + 1) % this.images.length;
+  }
+
+  prevImage(): void {
+    if (!this.images || this.images.length === 0) return;
+    this.selectedImageIndex = (this.selectedImageIndex - 1 + this.images.length) % this.images.length;
+  }
+
+  onGalleryBackdropClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target && target.classList.contains('gallery-overlay')) {
+      this.closeGallery();
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeydown(event: KeyboardEvent): void {
+    if (!this.galleryOpen) return;
+    if (event.key === 'Escape') {
+      this.closeGallery();
+      return;
+    }
+    if (event.key === 'ArrowRight') {
+      this.nextImage();
+      return;
+    }
+    if (event.key === 'ArrowLeft') {
+      this.prevImage();
+      return;
+    }
+  }
+
   toggleRaw(): void {
     this.showRaw = !this.showRaw;
   }
@@ -436,8 +485,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
   }
 
   openImageInNewTab(index = 0): void {
-    const img = this.images[index];
-    const src = img?.url || img?.thumbnailUrl || img;
-    if (src) window.open(src, '_blank');
+    // Mantenido por compatibilidad: ahora abre la galería en lugar de una nueva pestaña
+    this.openGallery(index);
   }
 }
