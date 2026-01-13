@@ -1,13 +1,24 @@
 <mat-sidenav-container class="sidenav-container">
   <!-- Sidenav (Mobile) -->
-  <mat-sidenav 
+  <mat-sidenav
     #sidenav
     mode="over"
     [opened]="isSidenavOpen"
     (closed)="closeSidenav()">
-    
+
     <div class="sidenav-header">
-      <span class="logo" (click)="goToHome()">Tirito</span>
+      <ng-container *ngIf="(currentUser$ | async) as user; else guestHeader">
+        <div class="sidenav-user" (click)="goToProfile()">
+          <img *ngIf="user?.avatar" [src]="user.avatar" class="sidenav-avatar" alt="avatar" />
+          <div class="sidenav-user-info">
+            <div class="sidenav-user-name">{{ user?.username || user?.name || 'Usuario' }}</div>
+            <div class="sidenav-user-sub">Mi perfil ›</div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #guestHeader>
+        <span class="logo" (click)="goToHome()">Tirito</span>
+      </ng-template>
     </div>
 
     <mat-nav-list>
@@ -15,12 +26,12 @@
         <mat-icon matListItemIcon>home</mat-icon>
         <span matListItemTitle>Inicio</span>
       </a>
-      
+
       <a mat-list-item (click)="goToTiritos()">
         <mat-icon matListItemIcon>list</mat-icon>
         <span matListItemTitle>Ver tiritos</span>
       </a>
-      
+
       <a mat-list-item (click)="goToCreateTirito()">
         <mat-icon matListItemIcon>add_circle</mat-icon>
         <span matListItemTitle>Publicar tirito</span>
@@ -28,7 +39,7 @@
 
       <ng-container *ngIf="authService.isLoggedIn">
         <mat-divider></mat-divider>
-        
+
         <a mat-list-item (click)="goToRequests()">
           <mat-icon matListItemIcon>assignment</mat-icon>
           <span matListItemTitle>Solicitudes</span>
@@ -40,9 +51,7 @@
         </a>
         
         <a mat-list-item (click)="goToChat()">
-          <mat-icon matListItemIcon [matBadge]="(unreadCount$ | async) || null" matBadgeColor="accent">
-            chat
-          </mat-icon>
+          <mat-icon matListItemIcon [matBadge]="(unreadCount$ | async) || null" matBadgeColor="accent">chat</mat-icon>
           <span matListItemTitle>Mis chats</span>
         </a>
         
@@ -107,41 +116,53 @@
 
       <!-- User menu -->
       <ng-container *ngIf="authService.isLoggedIn; else loginBtn">
-        <!-- Notification Dropdown -->
-        <app-notification-dropdown></app-notification-dropdown>
+        <div class="desktop-only">
+          <!-- Notification Dropdown (desktop only) -->
+          <app-notification-dropdown></app-notification-dropdown>
 
-        <ng-container *ngIf="(currentUser$ | async) as user">
-          <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
-            <img *ngIf="user?.avatar" [src]="user.avatar" class="user-avatar" alt="avatar"/>
-            <mat-icon *ngIf="!user?.avatar">account_circle</mat-icon>
-            <span class="user-name">{{ user?.username || user?.name || 'Usuario' }}</span>
-          </button>
-        </ng-container>
+          <ng-container *ngIf="(currentUser$ | async) as user">
+            <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
+              <img *ngIf="user?.avatar" [src]="user.avatar" class="user-avatar" alt="avatar"/>
+              <mat-icon *ngIf="!user?.avatar">account_circle</mat-icon>
+              <span class="user-name">{{ user?.username || user?.name || 'Usuario' }}</span>
+            </button>
+          </ng-container>
 
-        <mat-menu #userMenu="matMenu">
-          <button mat-menu-item (click)="openFavorites()">
-            <mat-icon>favorite</mat-icon>
-            <span>Favoritos</span>
-          </button>
-          <mat-divider></mat-divider>
-          <button mat-menu-item (click)="goToRequests()">
-            <mat-icon>assignment</mat-icon>
-            <span>Solicitudes</span>
-          </button>
-          <button mat-menu-item (click)="goToChat()">
-            <mat-icon>chat</mat-icon>
-            <span>Mis chats</span>
-          </button>
-          <button mat-menu-item (click)="goToProfile()">
-            <mat-icon>person</mat-icon>
-            <span>Mi perfil</span>
-          </button>
-          <mat-divider></mat-divider>
-          <button mat-menu-item (click)="logout()">
-            <mat-icon>logout</mat-icon>
-            <span>Cerrar sesión</span>
-          </button>
-        </mat-menu>
+          <mat-menu #userMenu="matMenu">
+            <button mat-menu-item disabled class="user-menu-header">
+              <img *ngIf="(currentUser$ | async)?.avatar" [src]="(currentUser$ | async).avatar" class="user-avatar" alt="avatar" />
+              <div class="user-info">
+                <div class="user-name">{{ (currentUser$ | async)?.username || (currentUser$ | async)?.name || 'Usuario' }}</div>
+                <div class="user-email" *ngIf="(currentUser$ | async)?.email">{{ (currentUser$ | async).email }}</div>
+              </div>
+            </button>
+
+            <mat-divider></mat-divider>
+
+            <button mat-menu-item (click)="openFavorites()">
+              <mat-icon>favorite</mat-icon>
+              <span>Favoritos</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="goToRequests()">
+              <mat-icon>assignment</mat-icon>
+              <span>Solicitudes</span>
+            </button>
+            <button mat-menu-item (click)="goToChat()">
+              <mat-icon>chat</mat-icon>
+              <span>Mis chats</span>
+            </button>
+            <button mat-menu-item (click)="goToProfile()">
+              <mat-icon>person</mat-icon>
+              <span>Mi perfil</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Cerrar sesión</span>
+            </button>
+          </mat-menu>
+        </div>
       </ng-container>
       
       <ng-template #loginBtn>

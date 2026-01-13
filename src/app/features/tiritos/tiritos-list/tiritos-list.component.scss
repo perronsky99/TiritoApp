@@ -97,6 +97,8 @@
   overflow: hidden;
   border-radius: 8px;
   padding: 0;
+  box-sizing: border-box;
+  width: 100%;
 
   &:hover {
     transform: translateY(-3px);
@@ -108,6 +110,8 @@
     align-items: flex-start;
     gap: 1rem;
     padding: 0.5rem;
+    position: relative;
+    overflow: hidden;
   }
 }
 
@@ -127,6 +131,13 @@
     height: 120px;
     width: 160px;
     flex: 0 0 160px;
+  }
+
+  /* Better compact sizing for mobile list view */
+  .tirito-card.list & {
+    height: 100px;
+    width: 120px;
+    flex: 0 0 120px;
   }
 
   .image-count {
@@ -212,6 +223,52 @@ mat-card-content {
       margin-right: 4px;
     }
   }
+}
+
+/* Mobile-specific adjustments to match reference */
+@media (max-width: 600px) {
+  .tiritos-list-container { padding: 0.75rem; }
+
+  .tiritos-grid { gap: 0.75rem; }
+
+  .tirito-card {
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .tirito-card.list {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .tirito-images {
+    height: 84px;
+    width: 84px;
+    flex: 0 0 84px;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .tirito-images img { height: 100%; width: 100%; object-fit: cover; }
+
+  mat-card-header {
+    padding: 0;
+    margin: 0;
+    align-items: flex-start;
+  }
+
+  .tirito-avatar { display: none; }
+
+  mat-card-title { font-size: 1rem; margin-bottom: 4px; }
+  mat-card-subtitle { font-size: 0.8rem; color: #777; }
+
+  mat-card-content p { margin: 6px 0 0; color: #666; font-size: 0.95rem; }
+
+  .fav-btn { right: 12px; top: 12px; }
+
+  /* ensure no horizontal overflow */
+  .tiritos-grid, .tirito-card, .list-main { min-width: 0; }
 }
 
 .load-more {
