@@ -169,6 +169,18 @@
   color: #777;
 }
 
+/* Añadir padding consistente dentro de la card para evitar contenido pegado al borde */
+.tirito-card mat-card-header,
+.tirito-card mat-card-content {
+  padding: 0.75rem 0.9rem;
+}
+
+/* padding reducido en modo lista (compacto) */
+.tirito-card.list mat-card-header,
+.tirito-card.list mat-card-content {
+  padding: 0.45rem 0.6rem;
+}
+
 mat-card-content {
   p {
     color: #666;
