@@ -35,6 +35,9 @@
       <div class="list-header">
         <h1>Tiritos disponibles</h1>
         <div class="actions">
+          <button mat-icon-button class="view-toggle" (click)="toggleViewMode()" [attr.aria-label]="viewMode === 'grid' ? 'Cambiar a lista' : 'Cambiar a tarjetas'">
+            <mat-icon>{{ viewMode === 'grid' ? 'view_list' : 'view_module' }}</mat-icon>
+          </button>
           <button mat-stroked-button class="filters-toggle" (click)="toggleFiltersMobile()" aria-label="Mostrar filtros">
             <mat-icon>filter_list</mat-icon>
           </button>
@@ -87,8 +90,8 @@
       <app-error-state *ngIf="error && !loading" [message]="error" (retry)="loadTiritos()"></app-error-state>
 
       <!-- List -->
-      <div class="tiritos-grid" *ngIf="!loading && !error">
-        <mat-card *ngFor="let tirito of tiritos" class="tirito-card" role="button" tabindex="0" (click)="goToTirito(tirito)" (keydown.enter)="goToTirito(tirito)">
+      <div class="tiritos-grid" [ngClass]="{'list-mode': viewMode === 'list'}" *ngIf="!loading && !error">
+        <mat-card *ngFor="let tirito of tiritos" class="tirito-card" [ngClass]="{'list': viewMode === 'list'}" role="button" tabindex="0" (click)="goToTirito(tirito)" (keydown.enter)="goToTirito(tirito)">
           <button mat-icon-button class="fav-btn" [attr.aria-pressed]="tirito.__isFav ? 'true' : 'false'" aria-label="Favorito" (click)="toggleFavorite(tirito, $event)">
             <mat-icon color="warn">{{ tirito.__isFav ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>

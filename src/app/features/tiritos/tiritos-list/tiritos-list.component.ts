@@ -29,6 +29,8 @@ export class TiritosListComponent implements OnInit {
   selectedCategory: string | null = null;
   sortOption: 'relevance' | 'newest' | 'nearest' | 'most_commented' | '' = 'relevance';
   showFiltersOnMobile = false;
+  // View mode: 'grid' (cards) or 'list' (compact rows)
+  viewMode: 'grid' | 'list' = (localStorage.getItem('tiritos_view_mode') as any) || 'grid';
   
   // Paginación
   page = 1;
@@ -141,6 +143,11 @@ export class TiritosListComponent implements OnInit {
 
   toggleFiltersMobile() {
     this.showFiltersOnMobile = !this.showFiltersOnMobile;
+  }
+
+  toggleViewMode() {
+    this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
+    try { localStorage.setItem('tiritos_view_mode', this.viewMode); } catch {}
   }
 
   toggleFavorite(tirito: Tirito, event: Event) {
