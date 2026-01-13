@@ -60,6 +60,9 @@ export interface TiritoFilters {
   location?: string;
   page?: number;
   limit?: number;
+  // UI-driven extras supported by backend when available
+  sort?: 'relevance' | 'newest' | 'nearest' | 'most_commented' | string;
+  category?: string;
 }
 
 /**

@@ -4,23 +4,56 @@
   margin: 0 auto;
 }
 
+.list-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+}
+
+.filters-aside {
+  position: relative;
+}
+
+.filters-aside-inner {
+  position: sticky;
+  top: 1rem;
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.aside-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-mobile { display: none; }
+
+.list-main {
+  min-height: 200px;
+}
+
 .list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  margin-bottom: 1rem;
   gap: 1rem;
 
-  h1 {
-    margin: 0;
-    color: #333;
-    font-size: 1.5rem;
-  }
+  h1 { margin: 0; color: #333; font-size: 1.5rem; }
+}
 
-  button mat-icon {
-    margin-right: 4px;
-  }
+.top-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: white;
+  position: sticky;
+  top: 0.5rem;
+  padding: 0.75rem 0;
+  z-index: 8;
 }
 
 .filters {
@@ -45,8 +78,8 @@
 
 .tiritos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
 }
 
 .tirito-card {
@@ -62,7 +95,7 @@
 
 .tirito-images {
   position: relative;
-  height: 160px;
+  height: 220px;
   background: #f5f5f5;
 
   img {
@@ -90,6 +123,14 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
+}
+
+.fav-btn {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  z-index: 4;
+  background: rgba(255,255,255,0.9);
 }
 
 mat-card-content {
@@ -129,21 +170,9 @@ mat-card-content {
 
 // Mobile responsiveness
 @media (max-width: 600px) {
-  .tiritos-list-container {
-    padding: 1rem;
-  }
-
-  .list-header {
-    h1 {
-      font-size: 1.25rem;
-    }
-  }
-
-  .search-field {
-    max-width: 100%;
-  }
-
-  .tiritos-grid {
-    grid-template-columns: 1fr;
-  }
+  .list-grid { grid-template-columns: 1fr; }
+  .filters-aside { display: none; }
+  .close-mobile { display: inline-flex; }
+  .top-bar { position: sticky; top: 56px; }
+  .tiritos-grid { grid-template-columns: 1fr; }
 }

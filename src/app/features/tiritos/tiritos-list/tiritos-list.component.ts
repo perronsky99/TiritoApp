@@ -4,6 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TiritosService } from '../../../core/services/tiritos.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Tirito, TiritoStatus, TiritoFilters } from '../../../core/models';
+import { FavoritesService } from '../../../core/services/favorites.service';
 
 /**
  * Lista de Tiritos
@@ -23,6 +24,11 @@ export class TiritosListComponent implements OnInit {
   // Filtros
   currentStatus: TiritoStatus | 'all' = 'open';
   searchQuery = '';
+  // Facets & sort
+  categories: string[] = ['Todos', 'Objetos', 'Servicios', 'Comunidad'];
+  selectedCategory: string | null = null;
+  sortOption: 'relevance' | 'newest' | 'nearest' | 'most_commented' | '' = 'relevance';
+  showFiltersOnMobile = false;
   
   // Paginación
   page = 1;
@@ -37,6 +43,8 @@ export class TiritosListComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer
+    ,
+    private favoritesService: FavoritesService
   ) {}
 
   ngOnInit(): void {
@@ -44,7 +52,11 @@ export class TiritosListComponent implements OnInit {
     this.route.queryParamMap.subscribe(q => {
       const s = q.get('search') || '';
       const p = parseInt(q.get('page') || '1', 10) || 1;
+      const cat = q.get('category');
+      const sort = (q.get('sort') || 'relevance') as any;
       this.searchQuery = s;
+      this.selectedCategory = cat;
+      this.sortOption = sort;
       this.routePage = p;
       this.loadTiritos();
     });
@@ -74,6 +86,12 @@ export class TiritosListComponent implements OnInit {
 
     if (this.searchQuery.trim()) {
       filters.search = this.searchQuery.trim();
+    }
+    if (this.selectedCategory && this.selectedCategory !== 'Todos') {
+      filters.category = this.selectedCategory;
+    }
+    if (this.sortOption) {
+      (filters as any).sort = this.sortOption;
     }
 
     this.tiritosService.getTiritos(filters).subscribe({
@@ -109,6 +127,36 @@ export class TiritosListComponent implements OnInit {
   onSearch(): void {
     // navigate with search query so url reflects current search
     this.router.navigate([], { relativeTo: this.route, queryParams: { search: this.searchQuery || null, page: 1 }, queryParamsHandling: 'merge' });
+  }
+
+  applyCategory(cat: string | null) {
+    this.selectedCategory = cat;
+    this.router.navigate([], { relativeTo: this.route, queryParams: { category: cat || null, page: 1 }, queryParamsHandling: 'merge' });
+  }
+
+  changeSort(sort: string) {
+    this.sortOption = (sort as any) || '';
+    this.router.navigate([], { relativeTo: this.route, queryParams: { sort: this.sortOption || null, page: 1 }, queryParamsHandling: 'merge' });
+  }
+
+  toggleFiltersMobile() {
+    this.showFiltersOnMobile = !this.showFiltersOnMobile;
+  }
+
+  toggleFavorite(tirito: Tirito, event: Event) {
+    event.stopPropagation();
+    // optimistic UI: mark removed locally and call service
+    const wasFav = (tirito as any).__isFav;
+    (tirito as any).__isFav = !wasFav;
+    if (!wasFav) {
+      this.favoritesService.addFavorite(tirito.id).subscribe({
+        error: () => { (tirito as any).__isFav = wasFav; }
+      });
+    } else {
+      this.favoritesService.removeFavorite(tirito.id).subscribe({
+        error: () => { (tirito as any).__isFav = wasFav; }
+      });
+    }
   }
 
   goToTirito(tirito: Tirito): void {

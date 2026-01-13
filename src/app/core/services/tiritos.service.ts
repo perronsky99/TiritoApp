@@ -33,6 +33,8 @@ export class TiritosService {
       if (filters.status) params = params.set('status', filters.status);
       if (filters.search) params = params.set('search', filters.search);
       if (filters.location) params = params.set('location', filters.location);
+      if ((filters as any).sort) params = params.set('sort', (filters as any).sort);
+      if ((filters as any).category) params = params.set('category', (filters as any).category);
       if (filters.page) params = params.set('page', filters.page.toString());
       if (filters.limit) params = params.set('limit', filters.limit.toString());
     }

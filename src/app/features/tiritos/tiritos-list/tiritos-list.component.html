@@ -1,132 +1,127 @@
 <div class="tiritos-list-container">
-  <!-- Header -->
-  <div class="list-header">
-    <h1>Tiritos disponibles</h1>
-    <button 
-      mat-raised-button 
-      color="primary"
-      (click)="goToCreate()">
-      <mat-icon>add</mat-icon>
-      Publicar tirito
-    </button>
-  </div>
+  <div class="list-grid">
+    <!-- Sidebar filters -->
+    <aside class="filters-aside" [class.open-mobile]="showFiltersOnMobile">
+      <div class="filters-aside-inner">
+        <div class="aside-header">
+          <h3>Filtros</h3>
+          <button mat-icon-button class="close-mobile" (click)="toggleFiltersMobile()" aria-label="Cerrar filtros">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
 
-  <!-- Filters -->
-  <div class="filters">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar</mat-label>
-      <input 
-        matInput 
-        [(ngModel)]="searchQuery"
-        (keyup.enter)="onSearch()"
-        placeholder="¿Qué estás buscando?">
-      <button mat-icon-button matSuffix (click)="onSearch()">
-        <mat-icon>search</mat-icon>
-      </button>
-    </mat-form-field>
+        <div class="facet">
+          <label class="facet-label">Categoría</label>
+          <mat-selection-list>
+            <mat-list-option *ngFor="let c of categories" [selected]="selectedCategory === c" (click)="applyCategory(c === 'Todos' ? null : c)">
+              {{ c }}
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
 
-    <div class="status-chips">
-      <mat-chip-list>
-        <mat-chip 
-          [selected]="currentStatus === 'all'"
-          (click)="onFilterChange('all')">
-          Todos
-        </mat-chip>
-        <mat-chip 
-          [selected]="currentStatus === 'open'"
-          (click)="onFilterChange('open')">
-          Abiertos
-        </mat-chip>
-        <mat-chip 
-          [selected]="currentStatus === 'in_progress'"
-          (click)="onFilterChange('in_progress')">
-          En progreso
-        </mat-chip>
-      </mat-chip-list>
-    </div>
-  </div>
+        <div class="facet">
+          <label class="facet-label">Estado</label>
+          <mat-chip-list>
+            <mat-chip [selected]="currentStatus === 'all'" (click)="onFilterChange('all')">Todos</mat-chip>
+            <mat-chip [selected]="currentStatus === 'open'" (click)="onFilterChange('open')">Abiertos</mat-chip>
+            <mat-chip [selected]="currentStatus === 'in_progress'" (click)="onFilterChange('in_progress')">En progreso</mat-chip>
+          </mat-chip-list>
+        </div>
+      </div>
+    </aside>
 
-  <!-- Loading -->
-  <ng-container *ngIf="loading">
-    <app-loading-spinner [message]="'Cargando tiritos...'"></app-loading-spinner>
-    <div class="tiritos-grid skeletons" aria-hidden="true">
-      <mat-card class="tirito-card skeleton" *ngFor="let n of [1,2,3,4,5,6]">
-        <div class="skeleton-img"></div>
-        <mat-card-header>
-          <div mat-card-avatar class="skeleton-avatar"></div>
-          <mat-card-title class="skeleton-line"></mat-card-title>
-          <mat-card-subtitle class="skeleton-line short"></mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <p class="skeleton-line"></p>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </ng-container>
-
-  <!-- Error -->
-  <app-error-state 
-    *ngIf="error && !loading"
-    [message]="error"
-    (retry)="loadTiritos()">
-  </app-error-state>
-
-  <!-- List -->
-  <div class="tiritos-grid" *ngIf="!loading && !error">
-    <mat-card 
-      *ngFor="let tirito of tiritos"
-      class="tirito-card"
-      (click)="goToTirito(tirito)">
-      
-      <!-- Images preview -->
-      <div class="tirito-images" *ngIf="tirito.images.length > 0">
-        <img [src]="tirito.images[0].thumbnailUrl || tirito.images[0].url" [alt]="tirito.title">
-        <span class="image-count" *ngIf="tirito.images.length > 1">
-          +{{ tirito.images.length - 1 }}
-        </span>
+    <!-- Main content -->
+    <main class="list-main">
+      <div class="list-header">
+        <h1>Tiritos disponibles</h1>
+        <div class="actions">
+          <button mat-stroked-button class="filters-toggle" (click)="toggleFiltersMobile()" aria-label="Mostrar filtros">
+            <mat-icon>filter_list</mat-icon>
+          </button>
+          <button mat-raised-button color="primary" (click)="goToCreate()">
+            <mat-icon>add</mat-icon>
+            Publicar
+          </button>
+        </div>
       </div>
 
-      <mat-card-header>
-        <div mat-card-avatar class="tirito-avatar">
-          {{ tirito.creatorInitials || tirito.creatorName.substring(0, 2).toUpperCase() }}
+      <div class="top-bar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar</mat-label>
+          <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="¿Qué estás buscando?">
+          <button mat-icon-button matSuffix (click)="onSearch()"><mat-icon>search</mat-icon></button>
+        </mat-form-field>
+
+        <div class="sort-select">
+          <mat-form-field appearance="fill">
+            <mat-label>Ordenar</mat-label>
+            <mat-select [(value)]="sortOption" (selectionChange)="changeSort($event.value)">
+              <mat-option value="relevance">Relevancia</mat-option>
+              <mat-option value="newest">Más nuevos</mat-option>
+              <mat-option value="nearest">Más cercanos</mat-option>
+              <mat-option value="most_commented">Más comentados</mat-option>
+            </mat-select>
+          </mat-form-field>
         </div>
-        <mat-card-title [innerHTML]="highlight(tirito.title | truncate:50, searchQuery)"></mat-card-title>
-        <mat-card-subtitle>
-          @{{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
-        </mat-card-subtitle>
-      </mat-card-header>
+      </div>
 
-      <mat-card-content>
-        <p [innerHTML]="highlight(tirito.description | truncate:120, searchQuery)"></p>
-        <div class="tirito-footer">
-          <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
-          <span class="location" *ngIf="tirito.location">
-            <mat-icon>location_on</mat-icon>
-            {{ tirito.location }}
-          </span>
+      <!-- Loading -->
+      <ng-container *ngIf="loading">
+        <app-loading-spinner [message]="'Cargando tiritos...'"></app-loading-spinner>
+        <div class="tiritos-grid skeletons" aria-hidden="true">
+          <mat-card class="tirito-card skeleton" *ngFor="let n of [1,2,3,4,5,6]">
+            <div class="skeleton-img"></div>
+            <mat-card-header>
+              <div mat-card-avatar class="skeleton-avatar"></div>
+              <mat-card-title class="skeleton-line"></mat-card-title>
+              <mat-card-subtitle class="skeleton-line short"></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p class="skeleton-line"></p>
+            </mat-card-content>
+          </mat-card>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+      </ng-container>
 
-  <!-- Empty State -->
-  <app-empty-state 
-    *ngIf="!loading && !error && tiritos.length === 0"
-    icon="search_off"
-    title="No encontramos tiritos"
-    [message]="searchQuery ? 'Probá con otra búsqueda' : 'Todavía no hay tiritos publicados'">
-    <button mat-raised-button color="primary" (click)="goToCreate()">
-      Publicar el primero
-    </button>
-  </app-empty-state>
+      <!-- Error -->
+      <app-error-state *ngIf="error && !loading" [message]="error" (retry)="loadTiritos()"></app-error-state>
 
-  <!-- Load More -->
-  <div class="load-more" *ngIf="hasMore && !loading">
-    <button 
-      mat-stroked-button 
-      (click)="loadMore()"
-      [disabled]="loadingMore">
-      {{ loadingMore ? 'Cargando...' : 'Ver más tiritos' }}
-    </button>
+      <!-- List -->
+      <div class="tiritos-grid" *ngIf="!loading && !error">
+        <mat-card *ngFor="let tirito of tiritos" class="tirito-card" role="button" tabindex="0" (click)="goToTirito(tirito)" (keydown.enter)="goToTirito(tirito)">
+          <button mat-icon-button class="fav-btn" [attr.aria-pressed]="tirito.__isFav ? 'true' : 'false'" aria-label="Favorito" (click)="toggleFavorite(tirito, $event)">
+            <mat-icon color="warn">{{ tirito.__isFav ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+
+          <div class="tirito-images" *ngIf="tirito.images.length > 0">
+            <img [src]="tirito.images[0].thumbnailUrl || tirito.images[0].url" [alt]="tirito.title">
+            <span class="image-count" *ngIf="tirito.images.length > 1">+{{ tirito.images.length - 1 }}</span>
+          </div>
+
+          <mat-card-header>
+            <div mat-card-avatar class="tirito-avatar">{{ tirito.creatorInitials || tirito.creatorName.substring(0,2).toUpperCase() }}</div>
+            <mat-card-title [innerHTML]="highlight(tirito.title | truncate:50, searchQuery)"></mat-card-title>
+            <mat-card-subtitle>@{{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <p [innerHTML]="highlight(tirito.description | truncate:120, searchQuery)"></p>
+            <div class="tirito-footer">
+              <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+              <span class="location" *ngIf="tirito.location"><mat-icon>location_on</mat-icon>{{ tirito.location }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <app-empty-state *ngIf="!loading && !error && tiritos.length === 0" icon="search_off" title="No encontramos tiritos" [message]="searchQuery ? 'Probá con otra búsqueda' : 'Todavía no hay tiritos publicados'">
+        <button mat-raised-button color="primary" (click)="goToCreate()">Publicar el primero</button>
+      </app-empty-state>
+
+      <!-- Load More -->
+      <div class="load-more" *ngIf="hasMore && !loading">
+        <button mat-stroked-button (click)="loadMore()" [disabled]="loadingMore">{{ loadingMore ? 'Cargando...' : 'Ver más tiritos' }}</button>
+      </div>
+    </main>
   </div>
 </div>
