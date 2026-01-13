@@ -76,3 +76,26 @@
 	.search-bar .suggestion img { width:44px; height:44px; }
 }
 
+/* Expanded input animation: when the search-bar has .expanded on mobile */
+@media (max-width: 768px) {
+	.search-bar {
+		transition: transform 240ms ease, width 240ms ease;
+	}
+
+	.search-bar.expanded {
+		position: fixed;
+		top: 8px;
+		left: 8px;
+		right: 8px;
+		z-index: 1200;
+		padding: 6px 8px;
+		background: transparent;
+	}
+
+	.search-bar.expanded input {
+		width: 100%;
+		box-shadow: 0 8px 26px rgba(16,24,40,0.12);
+		border-radius: 8px;
+	}
+}
+

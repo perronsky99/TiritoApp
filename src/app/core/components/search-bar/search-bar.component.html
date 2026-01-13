@@ -1,5 +1,5 @@
-<div class="search-bar">
-  <input #input type="text" [formControl]="control" placeholder="Buscar tiritos, ejemplo: 'plomería'" (keydown)="onKeydown($event)" aria-autocomplete="list" [attr.aria-expanded]="suggestions.length>0" aria-owns="suggestions-list" />
+<div class="search-bar" [class.expanded]="isExpanded">
+  <input #input type="text" [formControl]="control" placeholder="Buscar tiritos, ejemplo: 'plomería'" (keydown)="onKeydown($event)" (focus)="onFocus()" (blur)="onBlur()" aria-autocomplete="list" [attr.aria-expanded]="suggestions.length>0" aria-owns="suggestions-list" />
   <button mat-icon-button aria-label="Buscar" (click)="onSubmit()">
     <mat-icon>search</mat-icon>
   </button>
@@ -10,6 +10,8 @@
       class="suggestion"
       *ngFor="let s of suggestions; let i = index"
       (click)="onSelect(s)"
+      (mousedown)="onSuggestionMouseDown()"
+      (mouseup)="onSuggestionMouseUp()"
       [attr.id]="'search-sugg-' + i"
       [attr.role]="'option'"
       [attr.aria-selected]="activeIndex === i"

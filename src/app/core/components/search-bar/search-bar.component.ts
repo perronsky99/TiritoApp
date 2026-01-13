@@ -22,6 +22,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   // generate ids for aria
   private idPrefix = 'search-sugg-';
   @ViewChild('input') input?: ElementRef<HTMLInputElement>;
+  isExpanded = false;
+  private suppressBlur = false;
 
   constructor(private searchService: SearchService, private router: Router, private sanitizer: DomSanitizer) {}
 
@@ -45,6 +47,10 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       this.loading = false;
       this.suggestions = (res && res.data) ? res.data : (res.favorites || res.items || []);
       this.activeIndex = this.suggestions.length ? 0 : -1;
+      // expand search if there are suggestions (mobile UX)
+      if (this.suggestions && this.suggestions.length > 0) {
+        this.isExpanded = true;
+      }
     });
   }
 
@@ -55,6 +61,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     const id = item.id || item._id;
     if (id) this.router.navigate(['/tiritos', id]);
     this.clear();
+    this.isExpanded = false;
   }
 
   onSubmit(): void {
@@ -89,6 +96,23 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       if (this.input && this.input.nativeElement) this.input.nativeElement.blur();
     }
   }
+
+  onFocus(): void {
+    this.isExpanded = true;
+  }
+
+  onBlur(): void {
+    // allow click on suggestions to proceed without collapsing
+    setTimeout(() => {
+      if (!this.suppressBlur && (!this.suggestions || this.suggestions.length === 0)) {
+        this.isExpanded = false;
+      }
+      this.suppressBlur = false;
+    }, 120);
+  }
+
+  onSuggestionMouseDown(): void { this.suppressBlur = true; }
+  onSuggestionMouseUp(): void { setTimeout(() => { this.suppressBlur = false; }, 50); }
 
   private scrollToActive(): void {
     // ensure active suggestion is visible - basic approach
