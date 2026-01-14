@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>Reportar usuario</h2>
+<div mat-dialog-content [formGroup]="form">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Motivo</mat-label>
+    <mat-select formControlName="category">
+      <mat-option *ngFor="let r of reasons" [value]="r.value">{{ r.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Descripción (opcional)</mat-label>
+    <textarea matInput formControlName="description" rows="3"></textarea>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Cancelar</button>
+  <button mat-raised-button color="warn" (click)="submit()" [disabled]="form.invalid || loading">
+    Reportar
+    <mat-progress-spinner *ngIf="loading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+  </button>
+</div>

@@ -1,0 +1,63 @@
+<div class="admin-audits">
+	<h3>Registros de auditoría</h3>
+	<div class="filters">
+		<label>
+			Actor (email):
+			<input type="text" [(ngModel)]="filterActor" placeholder="actor@example.com" />
+		</label>
+		<label>
+			Target (email):
+			<input type="text" [(ngModel)]="filterTarget" placeholder="target@example.com" />
+		</label>
+		<label>
+			Acción:
+			<select [(ngModel)]="filterAction">
+				<option value="">-- cualquiera --</option>
+				<option value="ban">ban</option>
+				<option value="unban">unban</option>
+				<option value="suspend">suspend</option>
+				<option value="user_block">user_block</option>
+				<option value="user_unblock">user_unblock</option>
+				<option value="report_created">report_created</option>
+			</select>
+		</label>
+		<label>
+			Desde:
+			<input type="date" [(ngModel)]="filterFrom" />
+		</label>
+		<label>
+			Hasta:
+			<input type="date" [(ngModel)]="filterTo" />
+		</label>
+		<div class="actions">
+			<button (click)="applyFilters()">Buscar</button>
+			<button (click)="clearFilters()">Limpiar</button>
+		</div>
+	</div>
+	<div *ngIf="loading">Cargando...</div>
+	<table *ngIf="!loading && audits.length" class="table">
+		<thead>
+			<tr>
+				<th>Fecha</th>
+				<th>Actor</th>
+				<th>Acción</th>
+				<th>Target</th>
+				<th>Razón</th>
+				<th>Meta</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr *ngFor="let a of audits">
+				<td>{{ a.createdAt | date:'short' }}</td>
+				<td>{{ a.actor?.email || a.actor }}</td>
+				<td>{{ a.action }}</td>
+				<td>{{ a.targetUser?.email || a.targetUser }}</td>
+				<td>{{ a.reason || '-' }}</td>
+				<td><pre>{{ a.meta | json }}</pre></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div *ngIf="!loading && !audits.length">No hay registros.</div>
+
+</div>

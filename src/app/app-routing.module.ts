@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AdminAuditsComponent } from './features/admin/admin-audits/admin-audits.component';
+import { AdminReportsComponent } from './features/admin/admin-reports/admin-reports.component';
 
 /**
  * Rutas oficiales de Tirito App v1.0
@@ -78,6 +80,17 @@ const routes: Routes = [
       {
         path: 'favoritos',
         loadChildren: () => import('./features/favorites/favorites.module').then(m => m.FavoritesModule),
+        canActivate: [AuthGuard]
+      }
+      ,
+      {
+        path: 'admin/audits',
+        component: AdminAuditsComponent,
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'admin/reports',
+        component: AdminReportsComponent,
         canActivate: [AuthGuard]
       }
     ]

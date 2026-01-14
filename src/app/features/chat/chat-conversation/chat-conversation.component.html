@@ -8,6 +8,9 @@
     <div class="header-info" *ngIf="chat">
       <div class="header-top">
         <span class="participant-name">{{ getOtherParticipantName() }}</span>
+        <button mat-icon-button class="report-btn" matTooltip="Reportar usuario" (click)="openReportModal()">
+          <mat-icon color="warn">flag</mat-icon>
+        </button>
         <span 
           class="tirito-status-badge"
           [ngClass]="'status-' + tiritoStatus"

@@ -1,0 +1,32 @@
+<div class="admin-reports">
+  <h3>Reportes</h3>
+  <div *ngIf="loading">Cargando...</div>
+  <table *ngIf="!loading && reports.length" class="table">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Reporter</th>
+        <th>Target</th>
+        <th>Categoría</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of reports">
+        <td>{{ r._id }}</td>
+        <td>{{ r.reporter?.email || r.reporter }}</td>
+        <td>{{ r.target?.email || r.target }}</td>
+        <td>{{ r.category }}</td>
+        <td>{{ r.description || '-' }}</td>
+        <td>
+          <button (click)="doBan(r)">Banear</button>
+          <button (click)="doUnban(r)">Desbanear</button>
+          <button (click)="doBlock(r)">Bloquear</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && !reports.length">No hay reportes.</div>
+</div>

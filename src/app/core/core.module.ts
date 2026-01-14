@@ -7,9 +7,11 @@ import { AuthGuard } from './guards/auth.guard';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { TiritosService } from './services/tiritos.service';
 import { ChatService } from './services/chat.service';
+import { ReportService } from './services/report.service';
 import { AnalyticsService } from './services/analytics.service';
 import { ProfileService } from './services/profile.service';
 import { SearchService } from './services/search.service';
+import { AdminService } from './services/admin.service';
 
 /**
  * Core Module - Solo se importa en AppModule
@@ -25,6 +27,8 @@ import { SearchService } from './services/search.service';
     AuthGuard,
     TiritosService,
     ChatService,
+    ReportService,
+    AdminService,
     AnalyticsService,
     ProfileService,
     SearchService,

@@ -6,6 +6,8 @@ import { AuthService } from '../../../core/auth/auth.service';
 import { NotificationService, IChatMessageEvent } from '../../../core/services/notification.service';
 import { TiritosService } from '../../../core/services/tiritos.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ReportModalComponent } from '../../../shared/ui/report-modal/report-modal.component';
 
 /**
  * Conversación de chat
@@ -55,6 +57,8 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
     private notificationService: NotificationService,
     private tiritosService: TiritosService,
     private snackBar: MatSnackBar
+    ,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -68,6 +72,20 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
       this.loadChat(tiritoId, withUser || undefined);
       this.subscribeToRealTimeMessages();
     }
+  }
+
+  openReportModal(): void {
+    const other = this.chat?.participants?.find(p => String(p._id) !== String(this.authService.currentUser?.id));
+    const targetId = other?._id || '';
+    if (!targetId) return;
+    const dialogRef = this.dialog.open(ReportModalComponent, { data: { targetId } });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.success) {
+        this.snackBar.open('Reporte enviado. Gracias por ayudarnos a mantener la comunidad segura.', 'Cerrar', { duration: 4000 });
+      } else if (result?.err) {
+        this.snackBar.open('Error enviando reporte', 'Cerrar', { duration: 3000 });
+      }
+    });
   }
 
   ngOnDestroy(): void {
