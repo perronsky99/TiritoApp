@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ReportService } from '../../../core/services/report.service';
+import { MatDialog } from '@angular/material/dialog';
+import { BanModalComponent } from '../../../shared/ui/ban-modal/ban-modal.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-admin-reports',
@@ -10,7 +13,7 @@ export class AdminReportsComponent implements OnInit {
   reports: any[] = [];
   loading = false;
 
-  constructor(private reportService: ReportService) {}
+  constructor(private reportService: ReportService, private dialog: MatDialog, private snackBar: MatSnackBar) {}
 
   ngOnInit(): void {
     this.load();
@@ -28,11 +31,17 @@ export class AdminReportsComponent implements OnInit {
   }
 
   doBan(r: any) {
-    const hours = parseInt(window.prompt('Duración en horas (ej: 168 = 7 días)', '168') || '168', 10) || 168;
-    const reason = window.prompt('Razón para el baneo (ej: inappropriate_behavior)', 'inappropriate_behavior') || 'inappropriate_behavior';
-    this.reportService.actionReport(r._id, { action: 'ban', durationHours: hours, reason }).subscribe({
-      next: () => this.load(),
-      error: (e) => alert('Error: ' + (e?.message || e))
+    const dialogRef = this.dialog.open(BanModalComponent, { data: { report: r } });
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result?.success) return;
+      const payload = Object.assign({ action: 'ban' }, result.payload);
+      this.reportService.actionReport(r._id, payload).subscribe({
+        next: () => {
+          this.snackBar.open('Usuario baneado correctamente', 'Cerrar', { duration: 3000 });
+          this.load();
+        },
+        error: (e) => this.snackBar.open('Error: ' + (e?.message || e), 'Cerrar', { duration: 4000 })
+      });
     });
   }
 

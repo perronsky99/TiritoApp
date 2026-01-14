@@ -1,0 +1,32 @@
+<h2>Parámetros de baneo</h2>
+<div class="ban-form">
+  <form [formGroup]="form">
+    <label>
+      <input type="checkbox" formControlName="permanent" /> Permanente
+    </label>
+
+    <div *ngIf="!form.value.permanent">
+      <label>
+        Duración (horas):
+        <input type="number" formControlName="durationHours" />
+      </label>
+    </div>
+
+    <label>
+      Razón:
+      <select formControlName="reason">
+        <option *ngFor="let r of reasons" [value]="r.value">{{ r.label }}</option>
+      </select>
+    </label>
+
+    <label>
+      Nota (opcional):
+      <textarea formControlName="note"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="button" (click)="submit()">Aplicar baneo</button>
+      <button type="button" (click)="cancel()">Cancelar</button>
+    </div>
+  </form>
+</div>

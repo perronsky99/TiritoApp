@@ -40,6 +40,7 @@ import { NotificationDropdownComponent } from './ui/notification-dropdown/notifi
 import { RatingDialogComponent } from '../features/profile/rating-dialog/rating-dialog.component';
 import { SearchBarComponent } from '../core/components/search-bar/search-bar.component';
 import { ReportModalComponent } from './ui/report-modal/report-modal.component';
+import { BanModalComponent } from './ui/ban-modal/ban-modal.component';
 
 // Pipes
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
@@ -82,6 +83,7 @@ const UI_COMPONENTS = [
   RatingDialogComponent,
   SearchBarComponent
   ,ReportModalComponent
+  ,BanModalComponent
 ];
 
 const PIPES = [
