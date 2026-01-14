@@ -27,7 +27,7 @@
         <span matListItemTitle>Inicio</span>
       </a>
 
-      <a mat-list-item (click)="goToNotifications()">
+      <a *ngIf="authService.isLoggedIn" mat-list-item (click)="goToNotifications()">
         <mat-icon matListItemIcon [matBadge]="(notificationCount$ | async) || null" matBadgeColor="accent">notifications</mat-icon>
         <span matListItemTitle>Notificaciones</span>
       </a>

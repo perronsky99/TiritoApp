@@ -110,7 +110,11 @@ export class MainLayoutComponent implements OnInit {
   }
 
   goToNotifications(): void {
-    this.router.navigate(['/notificaciones']);
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/notificaciones']);
+    } else {
+      this.router.navigate(['/login'], { queryParams: { returnUrl: '/notificaciones' } });
+    }
     this.closeSidenav();
   }
 
