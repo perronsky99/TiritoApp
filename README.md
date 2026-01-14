@@ -1,91 +1,145 @@
-# Tirito App v1.0 – Frontend
+# Tirito App v1.0 – Frontend (Documentación técnica)
 
-Plataforma C2C/B2C para publicación y gestión de “tiritos” (trabajos rápidos y sin burocracia). Este frontend implementa exactamente lo definido en el Master Prompt para el MVP.
+Este documento ofrece una descripción técnica exhaustiva del cliente Angular, pensada para desarrolladores y analistas de sistemas. Cubre arquitectura, responsabilidades de módulos, flujos de datos, integraciones con el backend y procedimientos operativos.
 
----
+Contenido:
+- Visión general
+- Arquitectura y módulos
+- Componentes y servicios clave
+- Flujo de autenticación y sockets
+- Rutas importantes y vistas administrativas
+- Cómo ejecutar, construir y desplegar
+- Mantenimiento y extensiones
 
-# Tirito App — Frontend (UI)
+## Visión general
 
-Este repositorio contiene el cliente Angular de Tirito App: publicación y búsqueda de tiritos, chat, perfil y notificaciones.
+El frontend es una aplicación Angular (v14) que actúa como cliente para la API `BE` y proporciona interfaces para publicar/consumir "tiritos", chat en tiempo real, perfiles de usuario, notificaciones y paneles administrativos (reports/audits).
 
-Este README explica cómo preparar, ejecutar y conectar el frontend con el backend en un entorno de desarrollo.
+Puntos de integración con el backend:
+- API REST en `environment.apiUrl` para operaciones CRUD y acciones administrativas.
+- Socket.io para notificaciones y chat en tiempo real (token JWT en handshake).
 
-## Resumen rápido
+## Arquitectura y módulos
 
-- Tech stack: Angular 14, TypeScript, Angular Material, RxJS
-- Dev URL: http://localhost:4200
-- API backend: configurada en `src/environments/*` (clave `apiUrl`)
+Estructura principal en `src/app`:
 
-- Historial de cambios: ver `CHANGELOG.md` en la raíz del proyecto para notas de versión.
+- `core/` — Servicios singleton y utilidades globales:
+	- `AuthService`: gestión de sesión, token y usuario actual.
+	- `AuthGuard`: protección de rutas.
+	- `AuthInterceptor`: añade `Authorization: Bearer <token>` a llamadas API.
+	- Servicios de dominio: `TiritosService`, `ChatService`, `ReportService`, `AdminService`, `ProfileService`.
 
-## Requisitos
+- `shared/` — Componentes y utilidades reutilizables:
+	- UI: `ReportModalComponent`, `BanModalComponent`, `LoadingSpinner`, `EmptyState`, `ErrorState`.
+	- Pipes y Material modules agrupados en `SharedModule`.
 
-- Node.js >=16
-- npm (o equivalentes: yarn, pnpm)
+- `features/` — Funcionalidad por dominio:
+	- `auth/`, `home/`, `tiritos/`, `chat/`, `profile/`, `admin/`, `notifications/`.
 
-## Instalación
+- `layouts/` — Componentes de layout (toolbar, sidenav, main layout).
 
+## Componentes y servicios clave (detallado)
+
+- `ReportModalComponent` (`shared/ui/report-modal`): modal que envía un POST a `/api/reports` con `{ targetId, category, description }`.
+- `BanModalComponent` (`shared/ui/ban-modal`): modal administrativo que recopila `durationHours`, `reason` y `permanent` y retorna payload al `AdminReportsComponent`.
+- `AdminReportsComponent` (`features/admin/admin-reports`): lista reportes y botones para ejecutar acciones (`ban`, `unban`, `user_block`) que llaman a `ReportService.actionReport(reportId, payload)`.
+- `AdminAuditsComponent` (`features/admin/admin-audits`): vista para listar registros de auditoría, con filtros para actor, target, acción y rango de fechas.
+
+Servicios relevantes:
+- `ReportService` (`core/services/report.service.ts`): `createReport()`, `listReports()`, `actionReport()`.
+- `AdminService` (`core/services/admin.service.ts`): `listAudits(filters)` para consumir `/api/admin/audits`.
+
+## Flujos y secuencias importantes
+
+1) Reportar usuario desde chat:
+	- Usuario abre `ReportModalComponent` → envía `POST /api/reports` → backend crea `Report` y emite notificaciones según configuración.
+
+2) Admin revisa y banea:
+	- Admin abre `/admin/reports` → lista de reportes (GET `/api/reports`).
+	- Admin abre `BanModalComponent`, completa parámetros → `ReportService.actionReport(reportId,{action:'ban', durationHours, reason})`.
+	- Backend actualiza `User` y crea `Audit`. Frontend refresca la lista y muestra notificación (snackbar).
+
+3) Notificaciones y chat en tiempo real:
+	- Al autenticarse, `AuthService` expone token y `ChatService` conecta socket: `io(apiSocketUrl, { auth: { token } })`.
+	- Servidor une sockets a sala `user_<userId>` para entregas dirigidas.
+
+## Rutas y vistas administrativas
+
+- `/admin/reports` — Lista de reportes con acciones (requiere rol `admin`).
+- `/admin/audits` — Lista de logs de auditoría con filtros.
+
+Ambas vistas están dentro del feature `admin` y requieren que el token corresponde a un usuario `role: 'admin'`.
+
+## Requisitos de entorno y configuración
+
+- Node.js >= 16
+- npm
+- Variables en `src/environments/environment.ts`:
+	- `apiUrl` — URL base del backend (p. ej. `http://localhost:3000/api`).
+
+## Ejecutar localmente
+
+1. Instalar dependencias:
 ```bash
 cd TiritoApp
 npm install
 ```
-
-## Configuración
-
-Edita `src/environments/environment.ts` y `src/environments/environment.prod.ts` y ajusta `apiUrl` al host del backend (por ejemplo `http://localhost:3000/api`).
-
-Ejemplo (desarrollo):
-
-```ts
-export const environment = {
-	production: false,
-	apiUrl: 'http://localhost:3000/api'
-};
-```
-
-## Ejecutar en desarrollo
-
+2. Ajustar `src/environments/environment.ts` apuntando al backend.
+3. Levantar el frontend:
 ```bash
 npm start
-# o
-ng serve
 ```
+4. Abrir `http://localhost:4200`.
 
-Abrir `http://localhost:4200`.
-
-## Build (producción)
+## Construir para producción
 
 ```bash
 npm run build
 ```
 
-## Rutas y vistas importantes
+## Testing y calidad
 
-- `/notificaciones` — Buzón completo de notificaciones (requiere sesión)
-- `/chat` — Conversaciones y mensajes
-- `/perfil/:id` — Perfil público/privado
+- Ejecutar `npm test` para unit tests (si están configurados).
+- Recomendado: añadir E2E (Protractor/Cypress) para flujos críticos (auth, report, admin actions).
 
-## Integración realtime y autenticación
+## Buenas prácticas operativas
 
-- El cliente usa `socket.io-client` y envía el JWT en el handshake: `io(apiSocketUrl, { auth: { token } })`.
-- En esta app el token suele almacenarse en `localStorage` bajo la clave `tirito_jwt_token`. `AuthService` expone el token para la conexión socket.
+- No almacenar tokens sensibles en sesiones compartidas; usar `localStorage` o `sessionStorage` y limpiar en logout.
+- Validar siempre las respuestas del backend y mostrar mensajes claros al usuario (snackbars o dialogs).
+- Proteger vistas administrativas con `AuthGuard` y comprobaciones del rol en el servidor.
 
-## Notas de desarrollo
+## Extensiones recomendadas
 
-- Asegúrate de que el backend esté corriendo y la variable `apiUrl` apunte correctamente.
-- Si el socket no conecta revisa el token y los logs del backend (handshake JWT).
+- Añadir paginación en `/api/admin/audits` y UI de auditoría si el volumen es alto.
+- Añadir toasts y confirm dialogs más ricos para las acciones admin.
 
-## Tests
+## Estructura de archivos (resumen)
 
-- Ejecuta `npm test` si hay tests unitarios configurados.
+```
+src/
+	app/
+		core/
+			services/
+			guards/
+			interceptors/
+		shared/
+			ui/
+		features/
+			admin/
+			chat/
+			tiritos/
+		layouts/
+```
 
 ## Contribuir
 
-- Fork → rama `feature/xxx` → PR.
+1. Fork -> nueva rama `feature/x`
+2. Añadir tests y documentar cambios
+3. PR con descripción técnica y pasos para QA
 
 ---
-Mantén este README enfocado en cómo ejecutar y desarrollar el frontend; la documentación de terceros o assets de template han sido eliminados.
-```
+
+Si quieres, puedo generar además un archivo `DESIGN.md` con diagramas ASCII que describan los flujos (report -> admin -> ban) y la matriz de permisos. ¿Lo genero ahora?
 
 ---
 
