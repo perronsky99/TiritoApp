@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
+import { RoleGuard } from './core/guards/role.guard';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { AdminAuditsComponent } from './features/admin/admin-audits/admin-audits.component';
 import { AdminReportsComponent } from './features/admin/admin-reports/admin-reports.component';
@@ -58,6 +59,11 @@ const routes: Routes = [
         loadChildren: () => import('./features/chat/chat.module').then(m => m.ChatModule)
       },
       {
+        path: 'pagos',
+        loadChildren: () => import('./features/payments/payments.module').then(m => m.PaymentsModule),
+        canActivate: [AuthGuard]
+      },
+      {
         path: 'notificaciones',
         loadChildren: () => import('./features/notifications/notifications.module').then(m => m.NotificationsModule),
         canActivate: [AuthGuard]
@@ -86,12 +92,14 @@ const routes: Routes = [
       {
         path: 'admin/audits',
         component: AdminAuditsComponent,
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard, RoleGuard],
+        data: { role: 'admin' }
       },
       {
         path: 'admin/reports',
         component: AdminReportsComponent,
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard, RoleGuard],
+        data: { role: 'admin' }
       }
     ]
   },

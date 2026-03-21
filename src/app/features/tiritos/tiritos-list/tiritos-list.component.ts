@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { TiritosService } from '../../../core/services/tiritos.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Tirito, TiritoStatus, TiritoFilters } from '../../../core/models';
@@ -16,7 +18,8 @@ import { FavoritesService } from '../../../core/services/favorites.service';
   templateUrl: './tiritos-list.component.html',
   styleUrls: ['./tiritos-list.component.scss']
 })
-export class TiritosListComponent implements OnInit {
+export class TiritosListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   tiritos: Tirito[] = [];
   loading = true;
   error: string | null = null;
@@ -51,7 +54,7 @@ export class TiritosListComponent implements OnInit {
 
   ngOnInit(): void {
     // react to query params: `search` and `page`
-    this.route.queryParamMap.subscribe(q => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(q => {
       const s = q.get('search') || '';
       const p = parseInt(q.get('page') || '1', 10) || 1;
       const cat = q.get('category');
@@ -196,5 +199,10 @@ export class TiritosListComponent implements OnInit {
     const re = new RegExp(`(${escapeRegExp(q)})`, 'gi');
     const html = escapeHtml(t).replace(re, '<mark>$1</mark>');
     return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

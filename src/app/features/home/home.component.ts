@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { TiritosService } from '../../core/services/tiritos.service';
 import { AuthService } from '../../core/auth/auth.service';
+import { CategoryService, Category } from '../../core/services/category.service';
 import { Tirito, TiritosResponse } from '../../core/models';
 
 /**
@@ -17,17 +18,23 @@ import { Tirito, TiritosResponse } from '../../core/models';
 })
 export class HomeComponent implements OnInit {
   recentTiritos: Tirito[] = [];
+  categories: Category[] = [];
   loading = true;
   error: string | null = null;
 
   constructor(
     private tiritosService: TiritosService,
     public authService: AuthService,
+    private categoryService: CategoryService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadRecentTiritos();
+    this.categoryService.getCategories().subscribe({
+      next: (res) => this.categories = res.categories,
+      error: () => {}
+    });
   }
 
   loadRecentTiritos(): void {

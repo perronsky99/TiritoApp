@@ -45,6 +45,7 @@ import { BanModalComponent } from './ui/ban-modal/ban-modal.component';
 // Pipes
 import { RelativeTimePipe } from './pipes/relative-time.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
+import { HighlightPipe } from './pipes/highlight.pipe';
 
 const MATERIAL_MODULES = [
   MatButtonModule,
@@ -88,7 +89,8 @@ const UI_COMPONENTS = [
 
 const PIPES = [
   RelativeTimePipe,
-  TruncatePipe
+  TruncatePipe,
+  HighlightPipe
 ];
 
 /**

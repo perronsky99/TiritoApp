@@ -10,7 +10,8 @@ import { ChatService, IChat } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { FavoritesStateService } from '../../../core/services/favorites-state.service';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AnalyticsService } from '../../../core/services/analytics.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Tirito } from '../../../core/models';
@@ -26,7 +27,7 @@ import { Tirito } from '../../../core/models';
   styleUrls: ['./tirito-detail.component.scss']
 })
 export class TiritoDetailComponent implements OnInit, OnDestroy {
-  private _favSub?: Subscription;
+  private destroy$ = new Subject<void>();
   tirito: Tirito | null = null;
   loading = true;
   error: string | null = null;
@@ -98,7 +99,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     this.loadFavorites();
     // update local favorites when other components change favorites
     try {
-      this._favSub = this.favoritesState.onChange().subscribe(() => {
+      this.favoritesState.onChange().pipe(takeUntil(this.destroy$)).subscribe(() => {
         this.loadFavorites();
       });
     } catch (e) {}
@@ -198,7 +199,8 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this._favSub) this._favSub.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   canRate(): boolean {

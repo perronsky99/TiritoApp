@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatStepper } from '@angular/material/stepper';
 import { CedulaLookupService, CedulaResult } from '../../../core/services/cedula-lookup.service';
 import { ESTADOS_VENEZUELA } from '../../../shared/data/venezuela-locations';
-import { AuthService } from '../../../core/services/auth.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 

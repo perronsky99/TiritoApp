@@ -52,6 +52,20 @@
     </div>
   </section>
 
+  <!-- Categorías -->
+  <section class="categories-section" *ngIf="categories.length > 0">
+    <h2>Explorá por categoría</h2>
+    <div class="categories-grid">
+      <a *ngFor="let cat of categories"
+         class="category-chip"
+         [routerLink]="['/tiritos']"
+         [queryParams]="{ category: cat.slug }">
+        <mat-icon>{{ cat.icon }}</mat-icon>
+        <span>{{ cat.name }}</span>
+      </a>
+    </div>
+  </section>
+
   <!-- Recent Tiritos -->
   <section class="recent-tiritos">
     <div class="section-header">

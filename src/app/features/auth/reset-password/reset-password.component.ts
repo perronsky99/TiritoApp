@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AuthService } from '../../../core/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -9,7 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './reset-password.component.html',
   styleUrls: ['../login/login.component.scss']
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   form: FormGroup;
   token: string | null = null;
   loading = false;
@@ -28,7 +31,7 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.token = params.get('token');
     });
   }
@@ -54,5 +57,10 @@ export class ResetPasswordComponent implements OnInit {
         this.snack.open(msg, 'Cerrar', { duration: 5000 });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

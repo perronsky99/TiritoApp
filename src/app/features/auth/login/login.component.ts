@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ESTADOS_VENEZUELA, TIPOS_DOCUMENTO, getMunicipiosByEstado, Municipio } from '../../../shared/data/venezuela-locations';
 
@@ -14,7 +16,8 @@ import { ESTADOS_VENEZUELA, TIPOS_DOCUMENTO, getMunicipiosByEstado, Municipio } 
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   loginForm: FormGroup;
   registerForm: FormGroup;
   
@@ -73,7 +76,7 @@ export class LoginComponent implements OnInit {
     }
     
     // Escuchar cambios en el estado para cargar municipios
-    this.registerForm.get('estado')?.valueChanges.subscribe(estadoId => {
+    this.registerForm.get('estado')?.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(estadoId => {
       this.municipios = getMunicipiosByEstado(estadoId);
       this.registerForm.get('municipio')?.setValue('');
     });
@@ -149,4 +152,9 @@ export class LoginComponent implements OnInit {
   get registerPhoneLocal() { return this.registerForm.get('phoneLocal'); }
   get registerEmail() { return this.registerForm.get('email'); }
   get registerPassword() { return this.registerForm.get('password'); }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

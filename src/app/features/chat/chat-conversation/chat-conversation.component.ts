@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ChatService, IChat, IMessage } from '../../../core/services/chat.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { NotificationService, IChatMessageEvent } from '../../../core/services/notification.service';
@@ -47,7 +48,7 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
   private shouldScroll = true;
   
   // Suscripción a mensajes en tiempo real
-  private chatMessageSub: Subscription | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -89,16 +90,15 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
   }
 
   ngOnDestroy(): void {
-    if (this.chatMessageSub) {
-      this.chatMessageSub.unsubscribe();
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**
    * Suscribirse a mensajes de chat en tiempo real via Socket.IO
    */
   private subscribeToRealTimeMessages(): void {
-    this.chatMessageSub = this.notificationService.chatMessage$.subscribe((event: IChatMessageEvent) => {
+    this.notificationService.chatMessage$.pipe(takeUntil(this.destroy$)).subscribe((event: IChatMessageEvent) => {
       console.log('Chat recibió evento socket:', { 
         eventTiritoId: event.tiritoId, 
         thisTiritoId: this.tiritoId,
