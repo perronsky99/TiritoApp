@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
 }
 
 .auth-card {
@@ -29,7 +29,7 @@
 .logo {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #7b1fa2;
+  color: var(--tirito-blue-600, #2563EB);
   margin: 0;
 }
 
@@ -95,7 +95,7 @@
   color: #666;
   
   a {
-    color: #7b1fa2;
+    color: var(--tirito-blue-600, #2563EB);
     cursor: pointer;
     font-weight: 500;
     

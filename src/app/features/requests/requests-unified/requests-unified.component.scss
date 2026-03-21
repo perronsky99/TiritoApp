@@ -15,7 +15,7 @@
     color: #333;
 
     mat-icon {
-      color: #7b1fa2;
+      color: var(--tirito-blue-500, #3B82F6);
     }
   }
 
@@ -38,7 +38,7 @@
 }
 
 .badge {
-  background: #7b1fa2;
+  background: var(--tirito-blue-500, #3B82F6);
   color: white;
   font-size: 0.75rem;
   padding: 2px 8px;
@@ -114,7 +114,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #7b1fa2;
+    background: var(--tirito-blue-500, #3B82F6);
     color: white;
     display: flex;
     align-items: center;

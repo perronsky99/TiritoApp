@@ -60,7 +60,7 @@
 
   .tirito-link {
     font-size: 0.8rem;
-    color: #7b1fa2;
+    color: var(--tirito-blue-600, #2563EB);
     cursor: pointer;
 
     &:hover {
@@ -186,7 +186,7 @@
     align-self: flex-end;
 
     .message-bubble {
-      background: #7b1fa2;
+      background: var(--tirito-blue-500, #3B82F6);
       color: white;
       border-radius: 18px 18px 4px 18px;
 
