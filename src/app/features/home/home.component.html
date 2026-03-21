@@ -15,25 +15,45 @@
     </div>
   </section>
 
-  <!-- Micro pasos + categorías -->
-  <div class="context-bar">
-    <div class="context-inner">
-      <div class="micro-steps">
-        <span class="micro-step"><mat-icon>edit</mat-icon> Publicá</span>
-        <mat-icon class="micro-arrow">trending_flat</mat-icon>
-        <span class="micro-step"><mat-icon>chat</mat-icon> Conectá</span>
-        <mat-icon class="micro-arrow">trending_flat</mat-icon>
-        <span class="micro-step"><mat-icon>check_circle</mat-icon> Listo</span>
+  <!-- Cómo funciona -->
+  <section class="how-it-works">
+    <div class="how-inner">
+      <div class="how-step">
+        <div class="how-icon">
+          <mat-icon>edit</mat-icon>
+        </div>
+        <strong>Publicá</strong>
+        <span>Describí lo que necesitás en un tirito</span>
       </div>
-      <nav class="cat-scroll" *ngIf="categories.length > 0">
-        <a *ngFor="let cat of categories"
-           class="cat-chip"
-           [routerLink]="['/tiritos']"
-           [queryParams]="{ category: cat.slug }">
-          <mat-icon>{{ cat.icon }}</mat-icon> {{ cat.name }}
-        </a>
-      </nav>
+      <mat-icon class="how-arrow">arrow_forward</mat-icon>
+      <div class="how-step">
+        <div class="how-icon">
+          <mat-icon>chat</mat-icon>
+        </div>
+        <strong>Conectá</strong>
+        <span>Recibí ofertas y elegí la mejor</span>
+      </div>
+      <mat-icon class="how-arrow">arrow_forward</mat-icon>
+      <div class="how-step">
+        <div class="how-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <strong>¡Listo!</strong>
+        <span>Resolvé tu necesidad fácilmente</span>
+      </div>
     </div>
+  </section>
+
+  <!-- Categorías -->
+  <div class="context-bar" *ngIf="categories.length > 0">
+    <nav class="cat-scroll-inner">
+      <a *ngFor="let cat of categories"
+         class="cat-chip"
+         [routerLink]="['/tiritos']"
+         [queryParams]="{ category: cat.slug }">
+        <mat-icon>{{ cat.icon }}</mat-icon> {{ cat.name }}
+      </a>
+    </nav>
   </div>
 
   <!-- Feed principal: tiritos + promo card integrada -->

@@ -54,60 +54,83 @@ $max-w: 1100px;
   color: white !important;
 }
 
-// ── Context bar: micro-steps + categorías ──
+// ── Cómo funciona: centrado con contexto ──
+.how-it-works {
+  background: white;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--tirito-border, #E2E8F0);
+}
+
+.how-inner {
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.how-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  flex: 1;
+  max-width: 160px;
+
+  strong {
+    font-size: 0.9rem;
+    color: var(--tirito-text, #1E293B);
+  }
+
+  span {
+    font-size: 0.78rem;
+    color: var(--tirito-muted, #64748B);
+    line-height: 1.35;
+  }
+}
+
+.how-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--tirito-blue-50, #EFF6FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--tirito-blue-500, #3B82F6);
+  }
+}
+
+.how-arrow {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: var(--tirito-border, #CBD5E1) !important;
+  margin-top: 12px;
+  flex-shrink: 0;
+}
+
+// ── Categorías ──
 .context-bar {
   background: white;
   border-bottom: 1px solid var(--tirito-border, #E2E8F0);
   padding: 0 1.5rem;
 }
 
-.context-inner {
+.cat-scroll-inner {
   max-width: $max-w;
   margin: 0 auto;
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  gap: 6px;
   padding: 0.6rem 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
-}
-
-.micro-steps {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  padding-right: 1rem;
-  border-right: 1px solid var(--tirito-border, #E2E8F0);
-}
-
-.micro-step {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: var(--tirito-text, #1E293B);
-
-  mat-icon {
-    font-size: 15px;
-    width: 15px;
-    height: 15px;
-    color: var(--tirito-blue-500, #3B82F6);
-  }
-}
-
-.micro-arrow {
-  font-size: 14px !important;
-  width: 14px !important;
-  height: 14px !important;
-  color: var(--tirito-border, #CBD5E1) !important;
-}
-
-.cat-scroll {
-  display: flex;
-  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
@@ -307,8 +330,16 @@ $max-w: 1100px;
     padding: 0 1rem;
   }
 
-  .micro-steps {
-    display: none;
+  .how-inner {
+    gap: 0.75rem;
+  }
+
+  .how-step span {
+    font-size: 0.72rem;
+  }
+
+  .how-arrow {
+    margin-top: 10px;
   }
 
   .feed {
