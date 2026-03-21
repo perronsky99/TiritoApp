@@ -1,139 +1,57 @@
 <div class="home-container">
-  <!-- Hero Section -->
+  <!-- Hero que se funde con el contenido -->
   <section class="hero">
-    <div class="hero-content">
+    <div class="hero-inner">
       <h1>¿Necesitás una mano?</h1>
-      <p class="subtitle">
-        Publicá lo que necesitás y conectá con alguien que puede ayudarte. 
-        Sin vueltas, sin CVs, sin procesos.
-      </p>
+      <p class="hero-sub">Publicá lo que necesitás y conectá con alguien que puede ayudarte.</p>
       <div class="hero-actions">
-        <button 
-          mat-raised-button 
-          color="primary"
-          (click)="goToCreateTirito()">
-          <mat-icon>add</mat-icon>
-          Publicar un tirito
+        <button mat-raised-button class="hero-btn-primary" (click)="goToCreateTirito()">
+          <mat-icon>add</mat-icon> Publicar tirito
         </button>
-        <button 
-          mat-stroked-button
-          (click)="goToTiritos()">
-          Ver tiritos disponibles
+        <button mat-stroked-button class="hero-btn-outline" (click)="goToTiritos()">
+          Explorar todos
         </button>
       </div>
-      <div class="plan-hint">
-        <mat-icon>auto_awesome</mat-icon>
-        <span>Empezá gratis · 1 tirito activo incluido</span>
-        <a routerLink="/pagos/planes">Ver planes &rarr;</a>
-      </div>
     </div>
   </section>
 
-  <!-- Plans preview -->
-  <section class="plans-preview">
-    <h2>Planes simples, sin letra chica</h2>
-    <p class="section-subtitle">Empezá gratis y crecé cuando lo necesites</p>
-    <div class="plans-row">
-      <div class="preview-card">
-        <div class="preview-icon free">
-          <mat-icon>rocket_launch</mat-icon>
-        </div>
-        <h4>Gratis</h4>
-        <p class="preview-price">$0 <span>/ siempre</span></p>
-        <p class="preview-detail">1 tirito activo</p>
+  <!-- Micro pasos + categorías -->
+  <div class="context-bar">
+    <div class="context-inner">
+      <div class="micro-steps">
+        <span class="micro-step"><mat-icon>edit</mat-icon> Publicá</span>
+        <mat-icon class="micro-arrow">trending_flat</mat-icon>
+        <span class="micro-step"><mat-icon>chat</mat-icon> Conectá</span>
+        <mat-icon class="micro-arrow">trending_flat</mat-icon>
+        <span class="micro-step"><mat-icon>check_circle</mat-icon> Listo</span>
       </div>
-      <div class="preview-card featured">
-        <span class="preview-badge">Popular</span>
-        <div class="preview-icon pro">
-          <mat-icon>workspace_premium</mat-icon>
-        </div>
-        <h4>Pro</h4>
-        <p class="preview-price">$X <span>/ mes</span></p>
-        <p class="preview-detail">5 tiritos activos</p>
-      </div>
-      <div class="preview-card">
-        <div class="preview-icon business">
-          <mat-icon>diamond</mat-icon>
-        </div>
-        <h4>Business</h4>
-        <p class="preview-price">$XX <span>/ mes</span></p>
-        <p class="preview-detail">Tiritos ilimitados</p>
-      </div>
+      <nav class="cat-scroll" *ngIf="categories.length > 0">
+        <a *ngFor="let cat of categories"
+           class="cat-chip"
+           [routerLink]="['/tiritos']"
+           [queryParams]="{ category: cat.slug }">
+          <mat-icon>{{ cat.icon }}</mat-icon> {{ cat.name }}
+        </a>
+      </nav>
     </div>
-    <button mat-stroked-button color="primary" class="plans-cta" routerLink="/pagos/planes">
-      Comparar planes
-      <mat-icon>arrow_forward</mat-icon>
-    </button>
-  </section>
+  </div>
 
-  <!-- How it works -->
-  <section class="how-it-works">
-    <h2>¿Cómo funciona?</h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-icon">
-          <mat-icon>edit</mat-icon>
-        </div>
-        <h3>1. Publicá</h3>
-        <p>Contá qué necesitás resolver. Puede ser cualquier cosa puntual.</p>
-      </div>
-      <div class="step">
-        <div class="step-icon">
-          <mat-icon>chat</mat-icon>
-        </div>
-        <h3>2. Conectá</h3>
-        <p>Alguien interesado te contacta y coordinan por chat.</p>
-      </div>
-      <div class="step">
-        <div class="step-icon">
-          <mat-icon>check_circle</mat-icon>
-        </div>
-        <h3>3. Listo</h3>
-        <p>Se resuelve el tirito y cerrás la publicación.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Categorías -->
-  <section class="categories-section" *ngIf="categories.length > 0">
-    <h2>Explorá por categoría</h2>
-    <div class="categories-grid">
-      <a *ngFor="let cat of categories"
-         class="category-chip"
-         [routerLink]="['/tiritos']"
-         [queryParams]="{ category: cat.slug }">
-        <mat-icon>{{ cat.icon }}</mat-icon>
-        <span>{{ cat.name }}</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- Recent Tiritos -->
-  <section class="recent-tiritos">
-    <div class="section-header">
+  <!-- Feed principal: tiritos + promo card integrada -->
+  <section class="feed">
+    <div class="feed-header">
       <h2>Tiritos recientes</h2>
       <button mat-button color="primary" (click)="goToTiritos()">
-        Ver todos
-        <mat-icon>arrow_forward</mat-icon>
+        Ver todos <mat-icon>arrow_forward</mat-icon>
       </button>
     </div>
 
-    <app-loading-spinner 
-      *ngIf="loading"
-      [message]="'Cargando tiritos...'">
-    </app-loading-spinner>
+    <app-loading-spinner *ngIf="loading" [message]="'Cargando tiritos...'"></app-loading-spinner>
+    <app-error-state *ngIf="error && !loading" [message]="error" (retry)="loadRecentTiritos()"></app-error-state>
 
-    <app-error-state 
-      *ngIf="error && !loading"
-      [message]="error"
-      (retry)="loadRecentTiritos()">
-    </app-error-state>
-
-    <div class="tiritos-grid" *ngIf="!loading && !error">
-      <mat-card 
-        *ngFor="let tirito of recentTiritos"
-        class="tirito-card"
-        (click)="goToTirito(tirito)">
+    <div class="feed-grid" *ngIf="!loading && !error">
+      <!-- Primeros 3 tiritos -->
+      <mat-card *ngFor="let tirito of recentTiritos | slice:0:3"
+        class="tirito-card" (click)="goToTirito(tirito)">
         <mat-card-header>
           <div mat-card-avatar class="tirito-avatar">
             <ng-container *ngIf="authService.isLoggedIn; else anonAvatar">
@@ -156,8 +74,48 @@
           <div class="tirito-meta">
             <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
             <span class="location" *ngIf="tirito.location">
-              <mat-icon>location_on</mat-icon>
-              {{ tirito.location }}
+              <mat-icon>location_on</mat-icon> {{ tirito.location }}
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Promo card integrada en el grid -->
+      <div class="promo-card" routerLink="/pagos/planes">
+        <div class="promo-icon">
+          <mat-icon>auto_awesome</mat-icon>
+        </div>
+        <h3>Empezá gratis</h3>
+        <p>1 tirito activo incluido</p>
+        <span class="promo-link">Ver planes <mat-icon>arrow_forward</mat-icon></span>
+      </div>
+
+      <!-- Resto de tiritos -->
+      <mat-card *ngFor="let tirito of recentTiritos | slice:3"
+        class="tirito-card" (click)="goToTirito(tirito)">
+        <mat-card-header>
+          <div mat-card-avatar class="tirito-avatar">
+            <ng-container *ngIf="authService.isLoggedIn; else anonAvatar2">
+              {{ tirito.creatorName.charAt(0).toUpperCase() }}
+            </ng-container>
+            <ng-template #anonAvatar2>?</ng-template>
+          </div>
+          <mat-card-title>{{ tirito.title | truncate:40 }}</mat-card-title>
+          <mat-card-subtitle>
+            <ng-container *ngIf="authService.isLoggedIn; else anonName2">
+              {{ tirito.creatorName }} · {{ tirito.createdAt | relativeTime }}
+            </ng-container>
+            <ng-template #anonName2>
+              Usuario · {{ tirito.createdAt | relativeTime }}
+            </ng-template>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ tirito.description | truncate:100 }}</p>
+          <div class="tirito-meta">
+            <app-tirito-status-badge [status]="tirito.status"></app-tirito-status-badge>
+            <span class="location" *ngIf="tirito.location">
+              <mat-icon>location_on</mat-icon> {{ tirito.location }}
             </span>
           </div>
         </mat-card-content>

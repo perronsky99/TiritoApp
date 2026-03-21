@@ -1,355 +1,188 @@
+$max-w: 1100px;
+
 .home-container {
   min-height: 100vh;
+  background: var(--tirito-bg, #F8FAFC);
 }
 
-// Hero Section
+// ── Hero: centrado, gradiente que se funde con el fondo ──
 .hero {
-  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  background: linear-gradient(180deg, #1D4ED8 0%, #3B82F6 60%, var(--tirito-bg, #F8FAFC) 100%);
   color: white;
-  padding: 4rem 1.5rem;
   text-align: center;
+  padding: 2.5rem 1.5rem 1.75rem;
 }
 
-.hero-content {
-  max-width: 600px;
+.hero-inner {
+  max-width: $max-w;
   margin: 0 auto;
 
   h1 {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    margin: 0 0 1rem;
+    margin: 0 0 0.4rem;
   }
+}
 
-  .subtitle {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-bottom: 2rem;
-    line-height: 1.6;
-  }
+.hero-sub {
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+  opacity: 0.88;
+  line-height: 1.4;
 }
 
 .hero-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   justify-content: center;
   flex-wrap: wrap;
 
   button {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-
-    mat-icon {
-      margin-right: 4px;
-    }
-  }
-
-  button[mat-stroked-button] {
-    border-color: white;
-    color: white;
-  }
-}
-
-.plan-hint {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  opacity: 0.85;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--tirito-amber-400, #FBBF24);
-  }
-
-  a {
-    color: white;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    font-weight: 500;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-}
-
-// Plans preview
-.plans-preview {
-  padding: 3rem 1.5rem;
-  text-align: center;
-  background: white;
-
-  h2 {
-    margin: 0 0 0.5rem;
-    color: var(--tirito-text, #1E293B);
-  }
-
-  .section-subtitle {
-    color: var(--tirito-muted, #64748B);
-    margin: 0 0 2rem;
-    font-size: 1rem;
-  }
-}
-
-.plans-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.preview-card {
-  position: relative;
-  padding: 1.5rem 1rem;
-  border: 1px solid var(--tirito-border, #E2E8F0);
-  border-radius: var(--tirito-radius, 14px);
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--tirito-shadow-md, 0 4px 12px rgba(0,0,0,0.08));
-  }
-
-  &.featured {
-    border-color: var(--tirito-blue-500, #3B82F6);
-    box-shadow: 0 0 0 1px var(--tirito-blue-500, #3B82F6);
-  }
-
-  h4 {
-    margin: 0.75rem 0 0.25rem;
-    font-size: 1.1rem;
-    color: var(--tirito-text, #1E293B);
-  }
-}
-
-.preview-badge {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--tirito-blue-500, #3B82F6);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.preview-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-
-  mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-  }
-
-  &.free {
-    background: var(--tirito-emerald-50, #ECFDF5);
-    mat-icon { color: var(--tirito-emerald-500, #10B981); }
-  }
-
-  &.pro {
-    background: var(--tirito-blue-50, #EFF6FF);
-    mat-icon { color: var(--tirito-blue-500, #3B82F6); }
-  }
-
-  &.business {
-    background: var(--tirito-amber-50, #FFFBEB);
-    mat-icon { color: var(--tirito-amber-500, #F59E0B); }
-  }
-}
-
-.preview-price {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--tirito-text, #1E293B);
-
-  span {
-    font-size: 0.8rem;
-    font-weight: 400;
-    color: var(--tirito-muted, #64748B);
-  }
-}
-
-.preview-detail {
-  margin: 0.25rem 0 0;
-  font-size: 0.85rem;
-  color: var(--tirito-muted, #64748B);
-}
-
-.plans-cta {
-  margin-top: 1.5rem;
-
-  mat-icon {
-    margin-left: 4px;
-  }
-}
-
-// How it works
-.how-it-works {
-  padding: 3rem 1.5rem;
-  background: var(--tirito-bg, #F8FAFC);
-
-  h2 {
-    text-align: center;
-    margin: 0 0 2rem;
-    color: var(--tirito-text, #1E293B);
-  }
-}
-
-.steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.step {
-  text-align: center;
-  padding: 1.5rem;
-  background: white;
-  border-radius: var(--tirito-radius, 14px);
-  border: 1px solid var(--tirito-border, #E2E8F0);
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--tirito-shadow, 0 2px 8px rgba(0,0,0,0.06));
-  }
-
-  .step-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--tirito-blue-50, #EFF6FF);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-
-    mat-icon {
-      color: var(--tirito-blue-500, #3B82F6);
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
-    }
-  }
-
-  h3 {
-    margin: 0 0 0.5rem;
-    color: var(--tirito-text, #1E293B);
-    font-size: 1rem;
-  }
-
-  p {
-    color: var(--tirito-muted, #64748B);
-    margin: 0;
     font-size: 0.9rem;
-    line-height: 1.5;
+    mat-icon { margin-right: 4px; }
   }
 }
 
-// Categories
-.categories-section {
-  padding: 2rem 1.5rem;
-  max-width: 1200px;
+.hero-btn-primary {
+  background: white !important;
+  color: #1D4ED8 !important;
+  font-weight: 600;
+}
+
+.hero-btn-outline {
+  border-color: rgba(255,255,255,0.55) !important;
+  color: white !important;
+}
+
+// ── Context bar: micro-steps + categorías ──
+.context-bar {
+  background: white;
+  border-bottom: 1px solid var(--tirito-border, #E2E8F0);
+  padding: 0 1.5rem;
+}
+
+.context-inner {
+  max-width: $max-w;
   margin: 0 auto;
-
-  h2 {
-    margin-bottom: 1rem;
-  }
-}
-
-.categories-grid {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.6rem 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
 }
 
-.category-chip {
+.micro-steps {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  background: var(--tirito-blue-50, #EFF6FF);
-  border: 1px solid var(--tirito-border, #E2E8F0);
-  border-radius: 20px;
-  text-decoration: none;
-  color: var(--tirito-text, #1E293B);
-  font-size: 14px;
-  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+  padding-right: 1rem;
+  border-right: 1px solid var(--tirito-border, #E2E8F0);
+}
 
-  &:hover {
-    background: var(--tirito-blue-100, #DBEAFE);
-    border-color: var(--tirito-blue-500, #3B82F6);
-    box-shadow: 0 2px 4px rgba(59,130,246,0.1);
-  }
+.micro-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--tirito-text, #1E293B);
 
   mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
     color: var(--tirito-blue-500, #3B82F6);
   }
 }
 
-// Recent Tiritos
-.recent-tiritos {
-  padding: 3rem 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+.micro-arrow {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  color: var(--tirito-border, #CBD5E1) !important;
 }
 
-.section-header {
+.cat-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 12px;
+  background: var(--tirito-blue-50, #EFF6FF);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--tirito-blue-600, #2563EB);
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: var(--tirito-blue-500, #3B82F6);
+    background: var(--tirito-blue-100, #DBEAFE);
+  }
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// ── Feed ──
+.feed {
+  max-width: $max-w;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 2.5rem;
+}
+
+.feed-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 
   h2 {
     margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
     color: var(--tirito-text, #1E293B);
   }
 
-  button {
-    mat-icon {
-      margin-left: 4px;
-    }
+  button mat-icon {
+    margin-left: 4px;
+    font-size: 18px;
   }
 }
 
-.tiritos-grid {
+.feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
 }
 
+// ── Tirito card ──
 .tirito-card {
   cursor: pointer;
-  border-radius: var(--tirito-radius, 14px);
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
   border: 1px solid var(--tirito-border, #E2E8F0);
+  background: white;
+  transition: transform 0.15s, box-shadow 0.15s;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--tirito-shadow-md, 0 4px 12px rgba(0,0,0,0.08));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
   }
 
   .tirito-avatar {
@@ -359,68 +192,130 @@
     align-items: center;
     justify-content: center;
     font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  mat-card-title {
+    font-size: 0.95rem !important;
   }
 
   mat-card-content p {
     color: var(--tirito-muted, #64748B);
-    margin: 0 0 1rem;
-    line-height: 1.5;
+    margin: 0 0 0.6rem;
+    font-size: 0.88rem;
+    line-height: 1.45;
   }
 }
 
 .tirito-meta {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 
   .location {
     display: flex;
     align-items: center;
     color: var(--tirito-muted, #64748B);
+    font-size: 0.8rem;
+
+    mat-icon {
+      font-size: 15px;
+      width: 15px;
+      height: 15px;
+      margin-right: 3px;
+    }
+  }
+}
+
+// ── Promo card: integrada en el grid ──
+.promo-card {
+  cursor: pointer;
+  border-radius: 12px;
+  border: 1.5px dashed var(--tirito-blue-500, #3B82F6);
+  background: linear-gradient(135deg, var(--tirito-blue-50, #EFF6FF) 0%, white 100%);
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59,130,246,0.12);
+  }
+
+  .promo-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--tirito-blue-500, #3B82F6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+
+    mat-icon {
+      color: white;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--tirito-text, #1E293B);
+  }
+
+  p {
+    margin: 0 0 0.75rem;
     font-size: 0.85rem;
+    color: var(--tirito-muted, #64748B);
+  }
+
+  .promo-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--tirito-blue-600, #2563EB);
 
     mat-icon {
       font-size: 16px;
       width: 16px;
       height: 16px;
-      margin-right: 4px;
+      margin-left: 2px;
     }
   }
 }
 
-// Mobile responsiveness
-@media (max-width: 600px) {
+// ── Mobile ──
+@media (max-width: 768px) {
   .hero {
-    padding: 3rem 1rem;
-
-    h1 {
-      font-size: 1.75rem;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-    }
+    padding: 2rem 1rem 1.5rem;
   }
 
-  .hero-actions {
-    flex-direction: column;
-    
-    button {
-      width: 100%;
-    }
+  .hero-inner h1 {
+    font-size: 1.4rem;
   }
 
-  .plan-hint {
-    flex-wrap: wrap;
-    font-size: 0.8rem;
+  .context-bar {
+    padding: 0 1rem;
   }
 
-  .plans-row {
-    grid-template-columns: 1fr;
-    max-width: 320px;
+  .micro-steps {
+    display: none;
   }
 
-  .tiritos-grid {
+  .feed {
+    padding: 1rem;
+  }
+
+  .feed-grid {
     grid-template-columns: 1fr;
   }
 }
