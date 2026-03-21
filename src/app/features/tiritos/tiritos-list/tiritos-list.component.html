@@ -41,7 +41,7 @@
           <button mat-stroked-button class="filters-toggle" (click)="toggleFiltersMobile()" aria-label="Mostrar filtros">
             <mat-icon>filter_list</mat-icon>
           </button>
-          <button mat-raised-button color="primary" (click)="goToCreate()">
+          <button mat-raised-button color="accent" (click)="goToCreate()">
             <mat-icon>add</mat-icon>
             Publicar
           </button>
@@ -118,7 +118,7 @@
       </div>
 
       <app-empty-state *ngIf="!loading && !error && tiritos.length === 0" icon="search_off" title="No encontramos tiritos" [message]="searchQuery ? 'Probá con otra búsqueda' : 'Todavía no hay tiritos publicados'">
-        <button mat-raised-button color="primary" (click)="goToCreate()">Publicar el primero</button>
+        <button mat-raised-button color="accent" (click)="goToCreate()">Publicar el primero</button>
       </app-empty-state>
 
       <!-- Load More -->

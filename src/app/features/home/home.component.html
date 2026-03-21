@@ -5,7 +5,7 @@
       <h1>¿Necesitás una mano?</h1>
       <p class="hero-sub">Publicá lo que necesitás y conectá con alguien que puede ayudarte.</p>
       <div class="hero-actions">
-        <button mat-raised-button class="hero-btn-primary" (click)="goToCreateTirito()">
+        <button mat-raised-button color="accent" class="hero-btn-primary" (click)="goToCreateTirito()">
           <mat-icon>add</mat-icon> Publicar tirito
         </button>
         <button mat-stroked-button class="hero-btn-outline" (click)="goToTiritos()">
@@ -147,7 +147,7 @@
       icon="inbox"
       title="No hay tiritos todavía"
       message="¡Sé el primero en publicar uno!">
-      <button mat-raised-button color="primary" (click)="goToCreateTirito()">
+      <button mat-raised-button color="accent" (click)="goToCreateTirito()">
         Publicar tirito
       </button>
     </app-empty-state>
