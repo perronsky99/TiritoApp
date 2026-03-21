@@ -1,6 +1,13 @@
 /**
  * Tirito App - Global Styles
- * Mobile-first approach
+ * Mobile-first · Minimalista · Confiable
+ *
+ * Paleta de marca:
+ *   Primario:  #3B82F6 (azul confiable)
+ *   Acento:    #F59E0B (ámbar cálido)
+ *   Éxito:     #10B981 (esmeralda)
+ *   Fondo:     #F8FAFC
+ *   Texto:     #1E293B
  */
 
 // Angular Material Theme
@@ -9,10 +16,36 @@
 // Include core styles
 @include mat.core();
 
-// Define custom theme colors
-$tirito-primary: mat.define-palette(mat.$purple-palette, 700);
-$tirito-accent: mat.define-palette(mat.$pink-palette, A200);
-$tirito-warn: mat.define-palette(mat.$red-palette);
+// ── Paleta personalizada Tirito ──
+$tirito-blue: (
+  50:  #EFF6FF, 100: #DBEAFE, 200: #BFDBFE, 300: #93C5FD,
+  400: #60A5FA, 500: #3B82F6, 600: #2563EB, 700: #1D4ED8,
+  800: #1E40AF, 900: #1E3A8A, A100: #DBEAFE, A200: #93C5FD,
+  A400: #3B82F6, A700: #1D4ED8,
+  contrast: (
+    50: #1E293B, 100: #1E293B, 200: #1E293B, 300: #1E293B,
+    400: #fff, 500: #fff, 600: #fff, 700: #fff,
+    800: #fff, 900: #fff, A100: #1E293B, A200: #1E293B,
+    A400: #fff, A700: #fff
+  )
+);
+
+$tirito-amber: (
+  50:  #FFFBEB, 100: #FEF3C7, 200: #FDE68A, 300: #FCD34D,
+  400: #FBBF24, 500: #F59E0B, 600: #D97706, 700: #B45309,
+  800: #92400E, 900: #78350F, A100: #FEF3C7, A200: #FCD34D,
+  A400: #F59E0B, A700: #B45309,
+  contrast: (
+    50: #1E293B, 100: #1E293B, 200: #1E293B, 300: #1E293B,
+    400: #1E293B, 500: #1E293B, 600: #fff, 700: #fff,
+    800: #fff, 900: #fff, A100: #1E293B, A200: #1E293B,
+    A400: #1E293B, A700: #fff
+  )
+);
+
+$tirito-primary: mat.define-palette($tirito-blue, 500, 300, 700);
+$tirito-accent:  mat.define-palette($tirito-amber, 500, 300, 700);
+$tirito-warn:    mat.define-palette(mat.$red-palette);
 
 // Create theme
 $tirito-theme: mat.define-light-theme((
@@ -21,12 +54,39 @@ $tirito-theme: mat.define-light-theme((
     accent: $tirito-accent,
     warn: $tirito-warn,
   ),
-  typography: mat.define-typography-config(),
+  typography: mat.define-typography-config(
+    $font-family: 'Inter, Roboto, "Helvetica Neue", sans-serif',
+  ),
   density: 0,
 ));
 
 // Apply theme
 @include mat.all-component-themes($tirito-theme);
+
+// ── CSS Custom Properties (marca) ──
+:root {
+  --tirito-blue-50:  #EFF6FF;
+  --tirito-blue-100: #DBEAFE;
+  --tirito-blue-500: #3B82F6;
+  --tirito-blue-600: #2563EB;
+  --tirito-blue-700: #1D4ED8;
+  --tirito-amber-50:  #FFFBEB;
+  --tirito-amber-400: #FBBF24;
+  --tirito-amber-500: #F59E0B;
+  --tirito-emerald-50:  #ECFDF5;
+  --tirito-emerald-500: #10B981;
+  --tirito-emerald-600: #059669;
+  --tirito-bg:    #F8FAFC;
+  --tirito-text:  #1E293B;
+  --tirito-muted: #64748B;
+  --tirito-border: #E2E8F0;
+  --tirito-card:  #FFFFFF;
+  --tirito-radius: 14px;
+  --tirito-radius-lg: 20px;
+  --tirito-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --tirito-shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --tirito-shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+}
 
 // ============================================
 // GLOBAL STYLES
@@ -43,10 +103,10 @@ html, body {
 }
 
 body {
-  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: #fafafa;
-  color: #333;
-  line-height: 1.5;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: var(--tirito-bg);
+  color: var(--tirito-text);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -56,12 +116,13 @@ body {
 // ============================================
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 500;
-  line-height: 1.2;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--tirito-text);
 }
 
 a {
-  color: #7b1fa2;
+  color: var(--tirito-blue-600);
   text-decoration: none;
 
   &:hover {
@@ -80,8 +141,16 @@ button {
 .mat-mdc-raised-button,
 .mat-mdc-stroked-button,
 .mat-mdc-flat-button {
-  border-radius: 24px !important;
+  border-radius: 12px !important;
   padding: 0 24px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  transition: all 0.2s ease !important;
+}
+
+.mat-mdc-raised-button:not([disabled]):hover {
+  transform: translateY(-1px);
+  box-shadow: var(--tirito-shadow-md) !important;
 }
 
 // ============================================
@@ -89,7 +158,10 @@ button {
 // ============================================
 
 .mat-mdc-card {
-  border-radius: 12px !important;
+  border-radius: var(--tirito-radius) !important;
+  box-shadow: var(--tirito-shadow) !important;
+  border: 1px solid var(--tirito-border);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 // ============================================
@@ -109,7 +181,7 @@ button {
 }
 
 .text-muted {
-  color: #666;
+  color: var(--tirito-muted);
 }
 
 .mt-1 { margin-top: 0.5rem; }
@@ -150,12 +222,34 @@ button {
 
 .mat-mdc-snack-bar-container {
   &.success-snackbar {
-    --mdc-snackbar-container-color: #4caf50;
+    --mdc-snackbar-container-color: var(--tirito-emerald-500);
   }
 
   &.error-snackbar {
-    --mdc-snackbar-container-color: #f44336;
+    --mdc-snackbar-container-color: #EF4444;
   }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
 }
 
 // ============================================

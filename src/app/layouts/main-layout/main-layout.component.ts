@@ -123,6 +123,11 @@ export class MainLayoutComponent implements OnInit {
     this.closeSidenav();
   }
 
+  goToPlans(): void {
+    this.router.navigate(['/pagos/planes']);
+    this.closeSidenav();
+  }
+
   logout(): void {
     this.notificationService.reset();
     this.authService.logout();

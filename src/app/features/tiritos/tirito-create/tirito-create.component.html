@@ -11,11 +11,24 @@
 
     <!-- Can't create message -->
     <div class="limit-reached" *ngIf="!checkingLimit && !canCreate">
-      <mat-icon>info</mat-icon>
-      <p>{{ cantCreateMessage }}</p>
-      <button mat-stroked-button routerLink="/tiritos">
-        Ver mis tiritos
-      </button>
+      <div class="limit-icon">
+        <mat-icon>hourglass_top</mat-icon>
+      </div>
+      <h3 class="limit-title">Alcanzaste tu límite</h3>
+      <p class="limit-msg">{{ cantCreateMessage }}</p>
+      <div class="limit-actions">
+        <button mat-raised-button
+                color="primary"
+                routerLink="/pagos/planes"
+                class="upgrade-btn">
+          <mat-icon>workspace_premium</mat-icon>
+          Mejorar mi plan
+        </button>
+        <button mat-stroked-button routerLink="/tiritos" class="secondary-btn">
+          Ver mis tiritos
+        </button>
+      </div>
+      <p class="limit-hint">Cerrá uno de tus tiritos activos o mejoratu plan para publicar más</p>
     </div>
 
     <!-- Form -->

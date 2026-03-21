@@ -1,0 +1,475 @@
+// ============================================
+// Plans Page — Tirito App
+// Modern, minimal pricing page
+// ============================================
+
+.plans-page {
+  min-height: calc(100vh - 64px);
+  background: var(--tirito-bg);
+}
+
+// ── Hero ──
+.plans-hero {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: #fff;
+  padding: 3rem 1.5rem 2.5rem;
+  text-align: center;
+
+  .hero-content {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.05rem;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// ── Loading ──
+.plans-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  color: var(--tirito-muted);
+}
+
+// ── Section ──
+.plans-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  margin-top: -1.5rem; // overlap hero
+}
+
+// ── Usage banner ──
+.usage-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: var(--tirito-card);
+  border: 1px solid var(--tirito-border);
+  border-radius: var(--tirito-radius);
+  padding: 0.875rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--tirito-shadow);
+  color: var(--tirito-text);
+  font-size: 0.9rem;
+  animation: fadeInUp 0.3s ease-out;
+
+  mat-icon {
+    color: var(--tirito-blue-500);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  mat-progress-bar {
+    flex: 1;
+    min-width: 120px;
+    border-radius: 4px;
+  }
+}
+
+// ── Plans grid ──
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+// ── Plan card ──
+.plan-card {
+  position: relative;
+  background: var(--tirito-card);
+  border: 1.5px solid var(--tirito-border);
+  border-radius: var(--tirito-radius-lg);
+  padding: 2rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: fadeInUp 0.4s ease-out both;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--tirito-shadow-lg);
+  }
+
+  &.plan-recommended {
+    border-color: var(--tirito-blue-500);
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+
+    &:hover {
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  &.plan-current {
+    border-color: var(--tirito-emerald-500);
+  }
+}
+
+// ── Badge ──
+.plan-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  color: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &--current {
+    background: linear-gradient(135deg, #10B981, #059669);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  }
+}
+
+// ── Plan header ──
+.plan-header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.plan-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: #fff;
+  }
+
+  &--free {
+    background: linear-gradient(135deg, #64748B, #475569);
+  }
+
+  &--pro {
+    background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  }
+
+  &--premium, &--business {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+  }
+}
+
+.plan-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--tirito-text);
+  margin: 0;
+}
+
+// ── Price ──
+.plan-price {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--tirito-border);
+
+  .price-currency {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--tirito-text);
+    vertical-align: top;
+    line-height: 1.3;
+  }
+
+  .price-amount {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: var(--tirito-text);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .price-period {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--tirito-muted);
+    margin-top: 0.25rem;
+  }
+}
+
+// ── Features ──
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 auto;
+  flex: 1;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--tirito-text);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      color: var(--tirito-emerald-500);
+      flex-shrink: 0;
+    }
+  }
+
+  .feature-highlight {
+    background: var(--tirito-blue-50);
+    margin: 0 -0.5rem;
+    padding: 0.625rem 0.5rem;
+    border-radius: 8px;
+
+    mat-icon {
+      color: var(--tirito-blue-500);
+    }
+  }
+}
+
+// ── CTA ──
+.plan-cta {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.cta-btn {
+  width: 100%;
+  height: 44px !important;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  border-radius: 12px !important;
+  letter-spacing: 0.01em !important;
+
+  &--recommended {
+    background: linear-gradient(135deg, #3B82F6, #2563EB) !important;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35) !important;
+
+    &:hover:not([disabled]) {
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45) !important;
+    }
+  }
+}
+
+// ── Subscription details ──
+.sub-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--tirito-muted);
+  margin-bottom: 2rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .cancel-link {
+    font-size: 0.825rem;
+  }
+}
+
+// ── Trust signals ──
+.trust-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--tirito-border);
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--tirito-muted);
+  font-size: 0.85rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--tirito-emerald-500);
+  }
+}
+
+// ============================================
+// Mock Payment Gateway Overlay
+// ============================================
+
+.gateway-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.gateway-card {
+  background: var(--tirito-card);
+  border-radius: var(--tirito-radius-lg);
+  max-width: 420px;
+  width: 100%;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: var(--tirito-shadow-lg);
+}
+
+.gateway-step {
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+  }
+
+  p {
+    margin: 0.25rem 0;
+    color: var(--tirito-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.gateway-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &--success mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: var(--tirito-emerald-500);
+  }
+}
+
+.gateway-amount {
+  font-weight: 600;
+  color: var(--tirito-text) !important;
+  font-size: 1rem !important;
+}
+
+.gateway-hint {
+  font-size: 0.85rem !important;
+  margin-top: 0.5rem !important;
+}
+
+.gateway-benefit {
+  background: var(--tirito-emerald-50);
+  color: var(--tirito-emerald-600) !important;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem !important;
+  margin-top: 0.75rem !important;
+}
+
+.gateway-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--tirito-amber-50);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--tirito-muted);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--tirito-amber-500);
+  }
+}
+
+.gateway-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .gateway-btn {
+    height: 44px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+  }
+}
+
+// ============================================
+// Responsive
+// ============================================
+
+@media (max-width: 768px) {
+  .plans-hero {
+    padding: 2rem 1rem 2rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+    }
+  }
+
+  .plans-grid {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .trust-row {
+    gap: 1rem;
+  }
+
+  .trust-item {
+    font-size: 0.8rem;
+  }
+}

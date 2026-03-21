@@ -64,6 +64,11 @@
           <mat-icon matListItemIcon>person</mat-icon>
           <span matListItemTitle>Mi perfil</span>
         </a>
+
+        <a mat-list-item (click)="goToPlans()">
+          <mat-icon matListItemIcon>workspace_premium</mat-icon>
+          <span matListItemTitle>Mi plan</span>
+        </a>
         
         <mat-divider></mat-divider>
         
@@ -160,6 +165,10 @@
             <button mat-menu-item (click)="goToProfile()">
               <mat-icon>person</mat-icon>
               <span>Mi perfil</span>
+            </button>
+            <button mat-menu-item (click)="goToPlans()">
+              <mat-icon>workspace_premium</mat-icon>
+              <span>Mi plan</span>
             </button>
             <mat-divider></mat-divider>
             <button mat-menu-item (click)="logout()">
