@@ -1,10 +1,11 @@
 .chat-conversation-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100vh - 64px);
   max-width: 600px;
   margin: 0 auto;
   background: white;
+  --chat-input-h: 84px;
 }
 
 // Header
@@ -169,6 +170,7 @@
   flex-direction: column;
   gap: 0.75rem;
   background: #f5f5f5;
+  padding-bottom: var(--chat-input-h);
 }
 
 
@@ -231,6 +233,10 @@
   border-top: 1px solid #eee;
   background: white;
   padding: 0.5rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 18;
+  box-shadow: 0 -6px 16px rgba(14,30,60,0.06);
 }
 
 .image-preview {
@@ -304,4 +310,5 @@
   .message {
     max-width: 85%;
   }
+  .chat-conversation-container { --chat-input-h: 96px; }
 }
