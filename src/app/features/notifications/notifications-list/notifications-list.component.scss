@@ -1,37 +1,97 @@
 .notifications-page {
-  padding: 24px;
+  padding: 1.5rem;
+  max-width: 680px;
+  margin: 0 auto;
 
   .page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 1.25rem;
+
+    h1 {
+      margin: 0;
+      color: var(--tirito-text, #1E293B);
+      font-size: 1.5rem;
+    }
   }
 
   .notifications-list {
     background: white;
-    border-radius: 8px;
+    border-radius: var(--tirito-radius, 14px);
+    border: 1px solid var(--tirito-border, #E2E8F0);
     overflow: hidden;
   }
 
   .group-label {
-    margin: 16px 0 8px;
-    font-size: 14px;
-    color: rgba(0,0,0,0.6);
+    margin: 0;
+    padding: 12px 16px 8px;
+    font-size: 0.75rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tirito-muted, #64748B);
+    background: var(--tirito-bg, #F8FAFC);
   }
 
   mat-list-item {
     cursor: pointer;
-    &.unread {
-      background: rgba(98,0,238,0.04);
+    transition: background 0.15s;
+
+    &:hover {
+      background: var(--tirito-bg, #F8FAFC);
     }
-    .title { font-weight: 600; }
-    .message { color: rgba(0,0,0,0.7); }
-    .meta { font-size: 12px; color: rgba(0,0,0,0.45); }
+
+    &.unread {
+      background: var(--tirito-blue-50, #EFF6FF);
+      border-left: 3px solid var(--tirito-blue-500, #3B82F6);
+    }
+
+    .title {
+      font-weight: 600;
+      color: var(--tirito-text, #1E293B);
+    }
+
+    .message {
+      color: var(--tirito-muted, #64748B);
+      font-size: 0.9rem;
+    }
+
+    .meta {
+      font-size: 0.75rem;
+      color: var(--tirito-muted, #64748B);
+      opacity: 0.8;
+    }
   }
 
-  .empty { text-align: center; color: rgba(0,0,0,0.54); padding: 36px 0; }
+  .loading {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 0;
+  }
 
-  .load-more { text-align: center; margin-top: 12px; }
+  .empty {
+    text-align: center;
+    padding: 3rem 1rem;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--tirito-border, #E2E8F0);
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin: 0;
+      color: var(--tirito-muted, #64748B);
+      font-size: 1rem;
+    }
+  }
+
+  .load-more {
+    text-align: center;
+    margin-top: 1rem;
+    padding-bottom: 0.5rem;
+  }
 }

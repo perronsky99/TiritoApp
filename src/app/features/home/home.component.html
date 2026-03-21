@@ -21,7 +21,49 @@
           Ver tiritos disponibles
         </button>
       </div>
+      <div class="plan-hint">
+        <mat-icon>auto_awesome</mat-icon>
+        <span>Empezá gratis · 1 tirito activo incluido</span>
+        <a routerLink="/pagos/planes">Ver planes &rarr;</a>
+      </div>
     </div>
+  </section>
+
+  <!-- Plans preview -->
+  <section class="plans-preview">
+    <h2>Planes simples, sin letra chica</h2>
+    <p class="section-subtitle">Empezá gratis y crecé cuando lo necesites</p>
+    <div class="plans-row">
+      <div class="preview-card">
+        <div class="preview-icon free">
+          <mat-icon>rocket_launch</mat-icon>
+        </div>
+        <h4>Gratis</h4>
+        <p class="preview-price">$0 <span>/ siempre</span></p>
+        <p class="preview-detail">1 tirito activo</p>
+      </div>
+      <div class="preview-card featured">
+        <span class="preview-badge">Popular</span>
+        <div class="preview-icon pro">
+          <mat-icon>workspace_premium</mat-icon>
+        </div>
+        <h4>Pro</h4>
+        <p class="preview-price">$X <span>/ mes</span></p>
+        <p class="preview-detail">5 tiritos activos</p>
+      </div>
+      <div class="preview-card">
+        <div class="preview-icon business">
+          <mat-icon>diamond</mat-icon>
+        </div>
+        <h4>Business</h4>
+        <p class="preview-price">$XX <span>/ mes</span></p>
+        <p class="preview-detail">Tiritos ilimitados</p>
+      </div>
+    </div>
+    <button mat-stroked-button color="primary" class="plans-cta" routerLink="/pagos/planes">
+      Comparar planes
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
   </section>
 
   <!-- How it works -->
