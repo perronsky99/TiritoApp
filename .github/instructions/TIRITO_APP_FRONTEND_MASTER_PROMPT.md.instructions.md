@@ -398,6 +398,39 @@ Font:                'Inter', 'Roboto', sans-serif
 
 ---
 
+## REGLA CRÍTICA - NO ROMPER FUNCIONALIDAD EXISTENTE
+
+- NO modificar endpoints existentes
+- NO cambiar nombres de servicios
+- NO alterar contratos HTTP actuales
+- NO eliminar código existente sin justificación explícita
+- NO refactorizar AuthService, Interceptors o Guards sin pedir confirmación
+- NO cambiar estructura de módulos o rutas existentes
+
+Cualquier cambio debe ser ADITIVO, no destructivo. Si es necesario modificar algo, primero validar que no rompa nada y luego agregar el nuevo código sin eliminar el anterior (de ser posible).
+
+---
+
+## UI/UX ESPECÍFICO (OBLIGATORIO)
+
+- Si se pide un stepper, DEBE ser Angular Material Stepper (MatStepper)
+- NO reemplazar layouts existentes sin confirmación
+- NO usar componentes custom si Angular Material tiene equivalente
+- Mantener consistencia visual con Material (inputs, botones, spacing)
+
+Si una funcionalidad UI no coincide con lo pedido, es un ERROR.
+
+---
+
+## MODO DE EJECUCIÓN
+
+- Implementar EXACTAMENTE lo solicitado
+- No interpretar, no simplificar, no omitir partes
+- Si algo no está claro, asumir la opción más completa
+- No entregar soluciones parciales
+
+---
+
 ## CONTRATO FINAL
 
 Este frontend sirve a usuarios de Tirito App. Se conecta al backend via REST + Socket.IO. No se sobrearquitecta. No se agrega state management externo. No se reescribe sin motivo. **La paleta de colores, la estructura de rutas, los modelos de datos y los flujos aqui documentados son la FUENTE DE VERDAD.** Antes de modificar cualquier aspecto, validar que no contradiga este documento.
