@@ -113,7 +113,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     try {
       // If logged in, try to load from server into local cache
       if (this.authService.isLoggedIn) {
-        this.favoritesService.getFavorites(1, 1000).subscribe({
+        this.favoritesService.getFavorites(1, 1000).pipe(takeUntil(this.destroy$)).subscribe({
           next: (res) => {
             const ids = (res.favorites || res.items || []).map((f: any) => f._id || f.id || f);
             this.favorites = new Set(ids);
@@ -161,7 +161,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     // If user is logged in, sync with backend; otherwise persist locally
     if (this.authService.isLoggedIn) {
       if (this.favorites.has(id)) {
-        this.favoritesService.removeFavorite(id).subscribe({
+        this.favoritesService.removeFavorite(id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.favorites.delete(id);
             this.snackBar.open('Quitado de favoritos', undefined, { duration: 1500 });
@@ -173,7 +173,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
           }
         });
       } else {
-        this.favoritesService.addFavorite(id).subscribe({
+        this.favoritesService.addFavorite(id).pipe(takeUntil(this.destroy$)).subscribe({
           next: () => {
             this.favorites.add(id);
             this.snackBar.open('Agregado a favoritos', undefined, { duration: 1500 });
@@ -236,7 +236,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
       const { score, comment } = result;
-      this.ratingService.createRating({ tiritoId: this.tirito!.id, targetId, score, comment }).subscribe({
+      this.ratingService.createRating({ tiritoId: this.tirito!.id, targetId, score, comment }).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.snackBar.open('Valoración enviada', undefined, { duration: 3000 });
         },
@@ -252,7 +252,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    this.tiritosService.getTiritoById(id).subscribe({
+    this.tiritosService.getTiritoById(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (tirito) => {
         this.tirito = tirito;
         this.loading = false;
@@ -277,7 +277,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
    * Carga la solicitud del usuario actual para este tirito (si existe)
    */
   loadMyRequest(tiritoId: string): void {
-    this.tiritoRequestsService.getMyRequestForTirito(tiritoId).subscribe({
+    this.tiritoRequestsService.getMyRequestForTirito(tiritoId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.myRequest = res.request;
       },
@@ -327,7 +327,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
 
     this.actionLoading = true;
 
-    this.tiritosService.markInProgress(this.tirito.id).subscribe({
+    this.tiritosService.markInProgress(this.tirito.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (updated) => {
         this.tirito = updated;
         this.actionLoading = false;
@@ -354,7 +354,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
 
     this.actionLoading = true;
 
-    this.tiritosService.closeTirito(this.tirito.id).subscribe({
+    this.tiritosService.closeTirito(this.tirito.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (updated) => {
         this.tirito = updated;
         this.actionLoading = false;
@@ -383,7 +383,7 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
 
     this.actionLoading = true;
 
-    this.tiritoRequestsService.createRequest(this.tirito.id, '¡Me interesa hacer este tirito!').subscribe({
+    this.tiritoRequestsService.createRequest(this.tirito.id, '¡Me interesa hacer este tirito!').pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.actionLoading = false;
         // Actualizar el estado local para reflejar la solicitud enviada

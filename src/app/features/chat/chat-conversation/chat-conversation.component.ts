@@ -139,7 +139,7 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
     this.loading = true;
     this.error = null;
 
-    this.chatService.getChat(tiritoId, withUser).subscribe({
+    this.chatService.getChat(tiritoId, withUser).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         this.chat = response.chat;
         // Backend v1.0: mensajes vienen en respuesta separada
@@ -177,7 +177,7 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
     this.sending = true;
     this.shouldScroll = true;
 
-    this.chatService.sendMessage(this.tiritoId, this.newMessage.trim()).subscribe({
+    this.chatService.sendMessage(this.tiritoId, this.newMessage.trim()).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         // Backend devuelve { message: string, data: IMessage }
         this.messages.push(response.data);
@@ -293,7 +293,7 @@ export class ChatConversationComponent implements OnInit, AfterViewChecked, OnDe
     if (!this.tiritoId || this.closingTirito) return;
 
     this.closingTirito = true;
-    this.tiritosService.closeTirito(this.tiritoId).subscribe({
+    this.tiritosService.closeTirito(this.tiritoId).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         this.closingTirito = false;
         this.tiritoStatus = 'closed';

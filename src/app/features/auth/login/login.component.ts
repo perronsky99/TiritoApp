@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(8)]]
     });
 
     this.registerForm = this.fb.group({
@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       phoneMobile: ['', [Validators.required, Validators.pattern(/^(0414|0424|0412|0416|0426)\d{7}$/)]],
       phoneLocal: ['', [Validators.pattern(/^(0\d{3})\d{7}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       role: ['user', Validators.required]
     });
 

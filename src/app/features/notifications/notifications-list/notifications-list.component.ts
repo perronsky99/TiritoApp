@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NotificationService, INotification } from '../../../core/services/notification.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notifications-list',
   templateUrl: './notifications-list.component.html',
   styleUrls: ['./notifications-list.component.scss']
 })
-export class NotificationsListComponent implements OnInit {
+export class NotificationsListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   notifications: INotification[] = [];
   grouped: { label: string; items: INotification[] }[] = [];
   loading = false;
@@ -29,7 +32,7 @@ export class NotificationsListComponent implements OnInit {
   loadPage(page: number): void {
     this.loading = true;
     const skip = (page - 1) * this.limit;
-    this.notificationService.getNotifications(false, this.limit, skip).subscribe({
+    this.notificationService.getNotifications(false, this.limit, skip).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         if (page === 1) {
           this.notifications = res.notifications;
@@ -47,7 +50,7 @@ export class NotificationsListComponent implements OnInit {
 
   open(notification: INotification): void {
     if (!notification.read) {
-      this.notificationService.markAsRead(notification._id).subscribe(() => {
+      this.notificationService.markAsRead(notification._id).pipe(takeUntil(this.destroy$)).subscribe(() => {
         this.snackBar.open('Notificación marcada como leída', 'Deshacer', { duration: 3000 })
           .onAction().subscribe(() => {
             // no implementamos deshacer en backend; simplemente volver a marcar como no leída localmente
@@ -67,7 +70,7 @@ export class NotificationsListComponent implements OnInit {
   }
 
   markAll(): void {
-    this.notificationService.markAllAsRead().subscribe(() => {
+    this.notificationService.markAllAsRead().pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.snackBar.open('Todas las notificaciones marcadas como leídas', '', { duration: 2000 });
       this.notifications = this.notifications.map(n => ({ ...n, read: true }));
       this.rebuildGroups();
@@ -76,7 +79,7 @@ export class NotificationsListComponent implements OnInit {
 
   delete(event: Event, n: INotification): void {
     event.stopPropagation();
-    this.notificationService.deleteNotification(n._id).subscribe();
+    this.notificationService.deleteNotification(n._id).pipe(takeUntil(this.destroy$)).subscribe();
   }
 
   loadMore(): void {
@@ -123,5 +126,10 @@ export class NotificationsListComponent implements OnInit {
     const now = new Date();
     const y = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
     return d.getFullYear() === y.getFullYear() && d.getMonth() === y.getMonth() && d.getDate() === y.getDate();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

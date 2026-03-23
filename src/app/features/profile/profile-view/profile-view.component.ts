@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfileService } from '../../../core/services/profile.service';
 import { TiritosService } from '../../../core/services/tiritos.service';
@@ -8,6 +8,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { RatingDialogComponent } from '../rating-dialog/rating-dialog.component';
 import { AuthService } from '../../../core/auth/auth.service';
 import { User, Tirito } from '../../../core/models';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 /**
  * Vista de perfil público
@@ -19,7 +21,8 @@ import { User, Tirito } from '../../../core/models';
   templateUrl: './profile-view.component.html',
   styleUrls: ['./profile-view.component.scss']
 })
-export class ProfileViewComponent implements OnInit {
+export class ProfileViewComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   user: User | null = null;
   tiritos: Tirito[] = [];
   loading = true;
@@ -72,7 +75,7 @@ export class ProfileViewComponent implements OnInit {
     const isOwn = this.authService.currentUser?.id === userId;
     const obs = isOwn ? this.profileService.getMyProfile() : this.profileService.getProfile(userId);
 
-    obs.subscribe({
+    obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (user) => {
         this.user = user;
         this.loading = false;
@@ -102,7 +105,7 @@ export class ProfileViewComponent implements OnInit {
 
     // Si es el propio perfil, usar el endpoint /me para obtener todos los tiritos (incluidos cerrados)
     if (this.isOwnProfile) {
-      this.tiritosService.getMyTiritos().subscribe({
+      this.tiritosService.getMyTiritos().pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           this.tiritos = response.data || [];
           this.loadingTiritos = false;
@@ -119,7 +122,7 @@ export class ProfileViewComponent implements OnInit {
     }
 
     // Perfil público: obtener tiritos por creatorId (incluye cerrados)
-    this.tiritosService.getTiritosByCreator(this.user.id, 1, 12).subscribe({
+    this.tiritosService.getTiritosByCreator(this.user.id, 1, 12).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         this.tiritos = response.data || [];
         this.loadingTiritos = false;
@@ -137,7 +140,7 @@ export class ProfileViewComponent implements OnInit {
   // Cargar info de ratings para un tirito específico
   loadTiritoRatings(tiritoId: string): void {
     this.tiritoRatings[tiritoId] = { givenRating: null, receivedRating: null, counterpartName: null, loading: true };
-    this.ratingService.getRatingsForTirito(tiritoId).subscribe({
+    this.ratingService.getRatingsForTirito(tiritoId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         this.tiritoRatings[tiritoId] = {
           givenRating: res.givenRating,
@@ -157,7 +160,7 @@ export class ProfileViewComponent implements OnInit {
     const info = this.tiritoRatings[tiritoId];
     if (!info) return;
     info.requestingRating = true;
-    this.ratingService.requestRating(tiritoId).subscribe({
+    this.ratingService.requestRating(tiritoId).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         info.requestingRating = false;
         this.snackBar.open('Solicitud de valoración enviada', undefined, { duration: 3000 });
@@ -172,12 +175,12 @@ export class ProfileViewComponent implements OnInit {
 
   // Cargar resumen y reseñas del usuario
   loadRatings(userId: string): void {
-    this.ratingService.getSummary(userId).subscribe({
+    this.ratingService.getSummary(userId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => this.ratingSummary = res,
       error: () => this.ratingSummary = {}
     });
 
-    this.ratingService.getRatingsForUser(userId).subscribe({
+    this.ratingService.getRatingsForUser(userId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res: any) => this.ratings = res.data || [],
       error: () => this.ratings = []
     });
@@ -208,7 +211,7 @@ export class ProfileViewComponent implements OnInit {
       targetId: this.user.id,
       score: draft.score,
       comment: draft.comment
-    }).subscribe({
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: () => {
         draft.submitting = false;
         this.showRatingForm[tirito.id] = false;
@@ -230,11 +233,11 @@ export class ProfileViewComponent implements OnInit {
       data: { tiritoId: tirito.id, targetId: this.user?.id, targetName: this.user?.name }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
       if (!result) return;
       const { score, comment } = result;
       // submit via ratingService
-      this.ratingService.createRating({ tiritoId: tirito.id, targetId: this.user!.id, score, comment }).subscribe({
+      this.ratingService.createRating({ tiritoId: tirito.id, targetId: this.user!.id, score, comment }).pipe(takeUntil(this.destroy$)).subscribe({
         next: () => {
           this.snackBar.open('Valoración enviada', undefined, { duration: 3000 });
           if (this.user) this.loadRatings(this.user.id);
@@ -250,7 +253,7 @@ export class ProfileViewComponent implements OnInit {
   // Intentar cargar tiritos usando un creatorId cuando el perfil no existe
   loadUserTiritosByCreator(creatorId: string): void {
     this.loadingTiritos = true;
-    this.tiritosService.getTiritosByCreator(creatorId, 1, 12).subscribe({
+    this.tiritosService.getTiritosByCreator(creatorId, 1, 12).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         const matches = response.data || [];
         this.tiritos = matches;
@@ -296,7 +299,7 @@ export class ProfileViewComponent implements OnInit {
     this.checkingSensitiveAccess = true;
     
     // Verificar si hay tiritos donde ambos usuarios participan y el estado es 'in_progress' o 'closed'
-    this.tiritosService.checkSharedTiritos(profileUserId).subscribe({
+    this.tiritosService.checkSharedTiritos(profileUserId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         this.canViewSensitiveData = response.hasSharedTiritos;
         this.checkingSensitiveAccess = false;
@@ -353,5 +356,10 @@ export class ProfileViewComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/tiritos']);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, interval, of, Subscription, Subject } from 'rxjs';
-import { tap, switchMap, startWith, catchError } from 'rxjs/operators';
+import { tap, switchMap, startWith, catchError, takeUntil } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { io, Socket } from 'socket.io-client';
 
@@ -59,8 +59,9 @@ export interface NotificationsResponse {
 @Injectable({
   providedIn: 'root'
 })
-export class NotificationService {
+export class NotificationService implements OnDestroy {
   private readonly API_URL = `${environment.apiUrl}/notifications`;
+  private destroy$ = new Subject<void>();
 
   // Contador de no leídas (reactivo)
   private unreadCountSubject = new BehaviorSubject<number>(0);
@@ -80,6 +81,12 @@ export class NotificationService {
   private socket: Socket | null = null;
 
   constructor(private http: HttpClient) {}
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.reset();
+  }
 
   /**
    * Inicia el polling de notificaciones
@@ -119,33 +126,37 @@ export class NotificationService {
 
   private connectSocket(): void {
     try {
-      if (this.socket) return;
+      // Evitar conexiones duplicadas
+      if (this.socket?.connected) return;
+      // Limpiar socket previo si existe
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+        this.socket = null;
+      }
+
       const base = environment.apiUrl.replace(/\/api\/?$/, '');
-      // connect with autoConnect false to control when to register
       const token = localStorage.getItem('tirito_jwt_token');
+      if (!token) return;
+
       this.socket = io(base, { autoConnect: true, auth: { token } });
 
       this.socket.on('connect', () => {
-        // register with current user id if available
         const stored = localStorage.getItem('tirito_user');
-          const token = localStorage.getItem('tirito_jwt_token');
-          if (stored) {
-            const user = JSON.parse(stored);
-            this.socket?.emit('register', user.id || user._id);
-          }
+        if (stored) {
+          const user = JSON.parse(stored);
+          this.socket?.emit('register', user.id || user._id);
+        }
       });
 
       this.socket.on('notification', (payload: any) => {
-        // Push into subjects
         const current = this.notificationsSubject.value || [];
         this.notificationsSubject.next([payload, ...current]);
         const unread = this.unreadCountSubject.value + (payload.read ? 0 : 1);
         this.unreadCountSubject.next(unread);
       });
 
-      // Escuchar mensajes de chat en tiempo real
       this.socket.on('chat_message', (payload: IChatMessageEvent) => {
-        //console.log('Socket: chat_message recibido', payload);
         this.chatMessageSubject.next(payload);
       });
     } catch (err) {
@@ -155,6 +166,7 @@ export class NotificationService {
 
   private disconnectSocket(): void {
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
       this.socket = null;
     }
