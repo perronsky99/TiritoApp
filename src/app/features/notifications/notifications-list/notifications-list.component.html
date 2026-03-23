@@ -16,7 +16,7 @@
       <mat-list>
         <mat-divider></mat-divider>
         <mat-list-item *ngFor="let n of g.items" (click)="open(n)" [class.unread]="!n.read">
-          <mat-icon matListIcon>{{ n.type === 'tirito_interest' ? 'favorite' : (n.type === 'chat_new' ? 'chat_bubble' : 'message') }}</mat-icon>
+          <mat-icon matListIcon>{{ getIcon(n.type) }}</mat-icon>
           <div matLine class="title">{{ n.title }}</div>
           <div matLine class="message">{{ n.message }}</div>
           <div class="meta">{{ n.createdAt | relativeTime }}</div>

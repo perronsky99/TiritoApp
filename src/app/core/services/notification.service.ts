@@ -15,9 +15,17 @@ export interface IChatMessageEvent {
 }
 
 /**
- * Tipos de notificación
+ * Tipos de notificación (alineados con el enum del backend)
  */
-export type NotificationType = 'chat_new' | 'chat_message' | 'tirito_interest';
+export type NotificationType =
+  | 'chat_new'
+  | 'chat_message'
+  | 'tirito_status'
+  | 'tirito_request'
+  | 'request_accepted'
+  | 'request_rejected'
+  | 'rating_request'
+  | 'system';
 
 /**
  * Interface de Notificación

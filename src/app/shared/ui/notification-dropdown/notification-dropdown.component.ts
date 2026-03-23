@@ -100,8 +100,18 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
         return 'chat_bubble';
       case 'chat_message':
         return 'message';
-      case 'tirito_interest':
-        return 'favorite';
+      case 'tirito_status':
+        return 'info';
+      case 'tirito_request':
+        return 'person_add';
+      case 'request_accepted':
+        return 'check_circle';
+      case 'request_rejected':
+        return 'cancel';
+      case 'rating_request':
+        return 'star';
+      case 'system':
+        return 'campaign';
       default:
         return 'notifications';
     }
@@ -113,8 +123,14 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
         return 'primary';
       case 'chat_message':
         return 'accent';
-      case 'tirito_interest':
+      case 'tirito_request':
         return 'warn';
+      case 'request_accepted':
+        return 'primary';
+      case 'request_rejected':
+        return 'warn';
+      case 'rating_request':
+        return 'accent';
       default:
         return '';
     }

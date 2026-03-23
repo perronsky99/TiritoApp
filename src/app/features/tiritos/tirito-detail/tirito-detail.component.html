@@ -95,9 +95,15 @@
             <!-- Non-owner & open -->
             <ng-container *ngIf="!isOwner && tirito.status === 'open'">
               <ng-container *ngIf="!myRequest">
-                <button mat-flat-button color="primary" class="action-primary" (click)="acceptTirito()" [disabled]="actionLoading">
+                <!-- Usuario logueado: botón de solicitud -->
+                <button *ngIf="isLoggedIn" mat-flat-button color="primary" class="action-primary" (click)="acceptTirito()" [disabled]="actionLoading">
                   <mat-icon>send</mat-icon>
                   Solicitar este trabajo
+                </button>
+                <!-- Usuario no logueado: CTA login -->
+                <button *ngIf="!isLoggedIn" mat-flat-button color="primary" class="action-primary" (click)="acceptTirito()">
+                  <mat-icon>login</mat-icon>
+                  Iniciá sesión para solicitar
                 </button>
               </ng-container>
 

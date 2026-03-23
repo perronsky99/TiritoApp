@@ -128,6 +128,20 @@ export class NotificationsListComponent implements OnInit, OnDestroy {
     return d.getFullYear() === y.getFullYear() && d.getMonth() === y.getMonth() && d.getDate() === y.getDate();
   }
 
+  getIcon(type: string): string {
+    switch (type) {
+      case 'chat_new': return 'chat_bubble';
+      case 'chat_message': return 'message';
+      case 'tirito_status': return 'info';
+      case 'tirito_request': return 'person_add';
+      case 'request_accepted': return 'check_circle';
+      case 'request_rejected': return 'cancel';
+      case 'rating_request': return 'star';
+      case 'system': return 'campaign';
+      default: return 'notifications';
+    }
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

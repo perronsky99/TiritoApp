@@ -378,8 +378,18 @@ export class TiritoDetailComponent implements OnInit, OnDestroy {
    * Usuario solicita tomar el trabajo del tirito
    * Envía una solicitud que el creador debe aprobar
    */
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn;
+  }
+
   acceptTirito(): void {
-    if (!this.tirito || !this.authService.isLoggedIn) return;
+    if (!this.tirito) return;
+    if (!this.authService.isLoggedIn) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: `/tiritos/${this.tirito.id}` }
+      });
+      return;
+    }
 
     this.actionLoading = true;
 
