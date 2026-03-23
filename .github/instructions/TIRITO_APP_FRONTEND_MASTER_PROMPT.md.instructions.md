@@ -431,6 +431,19 @@ Si una funcionalidad UI no coincide con lo pedido, es un ERROR.
 
 ---
 
+## PRIORIDAD DE FUENTES DE VERDAD
+
+En caso de conflicto, respetar este orden:
+
+1. Backend real implementado y contratos HTTP reales
+2. Este documento (MASTER PROMPT FRONTEND)
+3. Código existente funcionando en el proyecto
+
+Si una parte de este documento contradice el backend real, prevalece el backend.
+Si una parte del código existente contradice este documento pero funciona y no rompe el backend, pedir confirmación antes de modificar.
+
+---
+
 ## CONTRATO FINAL
 
 Este frontend sirve a usuarios de Tirito App. Se conecta al backend via REST + Socket.IO. No se sobrearquitecta. No se agrega state management externo. No se reescribe sin motivo. **La paleta de colores, la estructura de rutas, los modelos de datos y los flujos aqui documentados son la FUENTE DE VERDAD.** Antes de modificar cualquier aspecto, validar que no contradiga este documento.
