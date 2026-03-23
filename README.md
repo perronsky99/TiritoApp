@@ -1,228 +1,369 @@
-# Tirito App v1.0 – Frontend (Documentación técnica)
+# Tirito App – Frontend
 
-Este documento ofrece una descripción técnica exhaustiva del cliente Angular, pensada para desarrolladores y analistas de sistemas. Cubre arquitectura, responsabilidades de módulos, flujos de datos, integraciones con el backend y procedimientos operativos.
+> Cliente Angular 14 para la plataforma Tirito App.
+> Publicacion, solicitud y gestion de "tiritos" (servicios informales) con chat en tiempo real, notificaciones, calificaciones, sistema de pagos y panel administrativo.
 
-Contenido:
-- Visión general
-- Arquitectura y módulos
-- Componentes y servicios clave
-- Flujo de autenticación y sockets
-- Rutas importantes y vistas administrativas
-- Cómo ejecutar, construir y desplegar
-- Mantenimiento y extensiones
+---
 
-## Visión general
+## Stack
 
-El frontend es una aplicación Angular (v14) que actúa como cliente para la API `BE` y proporciona interfaces para publicar/consumir "tiritos", chat en tiempo real, perfiles de usuario, notificaciones y paneles administrativos (reports/audits).
+| Capa | Tecnologia |
+|------|-----------|
+| Framework | Angular 14.2.0 |
+| UI | Angular Material 14.2.0 + Angular CDK 14.2.0 |
+| Reactivo | RxJS 7.5.0 |
+| Realtime | socket.io-client 4.7.2 |
+| Lenguaje | TypeScript 4.7.4 |
+| Estilos | SCSS + CSS Custom Properties |
+| Build | Angular CLI 14.2.0, Webpack |
+| Deploy | Genezio (configurado via genezio.yaml) |
 
-Puntos de integración con el backend:
-- API REST en `environment.apiUrl` para operaciones CRUD y acciones administrativas.
-- Socket.io para notificaciones y chat en tiempo real (token JWT en handshake).
+---
 
-## Arquitectura y módulos
+## Arquitectura
 
-Estructura principal en `src/app`:
+```
+src/app/
+  core/          Servicios singleton, guards, interceptors, modelos
+  shared/        Componentes UI reutilizables, pipes, data, SharedModule
+  features/      Modulos lazy-loaded por dominio funcional
+  layouts/       Main layout (toolbar + sidenav + drawers)
+```
 
-- `core/` — Servicios singleton y utilidades globales:
-	- `AuthService`: gestión de sesión, token y usuario actual.
-	- `AuthGuard`: protección de rutas.
-	- `AuthInterceptor`: añade `Authorization: Bearer <token>` a llamadas API.
-	- Servicios de dominio: `TiritosService`, `ChatService`, `ReportService`, `AdminService`, `ProfileService`.
+**Integracion con backend:**
+- REST API via `environment.apiUrl` (todas las operaciones CRUD)
+- Socket.IO para notificaciones y chat en tiempo real (JWT en handshake)
+- Proxy en desarrollo: `proxy.conf.json` redirige `/api/*` a `localhost:3000`
 
-- `shared/` — Componentes y utilidades reutilizables:
-	- UI: `ReportModalComponent`, `BanModalComponent`, `LoadingSpinner`, `EmptyState`, `ErrorState`.
-	- Pipes y Material modules agrupados en `SharedModule`.
+---
 
-- `features/` — Funcionalidad por dominio:
-	- `auth/`, `home/`, `tiritos/`, `chat/`, `profile/`, `admin/`, `notifications/`.
+## Modulos y Funcionalidades
 
-- `layouts/` — Componentes de layout (toolbar, sidenav, main layout).
+### Core (singleton – se importa solo en AppModule)
 
-## Componentes y servicios clave (detallado)
+| Servicio | Responsabilidad |
+|----------|----------------|
+| AuthService | Login, registro, logout, token JWT, `currentUser$`, `isAuthenticated()` |
+| TiritosService | CRUD tiritos, can-create, shared, filtros |
+| ChatService | Chats por tirito, mensajes, `unreadCount$` |
+| NotificationService | Notificaciones REST + Socket.IO + polling 30s |
+| RatingService | Calificaciones: crear, pendientes, resumen |
+| TiritoRequestsService | Solicitudes: crear, aceptar, rechazar |
+| ProfileService | Perfil publico y propio |
+| SearchService | Busqueda con cache LRU (50 entries) y dedup |
+| PaymentService | Planes, suscripcion, transacciones (MOCK) |
+| FavoritesService | CRUD favoritos |
+| FavoritesStateService | Subject para sync estado de favoritos |
+| ReferralService | Codigo referido, stats, validar |
+| VerificationService | KYC: status, submit documentos |
+| CategoryService | Categorias jerarquicas |
+| CedulaLookupService | Consulta cedula venezolana externa |
+| ReportService | Reportes: crear, listar, acciones admin |
+| AdminService | Auditorias con filtros |
+| AnalyticsService | Tracking local de eventos |
 
-- `ReportModalComponent` (`shared/ui/report-modal`): modal que envía un POST a `/api/reports` con `{ targetId, category, description }`.
-- `BanModalComponent` (`shared/ui/ban-modal`): modal administrativo que recopila `durationHours`, `reason` y `permanent` y retorna payload al `AdminReportsComponent`.
-- `AdminReportsComponent` (`features/admin/admin-reports`): lista reportes y botones para ejecutar acciones (`ban`, `unban`, `user_block`) que llaman a `ReportService.actionReport(reportId, payload)`.
-- `AdminAuditsComponent` (`features/admin/admin-audits`): vista para listar registros de auditoría, con filtros para actor, target, acción y rango de fechas.
+| Guard/Interceptor | Funcion |
+|--------------------|---------|
+| AuthGuard | Verifica autenticacion, redirige a `/login?returnUrl=...` |
+| RoleGuard | Verifica rol (ej: `admin`) |
+| AuthInterceptor | Inyecta `Authorization: Bearer <token>`, maneja 401 -> logout |
 
-Servicios relevantes:
-- `ReportService` (`core/services/report.service.ts`): `createReport()`, `listReports()`, `actionReport()`.
-- `AdminService` (`core/services/admin.service.ts`): `listAudits(filters)` para consumir `/api/admin/audits`.
+### Shared (SharedModule)
 
-## Flujos y secuencias importantes
+| Componente | Descripcion |
+|-----------|-------------|
+| LoadingSpinnerComponent | Spinner con mensaje opcional |
+| EmptyStateComponent | Estado vacio con icono y texto |
+| ErrorStateComponent | Estado de error con accion retry |
+| VerificationBadgeComponent | Badge de estado de verificacion KYC |
+| TiritoStatusBadgeComponent | Badge estado del tirito (open/in_progress/closed) |
+| ImageUploadComponent | Upload de imagenes con drag & drop |
+| NotificationDropdownComponent | Dropdown de notificaciones en toolbar |
+| RatingDialogComponent | Dialog calificacion (1-5 estrellas + comentario) |
+| ReportModalComponent | Modal para reportar usuario |
+| BanModalComponent | Modal ban de usuario (admin) |
+| SearchBarComponent | Busqueda con autocomplete y keyboard navigation |
+| FavoritesDrawerComponent | Drawer lateral de favoritos |
 
-1) Reportar usuario desde chat:
-	- Usuario abre `ReportModalComponent` → envía `POST /api/reports` → backend crea `Report` y emite notificaciones según configuración.
+| Pipe | Funcion |
+|------|---------|
+| RelativeTimePipe | "hace 5 minutos", "ayer" |
+| TruncatePipe | Truncar texto a N caracteres |
+| HighlightPipe | Highlight terminos de busqueda con `<mark>` |
 
-2) Admin revisa y banea:
-	- Admin abre `/admin/reports` → lista de reportes (GET `/api/reports`).
-	- Admin abre `BanModalComponent`, completa parámetros → `ReportService.actionReport(reportId,{action:'ban', durationHours, reason})`.
-	- Backend actualiza `User` y crea `Audit`. Frontend refresca la lista y muestra notificación (snackbar).
+| Data | Contenido |
+|------|-----------|
+| venezuela-locations.ts | 24 estados + municipios + tipos documento (V/E) |
 
-3) Notificaciones y chat en tiempo real:
-	- Al autenticarse, `AuthService` expone token y `ChatService` conecta socket: `io(apiSocketUrl, { auth: { token } })`.
-	- Servidor une sockets a sala `user_<userId>` para entregas dirigidas.
+### Features (lazy-loaded)
 
-## Rutas y vistas administrativas
+| Modulo | Ruta base | Componentes |
+|--------|-----------|-------------|
+| Auth | `/login`, `/auth/*` | LoginComponent, RegisterStepperComponent, ForgotPasswordComponent, ResetPasswordComponent |
+| Home | `/` | HomeComponent (landing: ultimos tiritos + categorias + CTA) |
+| Tiritos | `/tiritos` | TiritosListComponent, TiritoDetailComponent, TiritoCreateComponent |
+| Chat | `/chat` | ChatListComponent, ChatConversationComponent |
+| Profile | `/perfil` | ProfileViewComponent, VerificationComponent, ReferralsComponent |
+| Notifications | `/notificaciones` | NotificationsListComponent |
+| Requests | `/solicitudes` | RequestsUnifiedComponent (tabs: recibidas + enviadas) |
+| Ratings | `/ratings` | PendingRatingsComponent |
+| Payments | `/pagos` | PlansComponent (MOCK) |
+| Favorites | `/favoritos` | FavoritesPageComponent |
+| Admin | `/admin` | AdminReportsComponent, AdminAuditsComponent |
 
-- `/admin/reports` — Lista de reportes con acciones (requiere rol `admin`).
-- `/admin/audits` — Lista de logs de auditoría con filtros.
+---
 
-Ambas vistas están dentro del feature `admin` y requieren que el token corresponde a un usuario `role: 'admin'`.
+## Rutas
 
-## Requisitos de entorno y configuración
+### Publicas (sin layout)
 
+| Ruta | Componente |
+|------|-----------|
+| `/login` | LoginComponent |
+| `/auth/register` | RegisterStepperComponent |
+| `/auth/forgot` | ForgotPasswordComponent |
+| `/auth/reset-password` | ResetPasswordComponent |
+
+### Protegidas (MainLayoutComponent)
+
+| Ruta | Componente | Guard |
+|------|-----------|-------|
+| `/` | HomeComponent | – |
+| `/tiritos` | TiritosListComponent | – |
+| `/tiritos/nuevo` | TiritoCreateComponent | AuthGuard |
+| `/tiritos/:id` | TiritoDetailComponent | – |
+| `/chat` | ChatListComponent | AuthGuard |
+| `/chat/:id` | ChatConversationComponent | AuthGuard |
+| `/notificaciones` | NotificationsListComponent | AuthGuard |
+| `/solicitudes` | RequestsUnifiedComponent | AuthGuard |
+| `/ratings` | PendingRatingsComponent | AuthGuard |
+| `/perfil/verificacion` | VerificationComponent | AuthGuard |
+| `/perfil/referidos` | ReferralsComponent | AuthGuard |
+| `/perfil/:id` | ProfileViewComponent | AuthGuard |
+| `/favoritos` | FavoritesPageComponent | AuthGuard |
+| `/pagos/planes` | PlansComponent | AuthGuard |
+| `/admin/reports` | AdminReportsComponent | AuthGuard + RoleGuard(admin) |
+| `/admin/audits` | AdminAuditsComponent | AuthGuard + RoleGuard(admin) |
+| `**` | Redirige a `/` | – |
+
+---
+
+## Endpoints HTTP Consumidos
+
+El frontend se comunica con el backend via REST. Todos los endpoints usan el prefijo configurado en `environment.apiUrl`.
+
+### Autenticacion
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| POST | `/api/auth/login` | AuthService |
+| POST | `/api/auth/register` | AuthService |
+| POST | `/api/auth/password/request` | AuthService |
+| POST | `/api/auth/password/reset` | AuthService |
+
+### Tiritos
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/tiritos` | TiritosService |
+| GET | `/api/tiritos/:id` | TiritosService |
+| GET | `/api/tiritos/me` | TiritosService |
+| GET | `/api/tiritos/can-create` | TiritosService |
+| GET | `/api/tiritos/creator/:id` | TiritosService |
+| GET | `/api/tiritos/shared/:userId` | TiritosService |
+| POST | `/api/tiritos` | TiritosService (FormData multipart) |
+| PATCH | `/api/tiritos/:id/status` | TiritosService |
+
+### Chats y Mensajes
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/chats` | ChatService |
+| GET | `/api/chats/:tiritoId` | ChatService |
+| POST | `/api/chats/:tiritoId/message` | ChatService |
+
+### Solicitudes
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| POST | `/api/tirito-requests` | TiritoRequestsService |
+| GET | `/api/tirito-requests/my` | TiritoRequestsService |
+| GET | `/api/tirito-requests/sent` | TiritoRequestsService |
+| GET | `/api/tirito-requests/tirito/:id/mine` | TiritoRequestsService |
+| GET | `/api/tirito-requests/count` | TiritoRequestsService |
+| PATCH | `/api/tirito-requests/:id/accept` | TiritoRequestsService |
+| PATCH | `/api/tirito-requests/:id/reject` | TiritoRequestsService |
+
+### Calificaciones
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| POST | `/api/ratings` | RatingService |
+| GET | `/api/ratings/user/:userId` | RatingService |
+| GET | `/api/ratings/summary/:userId` | RatingService |
+| GET | `/api/ratings/pending` | RatingService |
+| GET | `/api/ratings/tirito/:tiritoId` | RatingService |
+| POST | `/api/ratings/request` | RatingService |
+
+### Notificaciones
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/notifications` | NotificationService |
+| PATCH | `/api/notifications/:id` | NotificationService |
+| PATCH | `/api/notifications/mark-all` | NotificationService |
+| DELETE | `/api/notifications/:id` | NotificationService |
+
+### Perfil y Usuarios
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/profiles/:userId` | ProfileService |
+| GET | `/api/users/me` | ProfileService |
+
+### Favoritos
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/users/me/favorites` | FavoritesService |
+| POST | `/api/users/me/favorites/:id` | FavoritesService |
+| DELETE | `/api/users/me/favorites/:id` | FavoritesService |
+
+### Pagos (MOCK)
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/payments/plans` | PaymentService |
+| GET | `/api/payments/subscription` | PaymentService |
+| POST | `/api/payments/subscribe` | PaymentService |
+| POST | `/api/payments/cancel` | PaymentService |
+| GET | `/api/payments/transactions` | PaymentService |
+
+### Referidos
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/referrals/code` | ReferralService |
+| GET | `/api/referrals/stats` | ReferralService |
+| POST | `/api/referrals/validate` | ReferralService |
+
+### Verificacion KYC
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/verification/status` | VerificationService |
+| POST | `/api/verification/submit` | VerificationService |
+
+### Categorias
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| GET | `/api/categories` | CategoryService |
+
+### Reportes y Admin
+| Metodo | Endpoint | Servicio |
+|--------|----------|----------|
+| POST | `/api/reports` | ReportService |
+| GET | `/api/reports` | ReportService |
+| POST | `/api/reports/:id/action` | ReportService |
+| GET | `/api/admin/audits` | AdminService |
+
+---
+
+## Tema y Estilos
+
+### Paleta de colores
+| Nombre | Hex | Uso |
+|--------|-----|-----|
+| Primario (Azul) | `#3B82F6` | Botones principales, links, CTA |
+| Acento (Ambar) | `#F59E0B` | Highlights, badges, acciones secundarias |
+| Exito (Esmeralda) | `#10B981` | Confirmaciones, estados positivos |
+| Fondo | `#F8FAFC` | Background general |
+| Texto | `#1E293B` | Texto principal |
+| Muted | `#64748B` | Texto secundario |
+| Borde | `#E2E8F0` | Bordes y separadores |
+| Card | `#FFFFFF` | Background de tarjetas |
+
+### CSS Custom Properties
+```css
+--tirito-blue-500, --tirito-blue-600
+--tirito-amber-500
+--tirito-emerald-500
+--tirito-bg, --tirito-text, --tirito-muted
+--tirito-border, --tirito-card
+--tirito-radius (14px), --tirito-radius-lg (20px)
+--tirito-shadow, --tirito-shadow-md, --tirito-shadow-lg
+```
+
+### Tipografia
+- **Fuente**: 'Inter', 'Roboto', sans-serif
+- **Locale**: `es-VE`
+
+---
+
+## Seguridad
+
+| Medida | Implementacion |
+|--------|---------------|
+| Autenticacion | JWT en localStorage, inyectado via AuthInterceptor |
+| Rutas privadas | AuthGuard verifica token valido |
+| Rutas admin | RoleGuard verifica `role: 'admin'` |
+| Session expiry | 401 -> logout automatico + redirect a login |
+| XSS | DomSanitizer para HTML dinamico, pipes con escape |
+| Validaciones | ReactiveFormsModule: email, password min 8 chars, cedula, edad 18+ |
+| Memory leaks | `takeUntil(destroy$)` en todas las suscripciones |
+| Socket cleanup | Disconnect en ngOnDestroy |
+
+---
+
+## Instalacion
+
+### Requisitos
 - Node.js >= 16
-- npm
-- Variables en `src/environments/environment.ts`:
-	- `apiUrl` — URL base del backend (p. ej. `http://localhost:3000/api`).
+- npm >= 8
+- Backend corriendo en `localhost:3000` (o URL configurada)
 
-## Ejecutar localmente
+### Pasos
 
-1. Instalar dependencias:
 ```bash
+# Clonar repositorio
+git clone <repo-url>
 cd TiritoApp
+
+# Instalar dependencias
 npm install
-```
-2. Ajustar `src/environments/environment.ts` apuntando al backend.
-3. Levantar el frontend:
-```bash
+
+# Desarrollo (con proxy al backend)
 npm start
-```
-4. Abrir `http://localhost:4200`.
+# -> http://localhost:4200
 
-## Construir para producción
-
-```bash
+# Build produccion
 npm run build
+
+# Tests unitarios
+npm test
+
+# Linting
+npm run lint
 ```
 
-## Testing y calidad
+### Configuracion de entorno
 
-- Ejecutar `npm test` para unit tests (si están configurados).
-- Recomendado: añadir E2E (Protractor/Cypress) para flujos críticos (auth, report, admin actions).
-
-## Buenas prácticas operativas
-
-- No almacenar tokens sensibles en sesiones compartidas; usar `localStorage` o `sessionStorage` y limpiar en logout.
-- Validar siempre las respuestas del backend y mostrar mensajes claros al usuario (snackbars o dialogs).
-- Proteger vistas administrativas con `AuthGuard` y comprobaciones del rol en el servidor.
-
-## Extensiones recomendadas
-
-- Añadir paginación en `/api/admin/audits` y UI de auditoría si el volumen es alto.
-- Añadir toasts y confirm dialogs más ricos para las acciones admin.
-
-## Estructura de archivos (resumen)
-
-```
-src/
-	app/
-		core/
-			services/
-			guards/
-			interceptors/
-		shared/
-			ui/
-		features/
-			admin/
-			chat/
-			tiritos/
-		layouts/
-```
-
-## Contribuir
-
-1. Fork -> nueva rama `feature/x`
-2. Añadir tests y documentar cambios
-3. PR con descripción técnica y pasos para QA
-
----
-
-Si quieres, puedo generar además un archivo `DESIGN.md` con diagramas ASCII que describan los flujos (report -> admin -> ban) y la matriz de permisos. ¿Lo genero ahora?
-
----
-
-## Instalación y Uso
-
-1. Clona el repositorio:
-	 ```sh
-	 git clone https://github.com/TU_USUARIO/TiritoApp.git
-	 cd TiritoApp
-	 ```
-2. Instala dependencias:
-	 ```sh
-	 npm install
-	 ```
-3. Inicia el servidor de desarrollo:
-	 ```sh
-	 npm start
-	 ```
-4. Abre [http://localhost:4200](http://localhost:4200) en tu navegador.
-
----
-
-## Scripts Disponibles
-
-- `npm start` – Servidor de desarrollo (Angular Live Server)
-- `npm run build` – Compilar para producción
-- `npm test` – Ejecutar tests unitarios
-- `npm run lint` – Linting de código
-
----
-
-## Módulos y Funcionalidades
-
-### Core
-- **AuthService**: Login, registro, logout, refresh token
-- **AuthGuard**: Protección de rutas
-- **AuthInterceptor**: Inyección de Bearer token, manejo de 401
-- **TiritosService, ChatService, ProfileService, AnalyticsService**
-- **Modelos**: user, tirito, chat, api
-
-### Shared
-- **Componentes**: loading-spinner, empty-state, error-state, verification-badge, tirito-status-badge, image-upload
-- **Pipes**: relative-time, truncate
-
-### Features
-- **Auth**: Login y registro
-- **Home**: Landing page, últimos tiritos
-- **Tiritos**: Listado, detalle, crear tirito
-- **Chat**: Lista de chats, conversación
-- **Profile**: Ver perfil de usuario
-
-### Layouts
-- **MainLayout**: Toolbar, sidenav, router-outlet
-
----
-
-## Estilos y Temas
-
-- SCSS modular
-- Tema Angular Material personalizado
-- Responsive y accesible
-
----
-
-## Ambientes
-
-Configura la URL del backend en `src/environments/environment.ts`:
-
-```ts
+**Desarrollo** (`src/environments/environment.ts`):
+```typescript
 export const environment = {
-	production: false,
-	apiUrl: 'http://localhost:3000/api'
+  production: false,
+  apiUrl: 'http://localhost:3000/api'
+};
+```
+
+**Produccion** (`src/environments/environment.prod.ts`):
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.tirito.app/api'
 };
 ```
 
 ---
 
-## Contribuir
+## Contexto de Negocio
 
-1. Haz un fork del repositorio
-2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
-3. Realiza tus cambios y haz commit
-4. Haz push a tu rama y abre un Pull Request
+- **Pais objetivo**: Venezuela
+- **Tipos de documento**: V (venezolano), E (extranjero)
+- **Monedas**: VES, USD
+- **Datos geograficos**: 24 estados + municipios en `shared/data/venezuela-locations.ts`
+- **Roles**: `user`, `worker`, `business`
+- **Verificacion KYC**: unverified -> pending -> verified / rejected
+- **Planes**: Escalonados con limites de tiritos activos (sistema MOCK en v1)
 
 ---
 
@@ -233,238 +374,3 @@ MIT. Ver archivo LICENSE.md.
 ---
 
 **Desarrollado por el equipo de Tirito App.**
-
-## Table of Contents
-
-* [Versions](#versions)
-* [Demo](#demo)
-* [Quick Start](#quick-start)
-* [Deploy](#deploy)
-* [Documentation](#documentation)
-* [File Structure](#file-structure)
-* [Browser Support](#browser-support)
-* [Resources](#resources)
-* [Reporting Issues](#reporting-issues)
-* [Technical Support or Questions](#technical-support-or-questions)
-* [Licensing](#licensing)
-* [Useful Links](#useful-links)
-
-
-## Versions
-
-[<img src="https://github.com/creativetimofficial/public-assets/blob/master/logos/html-logo.jpg?raw=true" width="60" height="60" />](https://www.creative-tim.com/product/material-dashboard)
-[<img src="https://github.com/creativetimofficial/public-assets/blob/master/logos/angular-logo.jpg?raw=true" width="60" height="60" />](https://www.creative-tim.com/product/material-dashboard-angular2)
-[<img src="https://github.com/creativetimofficial/public-assets/blob/master/logos/vue-logo.jpg?raw=true" width="60" height="60" />](https://www.creative-tim.com/product/vue-material-dashboard)
-[<img src="https://github.com/creativetimofficial/public-assets/blob/master/logos/react-logo.jpg?raw=true" width="60" height="60" />](https://www.creative-tim.com/product/material-dashboard-react)
-
-| HTML | Angular | Vue | React |
-| --- | --- | --- | --- |
-| [![Material Dashboard HTML](https://github.com/creativetimofficial/public-assets/blob/master/material-dashboard-html/material-dashboard.jpg?raw=true)](https://www.creative-tim.com/product/material-dashboard) | [![Material Dashboard Angular](https://github.com/creativetimofficial/public-assets/blob/master/material-dashboard-angular/material-dashboard-angular.jpg?raw=true)](https://www.creative-tim.com/product/material-dashboard-angular2) | [![Vue Material Dashboard ](https://github.com/creativetimofficial/public-assets/blob/master/vue-material-dashboard/vue-material-dashboard.jpg?raw=true)](https://www.creative-tim.com/product/vue-material-dashboard) | [![Material Dashboard React](https://github.com/creativetimofficial/public-assets/blob/master/material-dashboard-react/material-dashboard-react.jpg?raw=true)](https://www.creative-tim.com/product/material-dashboard-react)
-
-## Demo
-
-| Dashboard | User Profile | Tables | Icons | Notifications |
-| --- | --- | --- | --- | --- |
-| [![Start page](https://raw.githubusercontent.com/creativetimofficial/public-assets/master/material-dashboard-angular/dashboard.png?raw=true)](https://demos.creative-tim.com/material-dashboard-angular2/#/dashboard) | [![User profile page](https://raw.githubusercontent.com/creativetimofficial/public-assets/master/material-dashboard-angular/user-profile.png?raw=true)](https://demos.creative-tim.com/material-dashboard-angular2/#/user-profile) | [![Tables page ](https://raw.githubusercontent.com/creativetimofficial/public-assets/master/material-dashboard-angular/tables.png?raw=true)](https://demos.creative-tim.com/material-dashboard-angular2/#/table-list) | [![Icons Page](https://raw.githubusercontent.com/creativetimofficial/public-assets/master/material-dashboard-angular/icons.png?raw=true)](https://demos.creative-tim.com/material-dashboard-angular2/#/maps) | [![Notifications page](https://raw.githubusercontent.com/creativetimofficial/public-assets/master/material-dashboard-angular/notifications.png?raw=true)](https://demos.creative-tim.com/material-dashboard-angular2/#/notifications)
-
-[View More](https://demos.creative-tim.com/material-dashboard-angular2/#/dashboard).
-
-## Quick start
-
-Quick start options:
-
-- [Download from Github](https://github.com/tiniestory/material-dashboard-angular2/archive/master.zip).
-- [Download from Creative Tim](http://www.creative-tim.com/product/material-dashboard-angular2).
-
-## Deploy
-
-:rocket: You can deploy your own version of the template to Genezio with one click:
-
-[![Deploy to Genezio](https://raw.githubusercontent.com/Genez-io/graphics/main/svg/deploy-button.svg)](https://app.genez.io/start/deploy?repository=https://github.com/creativetimofficial/material-dashboard-angular2&utm_source=github&utm_medium=referral&utm_campaign=github-creativetim&utm_term=deploy-project&utm_content=button-head)
-
-## Terminal Commands
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0 and angular 4.x.
-
-1. Install NodeJs from [NodeJs Official Page](https://nodejs.org/en).
-2. Open Terminal
-3. Go to your file project
-4. Make sure you have installed [Angular CLI](https://github.com/angular/angular-cli) already. If not, please install.
-5. Run in terminal: ```npm install```
-6. Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
-
-### What's included
-
-Within the download you'll find the following directories and files:
-
-```
-material-dashboard-angular
-├── CHANGELOG.md
-├── LICENSE.md
-├── README.md
-├── angular-cli.json
-├── documentation
-├── e2e
-├── karma.conf.js
-├── package-lock.json
-├── package.json
-├── protractor.conf.js
-├── src
-│   ├── app
-│   │   ├── app.component.css
-│   │   ├── app.component.html
-│   │   ├── app.component.spec.ts
-│   │   ├── app.component.ts
-│   │   ├── app.module.ts
-│   │   ├── app.routing.ts
-│   │   ├── components
-│   │   │   ├── components.module.ts
-│   │   │   ├── footer
-│   │   │   │   ├── footer.component.css
-│   │   │   │   ├── footer.component.html
-│   │   │   │   ├── footer.component.spec.ts
-│   │   │   │   └── footer.component.ts
-│   │   │   ├── navbar
-│   │   │   │   ├── navbar.component.css
-│   │   │   │   ├── navbar.component.html
-│   │   │   │   ├── navbar.component.spec.ts
-│   │   │   │   └── navbar.component.ts
-│   │   │   └── sidebar
-│   │   │       ├── sidebar.component.css
-│   │   │       ├── sidebar.component.html
-│   │   │       ├── sidebar.component.spec.ts
-│   │   │       └── sidebar.component.ts
-│   │   ├── dashboard
-│   │   │   ├── dashboard.component.css
-│   │   │   ├── dashboard.component.html
-│   │   │   ├── dashboard.component.spec.ts
-│   │   │   └── dashboard.component.ts
-│   │   ├── icons
-│   │   │   ├── icons.component.css
-│   │   │   ├── icons.component.html
-│   │   │   ├── icons.component.spec.ts
-│   │   │   └── icons.component.ts
-│   │   ├── layouts
-│   │   │   └── admin-layout
-│   │   │       ├── admin-layout.component.html
-│   │   │       ├── admin-layout.component.scss
-│   │   │       ├── admin-layout.component.spec.ts
-│   │   │       ├── admin-layout.component.ts
-│   │   │       ├── admin-layout.module.ts
-│   │   │       └── admin-layout.routing.ts
-│   │   ├── maps
-│   │   │   ├── maps.component.css
-│   │   │   ├── maps.component.html
-│   │   │   ├── maps.component.spec.ts
-│   │   │   └── maps.component.ts
-│   │   ├── notifications
-│   │   │   ├── notifications.component.css
-│   │   │   ├── notifications.component.html
-│   │   │   ├── notifications.component.spec.ts
-│   │   │   └── notifications.component.ts
-│   │   ├── table-list
-│   │   │   ├── table-list.component.css
-│   │   │   ├── table-list.component.html
-│   │   │   ├── table-list.component.spec.ts
-│   │   │   └── table-list.component.ts
-│   │   ├── typography
-│   │   │   ├── typography.component.css
-│   │   │   ├── typography.component.html
-│   │   │   ├── typography.component.spec.ts
-│   │   │   └── typography.component.ts
-│   │   ├── upgrade
-│   │   │   ├── upgrade.component.css
-│   │   │   ├── upgrade.component.html
-│   │   │   ├── upgrade.component.spec.ts
-│   │   │   └── upgrade.component.ts
-│   │   └── user-profile
-│   │       ├── user-profile.component.css
-│   │       ├── user-profile.component.html
-│   │       ├── user-profile.component.spec.ts
-│   │       └── user-profile.component.ts
-│   ├── assets
-│   │   ├── css
-│   │   │   └── demo.css
-│   │   ├── img
-│   │   └── scss
-│   │       ├── core
-│   │       └── material-dashboard.scss
-│   ├── environments
-│   ├── favicon.ico
-│   ├── index.html
-│   ├── main.ts
-│   ├── polyfills.ts
-│   ├── styles.css
-│   ├── test.ts
-│   ├── tsconfig.app.json
-│   ├── tsconfig.spec.json
-│   └── typings.d.ts
-├── tsconfig.json
-├── tslint.json
-└── typings
-
-```
-
-## Browser Support
-
-At present, we officially aim to support the last two versions of the following browsers:
-
-<img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/chrome.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/firefox.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/edge.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/safari.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/opera.png" width="64" height="64">
-
-
-
-## Resources
-- Demo: <https://demos.creative-tim.com/material-dashboard-angular2/#/dashboard>
-- Download Page: <https://www.creative-tim.com/product/material-dashboard-angular2>
-- Documentation: <https://demos.creative-tim.com/material-dashboard-angular2/#/documentation/tutorial>
-- License Agreement: <https://www.creative-tim.com/license>
-- Support: <https://www.creative-tim.com/contact-us>
-- Issues: [Github Issues Page](https://github.com/creativetimofficial/material-dashboard-angular2/issues)
-- [Material Kit](https://www.creative-tim.com/product/material-kit?ref=github-mda-free) - For Front End Development
-
-## Reporting Issues
-
-We use GitHub Issues as the official bug tracker for the Material Dashboard. Here are some advices for our users that want to report an issue:
-
-1. Make sure that you are using the latest version of the Material Dashboard. Check the CHANGELOG from your dashboard on our [website](https://www.creative-tim.com/).
-2. Providing us reproducible steps for the issue will shorten the time it takes for it to be fixed.
-3. Some issues may be browser specific, so specifying in what browser you encountered the issue might help.
-
-
-## Technical Support or Questions
-
-If you have questions or need help integrating the product please [contact us](https://www.creative-tim.com/contact-us) instead of opening an issue.
-
-
-
-## Licensing
-
-- Copyright 2018 Creative Tim (https://www.creative-tim.com/)
-
-- Licensed under MIT (https://github.com/creativetimofficial/material-dashboard-angular2/blob/master/LICENSE.md)
-
-
-## Useful Links
-
-- [More products](https://www.creative-tim.com/bootstrap-themes) from Creative Tim
-- [Tutorials](https://www.youtube.com/channel/UCVyTG4sCw-rOvB9oHkzZD1w)
-- [Freebies](https://www.creative-tim.com/bootstrap-themes/free) from Creative Tim
-- [Affiliate Program](https://www.creative-tim.com/affiliates/new) (earn money)
-
-##### Social Media
-
-Twitter: <https://twitter.com/CreativeTim>
-
-Facebook: <https://www.facebook.com/CreativeTim>
-
-Dribbble: <https://dribbble.com/creativetim>
-
-Google+: <https://plus.google.com/+CreativetimPage>
-
-Instagram: <https://www.instagram.com/CreativeTimOfficial>
-
-[CHANGELOG]: ./CHANGELOG.md
-
-[version-badge]: https://img.shields.io/badge/version-2.8.0-blue.svg
