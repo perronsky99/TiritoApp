@@ -407,7 +407,8 @@ Font:                'Inter', 'Roboto', sans-serif
 - NO refactorizar AuthService, Interceptors o Guards sin pedir confirmación
 - NO cambiar estructura de módulos o rutas existentes
 
-Cualquier cambio debe ser ADITIVO, no destructivo. Si es necesario modificar algo, primero validar que no rompa nada y luego agregar el nuevo código sin eliminar el anterior (de ser posible).
+Cualquier cambio debe ser ADITIVO, no destructivo. Si es necesario modificar algo, primero validar impacto y luego aplicar el cambio mínimo necesario.
+No duplicar código ni conservar implementaciones viejas si eso genera conflicto, deuda técnica o comportamiento ambiguo.
 
 ---
 
@@ -443,6 +444,30 @@ Si una parte de este documento contradice el backend real, prevalece el backend.
 Si una parte del código existente contradice este documento pero funciona y no rompe el backend, pedir confirmación antes de modificar.
 
 ---
+
+## REGLA DE MOCKS
+
+Los módulos marcados como MOCK deben conservarse como MOCK hasta nueva instrucción explícita.
+Ejemplo:
+- payment.service.ts
+- features/payments/
+
+No convertir flujos mock en reales sin confirmación explícita.
+No agregar integraciones de pago reales, SDKs ni lógica de cobro.
+
+---
+
+## REGLA DE ALCANCE
+
+Cada tarea debe modificar la menor cantidad posible de archivos.
+
+- Si el cambio puede resolverse en 1 archivo, no tocar más de 1
+- Si requiere 2 o 3 archivos, limitarse a esos
+- No hacer limpiezas, refactors o renombres no solicitados
+- Antes de modificar múltiples archivos, listar cuáles serán tocados y por qué
+
+---
+
 
 ## CONTRATO FINAL
 
